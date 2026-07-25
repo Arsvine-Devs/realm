@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { listenForWebglContextLoss } from '@/features/hud/model/webgl-context-loss';
+import { listenForWebglContextLoss } from '@/shared/lib/webgl-context-loss';
 
 describe('listenForWebglContextLoss', () => {
   it('prevents default handling and reports a canvas failure once', () => {

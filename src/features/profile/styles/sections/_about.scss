@@ -175,17 +175,45 @@
   position: absolute;
   top: 100px;
   right: 70px;
-  width: 12vw;
-  max-width: 300px;
-  min-width: 150px;
-  height: auto;
+  width: clamp(220px, 16vw, 360px);
+  aspect-ratio: 1;
   z-index: 3;
+  pointer-events: none;
 }
 
 .aboutNewImageContainer {
   position: relative;
   width: 100%;
-  height: auto;
+  height: 100%;
+}
+
+.aboutParticleFallback,
+.aboutParticleLayer {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.18s ease-out;
+}
+
+.aboutParticleFallback {
+  opacity: 1;
+}
+
+.aboutParticleFallbackHidden {
+  opacity: 0;
+}
+
+.aboutParticleLayer {
+  opacity: 0;
+}
+
+.aboutParticleLayerVisible {
+  opacity: 1;
+}
+
+.aboutParticleCanvas {
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
 }
 
 .aboutNewImageBase {
@@ -193,7 +221,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: contain;
 }
 
@@ -213,7 +241,7 @@
     position: relative;
     top: auto;
     right: auto;
-    width: min(200px, 50%);
+    width: min(260px, 60%);
     margin: 20px 0;
   }
 }

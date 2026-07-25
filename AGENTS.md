@@ -86,6 +86,7 @@ Read [`docs/GOTCHAS.md`](./docs/GOTCHAS.md) before editing:
 - protected blog post auth state machine (`src/features/blog/model/useBlogPostState.ts`);
 - route loading overlay placement;
 - avatar reveal/parallax layer separation and performance-tier cleanup;
+- About image particle visibility, sequence, and static fallback;
 - blog reveal animation and `<Explain>` tooltip stacking;
 - music player track-switch behavior;
 - mobile music-player auto-open guard;

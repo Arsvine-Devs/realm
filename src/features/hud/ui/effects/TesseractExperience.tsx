@@ -11,7 +11,7 @@ import {
   resolveBatteryWorldPosition,
   type BatteryPosition3D,
 } from '@/features/hud/model/tesseract-geometry';
-import { listenForWebglContextLoss } from '@/features/hud/model/webgl-context-loss';
+import { listenForWebglContextLoss } from '@/shared/lib/webgl-context-loss';
 
 function resolvePhysicsMesh(tesseractRef: React.RefObject<TesseractHandle | null>) {
   return tesseractRef.current?.meshRef.current ?? null;

@@ -233,6 +233,12 @@ pnpm-workspace.yaml: patches/@react-three__fiber@9.6.1.patch
 
 升级时重新 `pnpm patch`、更新精确版本和 patch key，并保持 `tests/repo/react-three-fiber-timer-patch.test.ts` 通过。
 
+## 30. About 图片粒子必须保留静态 fallback
+
+`AboutParticleImage` 只在桌面 `full` tier 且首次进入视口后创建 R3F Canvas。离开视口或页面隐藏时暂停 demand frameloop 和轮换 timer；重新进入时保持已组装状态，不重复 intro。
+
+静态 normal/inverted 图片必须始终留在 DOM 中，并覆盖移动端、非 full tier、700ms readiness timeout、动态 import/图片加载失败和 WebGL context loss。序列源的缓存键必须包含 `src` 与 `sampleSize`，否则相同图片使用不同采样分辨率时会复用错误数据。
+
 ## 维护本文件
 
 只记录已经发生且需要保留特殊实现/测试的项目陷阱。通用开发说明放入对应专题；新条目包含原因、禁止做法、必需行为和回归测试。

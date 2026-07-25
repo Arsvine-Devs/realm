@@ -63,6 +63,7 @@ styles/
 ## 反模式
 
 - **不要**把 Logo 揭示和视差重新合并到一个元素。`logoReveal` 独占 `revealLogo` 的 `forwards` transform，嵌套 `logoMotion` 独占 rAF transform；全尺寸 `logoContainer` 不得添加 filter/drop-shadow，也不再使用 inline `!important` 覆盖关键帧。
+- **不要**把 About 图片的粒子 Canvas 当作静态图的唯一渲染路径。`aboutParticleFallback` 必须覆盖未进入视口、非 full tier、移动端、readiness timeout、资源错误和 WebGL context loss。
 - **不要**给会接收 `<Explain>` 工具提示的容器加 `transform`（会创建 stacking context，工具提示被困在原段落内）。`pages/[locale]/blog/[slug].tsx` 的 IntersectionObserver 在 `transitionend` 时显式把 `transform` 设回 `'none'`（**不是** `''`，空串会回到 SCSS 初始值）。
 - **不要**用 `--font-display` 渲染任何会出现在用户输入或多语言内容里的文本（见上方"历史教训"）。
 - **不要**在组件 SCSS 里硬编码颜色 hex，先看 `globals.scss` 是否已有变量；新增颜色时也加变量，不要直接用色值。

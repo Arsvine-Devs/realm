@@ -122,6 +122,8 @@ patches/@react-three__fiber@9.6.1.patch
 - Logo reveal wrapper 限制在 artwork 方形区域。
 - pointer parallax 与 reveal transform 分层。
 - chromatic effect 使用 mask、transform 和 opacity。
+- About 图片粒子只在桌面 `full` tier 且进入视口后挂载；Canvas 使用 `frameloop="demand"`，离开视口、页面隐藏或动画/交互回位结束后停止渲染。
+- About 静态图片 fallback 始终保留，性能降级、readiness timeout、资源错误和 WebGL context loss 时不得留下空白。
 - 不在全左面板添加 filter/drop-shadow 合成层。
 - capability off 时通过 CSS attribute 关闭 expensive effect。
 - 不用 `will-change` 覆盖整个 viewport 或长期保留无用 layer。

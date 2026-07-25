@@ -34,7 +34,13 @@ describe('responsive style migration', () => {
   it('keeps About mobile panel and decorative-image overrides with the profile feature', async () => {
     const source = await readStyle('src/features/profile/styles/sections/_about.scss');
 
+    expect(source).toMatch(
+      /\.aboutNewImageWrapper[\s\S]*width: clamp\(220px, 16vw, 360px\)/,
+    );
     expect(source).toMatch(/@include breakpoints\.tablet-down[\s\S]*\.aboutNewImageWrapper[\s\S]*position: relative/);
+    expect(source).toMatch(
+      /@include breakpoints\.tablet-down[\s\S]*\.aboutNewImageWrapper[\s\S]*width: min\(260px, 60%\)/,
+    );
     expect(source).toMatch(/@include breakpoints\.mobile[\s\S]*\.contentSection\.aboutSection[\s\S]*padding: 20px 16px 80px/);
   });
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { listenForWebglContextLoss } from '@/features/hud/model/webgl-context-loss';
+import { listenForWebglContextLoss } from '@/shared/lib/webgl-context-loss';
 
 interface RainMorimeEffectProps {
   onContextLost: () => void;

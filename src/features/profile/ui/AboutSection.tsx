@@ -2,10 +2,15 @@
 import { useTranslations } from 'next-intl';
 import styles from '../styles/ProfileSections.module.scss';
 import Noise from '../../hud/ui/effects/Noise';
+import AboutParticleImage from './AboutParticleImage';
 import { siteConfig } from '@/shared/config/site';
 import { defaultLocale, isLocale } from '@/shared/contracts/locale';
 import { useTransition } from '../../navigation/model/TransitionProvider';
-import { useHudPerformance, useHudStats } from '../../hud/model/HudProvider';
+import {
+  useHudPerformance,
+  useHudPower,
+  useHudStats,
+} from '../../hud/model/HudProvider';
 import { useSiteAssets } from '../../assets/model/SiteAssetsProvider';
 import useVisitorLanguageCode from '@/shared/hooks/useVisitorLanguageCode';
 import type { RefObject } from 'react';
@@ -24,7 +29,8 @@ export default function AboutSection({
   const { query } = useNavigationRuntime();
   const { navigateTo } = useTransition();
   const { runtime, currentVisitDuration } = useHudStats();
-  const { allowDecorativeMotion } = useHudPerformance();
+  const { allowDecorativeMotion, performanceTier } = useHudPerformance();
+  const { isInverted } = useHudPower();
   const { getSiteAssetUrl } = useSiteAssets();
   const visitorLanguageCode = useVisitorLanguageCode();
   const queryLocale = query.locale;
@@ -69,22 +75,10 @@ export default function AboutSection({
           />
         </div>
       </div>
-      <div className={styles.aboutNewImageWrapper} aria-hidden="true">
-        <div className={styles.aboutNewImageContainer}>
-          <img
-            src="/icons/android-chrome-512x512.png"
-            alt=""
-            className={`${styles.aboutNewImageBase} ${styles.aboutNewImageNormal}`}
-            draggable={false}
-          />
-          <img
-            src="/icons/android-chrome-512x512.png"
-            alt=""
-            className={`${styles.aboutNewImageBase} ${styles.aboutNewImageInverted}`}
-            draggable={false}
-          />
-        </div>
-      </div>
+      <AboutParticleImage
+        enabled={performanceTier === 'full'}
+        inverted={isInverted}
+      />
     </div>
   );
 }
