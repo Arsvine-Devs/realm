@@ -75,18 +75,26 @@ describe('fetchGitHubContent', () => {
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
     const { fetchGitHubContent } = await import('@/shared/lib/content/github');
-    await expect(fetchGitHubContent('https://evil.test/owned')).rejects.toThrow(/Invalid content path/);
+    await expect(fetchGitHubContent('https://evil.test/owned')).rejects.toThrow(
+      /Invalid content path/,
+    );
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('throws on 404 with status info in the message', async () => {
-    vi.stubGlobal('fetch', async () => new Response('nope', { status: 404, statusText: 'Not Found' }));
+    vi.stubGlobal(
+      'fetch',
+      async () => new Response('nope', { status: 404, statusText: 'Not Found' }),
+    );
     const { fetchGitHubContent } = await import('@/shared/lib/content/github');
     await expect(fetchGitHubContent('blog/init.mdx')).rejects.toThrow(/404/);
   });
 
   it('throws on 500', async () => {
-    vi.stubGlobal('fetch', async () => new Response('boom', { status: 500, statusText: 'Server Error' }));
+    vi.stubGlobal(
+      'fetch',
+      async () => new Response('boom', { status: 500, statusText: 'Server Error' }),
+    );
     const { fetchGitHubContent } = await import('@/shared/lib/content/github');
     await expect(fetchGitHubContent('blog/init.mdx')).rejects.toThrow(/500/);
   });
@@ -105,9 +113,12 @@ describe('fetchGitHubContent', () => {
   });
 
   it('forwards non-timeout errors unchanged', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => {
-      throw new TypeError('network gone');
-    }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new TypeError('network gone');
+      }),
+    );
     const { fetchGitHubContent } = await import('@/shared/lib/content/github');
     await expect(fetchGitHubContent('blog/init.mdx')).rejects.toThrow(/network gone/);
   });
@@ -131,7 +142,10 @@ describe('getContentBlogIndex', () => {
   });
 
   it('returns the bundled fallback index on 404 (fresh private repos)', async () => {
-    vi.stubGlobal('fetch', async () => new Response('missing', { status: 404, statusText: 'Not Found' }));
+    vi.stubGlobal(
+      'fetch',
+      async () => new Response('missing', { status: 404, statusText: 'Not Found' }),
+    );
     const { getContentBlogIndex } = await import('@/shared/lib/content/github');
     const index = await getContentBlogIndex();
     expect(index.posts).toHaveLength(1);
@@ -140,11 +154,12 @@ describe('getContentBlogIndex', () => {
   });
 
   it('caches the index within TTL', async () => {
-    const fetchMock = vi.fn(async () =>
-      new Response(JSON.stringify({ version: 1, updatedAt: 'x', posts: [] }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }),
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ version: 1, updatedAt: 'x', posts: [] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
     );
     vi.stubGlobal('fetch', fetchMock);
     const { getContentBlogIndex } = await import('@/shared/lib/content/github');
@@ -155,10 +170,14 @@ describe('getContentBlogIndex', () => {
   });
 
   it('falls back to bundled content when the remote index shape is invalid', async () => {
-    vi.stubGlobal('fetch', async () => new Response(JSON.stringify({ version: 1, posts: [] }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    }));
+    vi.stubGlobal(
+      'fetch',
+      async () =>
+        new Response(JSON.stringify({ version: 1, posts: [] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+    );
     const { getContentBlogIndex } = await import('@/shared/lib/content/github');
 
     await expect(getContentBlogIndex()).resolves.toMatchObject({
@@ -172,9 +191,12 @@ describe('getContentBlogIndex', () => {
     const fetchMock = vi.fn(async () => {
       callCount += 1;
       if (callCount === 1) {
-        return new Response(JSON.stringify({ version: 1, updatedAt: 'x', posts: [{ slug: 'init' }] }), {
-          status: 200,
-        });
+        return new Response(
+          JSON.stringify({ version: 1, updatedAt: 'x', posts: [{ slug: 'init' }] }),
+          {
+            status: 200,
+          },
+        );
       }
       return new Response('boom', { status: 500, statusText: 'Server Error' });
     });

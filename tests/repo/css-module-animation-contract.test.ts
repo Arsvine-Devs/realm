@@ -30,12 +30,11 @@ const animationKeywords = new Set([
   'unset',
 ]);
 
-const stripComments = (source: string) => source
-  .replace(/\/\*[\s\S]*?\*\//g, '')
-  .replace(/\/\/.*$/gm, '');
+const stripComments = (source: string) =>
+  source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
 
-const listCssModules = (directory: string): string[] => readdirSync(directory, { withFileTypes: true })
-  .flatMap((entry) => {
+const listCssModules = (directory: string): string[] =>
+  readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const entryPath = path.join(directory, entry.name);
     if (entry.isDirectory()) return listCssModules(entryPath);
     return entry.name.endsWith('.module.scss') ? [entryPath] : [];
@@ -117,7 +116,10 @@ const collectAnimationReferences = (source: string): Set<string> => {
 
   for (const match of source.matchAll(/\banimation-name\s*:\s*([^;{}]+)/g)) {
     for (const value of splitTopLevelCommas(match[1])) {
-      const name = value.trim().replace(/!important$/, '').trim();
+      const name = value
+        .trim()
+        .replace(/!important$/, '')
+        .trim();
       if (name && !animationKeywords.has(name)) references.add(name);
     }
   }

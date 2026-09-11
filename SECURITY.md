@@ -8,13 +8,13 @@ Arsvine Realm is a personal website and content system. It does not provide a pu
 
 Security reports are accepted for the current production version of the site and the latest code on the default branch.
 
-| Target | Supported |
-| --- | --- |
-| Current production site | Yes |
-| Latest default branch | Yes |
-| Preview deployments created by this repository | Limited |
-| Archived branches or old experimental branches | No |
-| Third-party services such as GitHub, Vercel, Cloudflare, or analytics providers | No |
+| Target                                                                          | Supported |
+| ------------------------------------------------------------------------------- | --------- |
+| Current production site                                                         | Yes       |
+| Latest default branch                                                           | Yes       |
+| Preview deployments created by this repository                                  | Limited   |
+| Archived branches or old experimental branches                                  | No        |
+| Third-party services such as GitHub, Vercel, Cloudflare, or analytics providers | No        |
 
 Preview deployments are considered in scope only when the issue is caused by this repository's code or configuration. Vulnerabilities in third-party platforms should be reported to the relevant vendor instead.
 
@@ -108,12 +108,12 @@ Good-faith security research is welcome when it is limited, responsible, and doe
 
 Please do not:
 
-* perform denial-of-service testing
-* access or exfiltrate private content
-* modify site content or repository data
-* attempt persistence or privilege escalation beyond what is necessary to demonstrate the issue
-* use automated high-volume scanners against the production site
-* publicly disclose the vulnerability before it has been addressed
+- perform denial-of-service testing
+- access or exfiltrate private content
+- modify site content or repository data
+- attempt persistence or privilege escalation beyond what is necessary to demonstrate the issue
+- use automated high-volume scanners against the production site
+- publicly disclose the vulnerability before it has been addressed
 
 ## No Bug Bounty
 

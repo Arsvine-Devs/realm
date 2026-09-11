@@ -28,8 +28,7 @@ interface ExplainProps {
   note: string;
 }
 
-const useIsomorphicLayoutEffect =
-  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export default function Explain({ children, note }: ExplainProps) {
   const [open, setOpen] = useState(false);
@@ -90,6 +89,7 @@ export default function Explain({ children, note }: ExplainProps) {
     <span className={styles.explainWrapper} ref={ref}>
       <span
         ref={triggerRef}
+        /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- an inline button element changes line wrapping for explained prose. */
         role="button"
         tabIndex={0}
         className={styles.explainTrigger}
@@ -122,5 +122,3 @@ export default function Explain({ children, note }: ExplainProps) {
     </span>
   );
 }
-
-

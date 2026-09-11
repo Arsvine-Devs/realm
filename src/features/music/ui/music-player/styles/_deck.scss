@@ -73,14 +73,18 @@
   &::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background:
-      repeating-linear-gradient( // 扫描线条纹
+      repeating-linear-gradient(
+        // 扫描线条纹
         to bottom,
         transparent 0px,
         transparent 2px,
-        rgba(0,0,0,0.15) 2px,
-        rgba(0,0,0,0.15) 4px
+        rgba(0, 0, 0, 0.15) 2px,
+        rgba(0, 0, 0, 0.15) 4px
       ),
       var(--ark-highlight-green); // 绿色底色
     opacity: 0.7;
@@ -95,12 +99,14 @@
   &::after {
     content: '';
     position: absolute;
-    top: 50%; left: 50%;
-    width: 16px; height: 16px;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
     transform: translate(-50%, -50%);
     background: transparent;
     border-radius: 50%;
-    box-shadow: 0 0 0 999px rgba(0,0,0,0.0); // CSS Hack 保证中心透明
+    box-shadow: 0 0 0 999px rgba(0, 0, 0, 0); // CSS Hack 保证中心透明
     z-index: 2;
   }
 }
@@ -110,7 +116,7 @@
   position: absolute;
   right: 58px; // 根据唱盘位置和唱臂尺寸精确计算的右侧定位
   bottom: 185px; // 精确计算的底部定位
-  width: 1px;  // 容器本身尺寸不重要，作为旋转中心
+  width: 1px; // 容器本身尺寸不重要，作为旋转中心
   height: 1px;
   transform-origin: top center; // 旋转中心点 (容器的顶部中心)
   transition: transform 0.4s ease-in-out; // 唱臂放下/抬起动画
@@ -129,6 +135,9 @@
   width: 26px;
   height: 165px;
   background-color: transparent; // 透明，仅作为热区
+  border: 0;
+  padding: 0;
+  font: inherit;
   cursor: none;
   z-index: 6; // 确保在唱臂实体之上
 }
@@ -178,7 +187,8 @@
 // 低电量时唱臂样式 (边框、唱针、底座变为绿色)
 .tonearmLowPower {
   border-color: var(--ark-highlight-green);
-  &::after, &::before {
+  &::after,
+  &::before {
     border-color: var(--ark-highlight-green);
   }
 }

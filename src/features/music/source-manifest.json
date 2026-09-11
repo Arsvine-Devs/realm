@@ -1,7 +1,32 @@
 [
-  { "file": "dont-be-so-serious.m4a", "id": "dont-be-so-serious", "title": "Don't Be So Serious", "artist": "Low Roar" },
-  { "file": "jane-doe.m4a", "id": "jane-doe", "title": "Jane Doe", "artist": "米津玄師、宇多田ヒカル" },
-  { "file": "never-feat-evil-neuro.m4a", "id": "never-feat-evil-neuro", "title": "NEVER (feat. Evil Neuro)", "artist": "Neuro-sama" },
-  { "file": "somniomancer-null-set.m4a", "id": "somniomancer-null-set", "title": "Somniomancer (Null Set)", "artist": "Monster Siren Records, Crywolf" },
-  { "file": "vermilion.m4a", "id": "vermilion", "title": "Vermilion", "artist": "Metal Scar Records" }
+  {
+    "file": "dont-be-so-serious.m4a",
+    "id": "dont-be-so-serious",
+    "title": "Don't Be So Serious",
+    "artist": "Low Roar"
+  },
+  {
+    "file": "jane-doe.m4a",
+    "id": "jane-doe",
+    "title": "Jane Doe",
+    "artist": "米津玄師、宇多田ヒカル"
+  },
+  {
+    "file": "never-feat-evil-neuro.m4a",
+    "id": "never-feat-evil-neuro",
+    "title": "NEVER (feat. Evil Neuro)",
+    "artist": "Neuro-sama"
+  },
+  {
+    "file": "somniomancer-null-set.m4a",
+    "id": "somniomancer-null-set",
+    "title": "Somniomancer (Null Set)",
+    "artist": "Monster Siren Records, Crywolf"
+  },
+  {
+    "file": "vermilion.m4a",
+    "id": "vermilion",
+    "title": "Vermilion",
+    "artist": "Metal Scar Records"
+  }
 ]

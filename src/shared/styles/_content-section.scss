@@ -5,7 +5,8 @@
   margin-bottom: 10vh;
   min-height: 100vh;
   scroll-margin-top: 0;
-  padding: var(--spacing-section-top) var(--spacing-section-pad) clamp(40px, 5vw, 80px) var(--spacing-section-pad);
+  padding: var(--spacing-section-top) var(--spacing-section-pad) clamp(40px, 5vw, 80px)
+    var(--spacing-section-pad);
   display: flex;
   flex-direction: column;
   align-items: flex-start;

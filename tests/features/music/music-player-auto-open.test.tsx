@@ -15,15 +15,28 @@ vi.mock('@/features/navigation/model/NavigationRuntime', () => ({
 }));
 vi.mock('@/features/music/ui/music-player/useMusicPlayerState', () => ({
   useMusicPlayerState: () => ({
-    audioRef: { current: null }, currentTrack: null, currentTrackIndex: -1,
-    handleAudioError: vi.fn(), handleNext: vi.fn(), handlePrev: vi.fn(), isPlaying: false,
-    progressPercent: 0, selectTrack: vi.fn(), shouldPreloadMetadata: false, syncPlayState: vi.fn(),
+    audioRef: { current: null },
+    currentTrack: null,
+    currentTrackIndex: -1,
+    handleAudioError: vi.fn(),
+    handleNext: vi.fn(),
+    handlePrev: vi.fn(),
+    isPlaying: false,
+    progressPercent: 0,
+    selectTrack: vi.fn(),
+    shouldPreloadMetadata: false,
+    syncPlayState: vi.fn(),
   }),
 }));
 vi.mock('@/features/music/ui/music-player/useVinylDrag', () => ({
   useVinylDrag: () => ({
-    dragOffsetX: 0, incomingTrack: null, incomingTrackIndex: -1, incomingTrackOffsetX: 0,
-    isDragging: false, setVinylContainer: vi.fn(), startDrag: vi.fn(),
+    dragOffsetX: 0,
+    incomingTrack: null,
+    incomingTrackIndex: -1,
+    incomingTrackOffsetX: 0,
+    isDragging: false,
+    setVinylContainer: vi.fn(),
+    startDrag: vi.fn(),
   }),
 }));
 vi.mock('@/features/music/ui/music-player/VinylDeck', () => ({ default: () => null }));
@@ -36,7 +49,10 @@ describe('MusicPlayer desktop auto-open', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     responsiveMock.mockReturnValue({ isMobile: false });
-    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ items: [] }), { status: 200 })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(JSON.stringify({ items: [] }), { status: 200 })),
+    );
   });
 
   afterEach(() => {

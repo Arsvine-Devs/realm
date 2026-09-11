@@ -12,9 +12,18 @@ export interface Point2D {
 }
 
 const CUBE_EDGES = [
-  [0, 1], [1, 3], [3, 2], [2, 0],
-  [4, 5], [5, 7], [7, 6], [6, 4],
-  [0, 4], [1, 5], [2, 6], [3, 7],
+  [0, 1],
+  [1, 3],
+  [3, 2],
+  [2, 0],
+  [4, 5],
+  [5, 7],
+  [7, 6],
+  [6, 4],
+  [0, 4],
+  [1, 5],
+  [2, 6],
+  [3, 7],
 ] as const;
 
 export const TESSERACT_EDGES: ReadonlyArray<readonly [number, number]> = [
@@ -28,11 +37,13 @@ export function createTesseractVertices(outerSize = 0.4, innerSize = 0.2) {
   for (const size of [outerSize, innerSize]) {
     const half = size / 2;
     for (let index = 0; index < 8; index += 1) {
-      vertices.push(new THREE.Vector3(
-        (index & 1 ? 1 : -1) * half,
-        (index & 2 ? 1 : -1) * half,
-        (index & 4 ? 1 : -1) * half,
-      ));
+      vertices.push(
+        new THREE.Vector3(
+          (index & 1 ? 1 : -1) * half,
+          (index & 2 ? 1 : -1) * half,
+          (index & 4 ? 1 : -1) * half,
+        ),
+      );
     }
   }
   return vertices;
@@ -55,16 +66,16 @@ export function resolveBatteryAnchorPosition(
   iconRect: DOMRect,
 ): BatteryPosition3D | null {
   if (
-    canvasRect.width <= 0
-    || canvasRect.height <= 0
-    || iconRect.width <= 0
-    || iconRect.height <= 0
+    canvasRect.width <= 0 ||
+    canvasRect.height <= 0 ||
+    iconRect.width <= 0 ||
+    iconRect.height <= 0
   ) {
     return null;
   }
 
-  const relativeX = (iconRect.right + 4) - canvasRect.left;
-  const relativeY = (iconRect.top + iconRect.height / 2) - canvasRect.top;
+  const relativeX = iconRect.right + 4 - canvasRect.left;
+  const relativeY = iconRect.top + iconRect.height / 2 - canvasRect.top;
 
   return {
     x: (relativeX / canvasRect.width) * 2 - 1,

@@ -67,7 +67,7 @@ const RainMorimeEffect = ({ onContextLost }: RainMorimeEffectProps) => {
       time: { value: 0.0 },
       scanlineIntensity: { value: 0.6 },
       glitchIntensity: { value: 0.2 },
-      noiseIntensity: { value: 0.15 }
+      noiseIntensity: { value: 0.15 },
     };
     const material = new THREE.ShaderMaterial({
       uniforms,
@@ -75,7 +75,7 @@ const RainMorimeEffect = ({ onContextLost }: RainMorimeEffectProps) => {
       fragmentShader,
       transparent: true,
       depthTest: false,
-      depthWrite: false
+      depthWrite: false,
     });
 
     const geometry = new THREE.PlaneGeometry(2, 2);
@@ -143,7 +143,7 @@ const RainMorimeEffect = ({ onContextLost }: RainMorimeEffectProps) => {
     width: '100%',
     height: '100%',
     zIndex: -1, // 确保在其他内容后面
-    pointerEvents: 'none' // 不响应鼠标事件
+    pointerEvents: 'none', // 不响应鼠标事件
   };
 
   return <div ref={mountRef} style={style} />;

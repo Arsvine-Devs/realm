@@ -12,14 +12,17 @@ export default function useNavigationIntentPrefetch() {
   const { prefetch } = useNavigationRuntime();
   const prefetchedUrlsRef = useRef(new Set<string>());
 
-  return useCallback((url: string) => {
-    if (process.env.NODE_ENV !== 'production' || prefetchedUrlsRef.current.has(url)) {
-      return;
-    }
+  return useCallback(
+    (url: string) => {
+      if (process.env.NODE_ENV !== 'production' || prefetchedUrlsRef.current.has(url)) {
+        return;
+      }
 
-    prefetchedUrlsRef.current.add(url);
-    void prefetch(url).catch(() => {
-      prefetchedUrlsRef.current.delete(url);
-    });
-  }, [prefetch]);
+      prefetchedUrlsRef.current.add(url);
+      void prefetch(url).catch(() => {
+        prefetchedUrlsRef.current.delete(url);
+      });
+    },
+    [prefetch],
+  );
 }

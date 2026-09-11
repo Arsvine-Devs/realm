@@ -1,9 +1,6 @@
 import { jsonResponse } from '@/shared/server/http';
 
-export async function withAssetCatalogHandler(
-  label: string,
-  operation: () => Promise<Response>,
-) {
+export async function withAssetCatalogHandler(label: string, operation: () => Promise<Response>) {
   try {
     return await operation();
   } catch (error) {

@@ -10,11 +10,11 @@ interface NoiseProps {
 }
 
 const Noise = ({
-  patternSize = 250,          // 噪点图案的基础尺寸 (px)
-  patternScaleX = 1,          // X轴缩放 (当前未使用，CSS控制)
-  patternScaleY = 1,          // Y轴缩放 (当前未使用，CSS控制)
+  patternSize = 250, // 噪点图案的基础尺寸 (px)
+  patternScaleX = 1, // X轴缩放 (当前未使用，CSS控制)
+  patternScaleY = 1, // Y轴缩放 (当前未使用，CSS控制)
   patternRefreshInterval = 4, // 图案刷新间隔 (帧数，值越大刷新越慢)
-  patternAlpha = 10,          // 噪点透明度 (0-255，值越小越透明)
+  patternAlpha = 10, // 噪点透明度 (0-255，值越小越透明)
 }: NoiseProps) => {
   const grainRef = useRef<HTMLCanvasElement | null>(null); // Canvas 元素引用
 
@@ -41,7 +41,7 @@ const Noise = ({
     const updatePattern = () => {
       for (let i = 0; i < patternPixelDataLength; i += 4) {
         const value = Math.random() * 255; // 随机灰度值
-        patternData.data[i] = value;     // R
+        patternData.data[i] = value; // R
         patternData.data[i + 1] = value; // G
         patternData.data[i + 2] = value; // B
         patternData.data[i + 3] = patternAlpha; // Alpha (透明度)
@@ -53,36 +53,38 @@ const Noise = ({
     const drawGrain = () => {
       const { width, height } = canvas; // 获取当前主 Canvas 尺寸
       ctx.clearRect(0, 0, width, height); // 清除上一帧
-      
+
       if (patternCanvas.width > 0 && patternCanvas.height > 0) {
-          const pattern = ctx.createPattern(patternCanvas, 'repeat'); // 创建可重复的图案
-          if (pattern) {
-              ctx.fillStyle = pattern;
-              ctx.fillRect(0, 0, width, height); // 填充整个 Canvas
-          } else {
-              console.error("Failed to create noise pattern");
-          }
+        const pattern = ctx.createPattern(patternCanvas, 'repeat'); // 创建可重复的图案
+        if (pattern) {
+          ctx.fillStyle = pattern;
+          ctx.fillRect(0, 0, width, height); // 填充整个 Canvas
+        } else {
+          console.error('Failed to create noise pattern');
+        }
       } else {
-           console.error("Pattern canvas has zero dimensions");
+        console.error('Pattern canvas has zero dimensions');
       }
     };
 
     // 动画循环
     const loop = () => {
-      if (canvas.width > 0 && canvas.height > 0) { // 仅当 Canvas 有效尺寸时更新
-          if (frame % patternRefreshInterval === 0) { // 控制刷新频率
-            updatePattern();
-            drawGrain();
-          }
-          frame++;
+      if (canvas.width > 0 && canvas.height > 0) {
+        // 仅当 Canvas 有效尺寸时更新
+        if (frame % patternRefreshInterval === 0) {
+          // 控制刷新频率
+          updatePattern();
+          drawGrain();
+        }
+        frame++;
       }
       animationFrameId = window.requestAnimationFrame(loop);
     };
 
     // 初始化
     updatePattern(); // 生成初始图案
-    drawGrain();     // 立即绘制第一帧
-    loop();          // 启动动画
+    drawGrain(); // 立即绘制第一帧
+    loop(); // 启动动画
 
     // 清理函数
     return () => {

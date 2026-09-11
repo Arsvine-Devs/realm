@@ -6,8 +6,11 @@
   font-weight: inherit;
   letter-spacing: inherit;
   position: relative;
-  transition: transform 0.1s ease-out, color 0.1s ease-out, text-shadow 0.1s ease-out; /* 从 0.2s 减少到 0.1s */
-  
+  transition:
+    transform 0.1s ease-out,
+    color 0.1s ease-out,
+    text-shadow 0.1s ease-out; /* 从 0.2s 减少到 0.1s */
+
   /* Initial state for fade-in */
   opacity: 0;
   transform: scale(1) translateY(5px); /* Start slightly down */
@@ -18,12 +21,12 @@
     animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0); /* 使用更快的加速缓动 */
     /* animation-delay is set inline via style prop */
   }
-  
+
   /* 移除噪点效果 */
   &::before {
     content: none;
   }
-  
+
   /* 移除横向闪光效果 */
   &::after {
     content: none;
@@ -39,4 +42,4 @@
 
 .verticalShinyText.disabled {
   opacity: 0.5; /* 可以为禁用状态设置不同样式，例如降低透明度 */
-} 
+}

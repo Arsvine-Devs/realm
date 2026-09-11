@@ -31,43 +31,51 @@ export function useVinylDrag({
 
   const hasTracks = playlist.length > 0;
   const nextTrackIndex = hasTracks ? (currentTrackIndex + 1) % playlist.length : -1;
-  const prevTrackIndex = hasTracks ? (currentTrackIndex - 1 + playlist.length) % playlist.length : -1;
-  const incomingTrack = incomingTrackIndex === -1 ? null : playlist[incomingTrackIndex] ?? null;
+  const prevTrackIndex = hasTracks
+    ? (currentTrackIndex - 1 + playlist.length) % playlist.length
+    : -1;
+  const incomingTrack = incomingTrackIndex === -1 ? null : (playlist[incomingTrackIndex] ?? null);
 
-  const startDrag = useCallback((clientX: number) => {
-    if (isDraggingDisabled || playlist.length <= 1) {
-      return;
-    }
+  const startDrag = useCallback(
+    (clientX: number) => {
+      if (isDraggingDisabled || playlist.length <= 1) {
+        return;
+      }
 
-    setIsDragging(true);
-    setDragStartX(clientX);
-    setDragCurrentX(clientX);
-  }, [isDraggingDisabled, playlist.length]);
+      setIsDragging(true);
+      setDragStartX(clientX);
+      setDragCurrentX(clientX);
+    },
+    [isDraggingDisabled, playlist.length],
+  );
 
-  const moveDrag = useCallback((clientX: number) => {
-    if (!isDragging) {
-      return;
-    }
+  const moveDrag = useCallback(
+    (clientX: number) => {
+      if (!isDragging) {
+        return;
+      }
 
-    setDragCurrentX(clientX);
-    const offsetX = clientX - dragStartX;
-    setDragOffsetX(offsetX);
+      setDragCurrentX(clientX);
+      const offsetX = clientX - dragStartX;
+      setDragOffsetX(offsetX);
 
-    if (offsetX > DRAG_THRESHOLD / 2) {
-      setIncomingTrackIndex(prevTrackIndex);
-      setIncomingTrackOffsetX(offsetX - (vinylContainer?.offsetWidth || 200));
-      return;
-    }
+      if (offsetX > DRAG_THRESHOLD / 2) {
+        setIncomingTrackIndex(prevTrackIndex);
+        setIncomingTrackOffsetX(offsetX - (vinylContainer?.offsetWidth || 200));
+        return;
+      }
 
-    if (offsetX < -DRAG_THRESHOLD / 2) {
-      setIncomingTrackIndex(nextTrackIndex);
-      setIncomingTrackOffsetX(offsetX + (vinylContainer?.offsetWidth || 200));
-      return;
-    }
+      if (offsetX < -DRAG_THRESHOLD / 2) {
+        setIncomingTrackIndex(nextTrackIndex);
+        setIncomingTrackOffsetX(offsetX + (vinylContainer?.offsetWidth || 200));
+        return;
+      }
 
-    setIncomingTrackIndex(-1);
-    setIncomingTrackOffsetX(0);
-  }, [dragStartX, isDragging, nextTrackIndex, prevTrackIndex, vinylContainer]);
+      setIncomingTrackIndex(-1);
+      setIncomingTrackOffsetX(0);
+    },
+    [dragStartX, isDragging, nextTrackIndex, prevTrackIndex, vinylContainer],
+  );
 
   const finishDrag = useCallback(() => {
     if (!isDragging) {

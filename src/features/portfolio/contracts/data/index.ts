@@ -1,6 +1,11 @@
 import type { CopyableToken, Project } from '@/shared/types';
 import type { Locale } from '@/shared/contracts/locale';
-import { findSourceItem, galleryReferences, legacyAssetReference, sourceManifests } from '@/features/assets/contracts/source-manifest';
+import {
+  findSourceItem,
+  galleryReferences,
+  legacyAssetReference,
+  sourceManifests,
+} from '@/features/assets/contracts/source-manifest';
 
 const realmSource = findSourceItem(sourceManifests.portfolio, 'arsvine-realm');
 const plannerSource = findSourceItem(sourceManifests.portfolio, 'endfield-planner');
@@ -40,7 +45,8 @@ export const webProjects: Project[] = [
   {
     id: plannerSource.runtimeId,
     title: plannerSource.title,
-    description: '面向《明日方舟：终末地》的抽卡模拟与资源规划工具，尝试把玩家直觉转化为可计算的策略。',
+    description:
+      '面向《明日方舟：终末地》的抽卡模拟与资源规划工具，尝试把玩家直觉转化为可计算的策略。',
     role: 'Full Stack Developer / System Designer',
     year: '2026',
     status: 'wip',
@@ -93,9 +99,6 @@ export const earlyProjects: Project[] = [
 我把它们归档在这里，不是为了证明过去有多厉害，而是为了保留一条轨迹：很多现在看似清晰的偏好，其实都来自早期那些混乱的小实验。`,
   },
 ];
-
-export const learnProjects = earlyProjects;
-export const workProjects = [...webProjects, ...gameProjects];
 
 // ============================================================
 // 详情页正文里需要被识别为"可复制"的关键词。

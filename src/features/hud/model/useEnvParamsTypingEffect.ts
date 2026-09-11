@@ -8,10 +8,17 @@ import {
 } from './envTelemetryController';
 import { useNavigationRuntime } from '@/features/navigation/model/NavigationRuntime';
 
-export function useEnvParamsTypingEffect(textVisible: boolean, routeEnabled: boolean): EnvParamsTypingState {
+export function useEnvParamsTypingEffect(
+  textVisible: boolean,
+  routeEnabled: boolean,
+): EnvParamsTypingState {
   const { asPath } = useNavigationRuntime();
   const [controller] = useState(() => new EnvTelemetryController());
-  const snapshot = useSyncExternalStore(controller.subscribe, controller.getSnapshot, controller.getSnapshot);
+  const snapshot = useSyncExternalStore(
+    controller.subscribe,
+    controller.getSnapshot,
+    controller.getSnapshot,
+  );
 
   useEffect(() => {
     if (!textVisible) {

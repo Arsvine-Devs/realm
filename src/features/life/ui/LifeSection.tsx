@@ -44,7 +44,10 @@ export default function LifeSection({
   handleLifeItemIntent,
 }: LifeSectionProps) {
   const { isInverted } = useHudPower();
-  const [alsoPlayExpanded, setAlsoPlayExpanded] = useLocaleStableState('content.life.also-play-expanded', false);
+  const [alsoPlayExpanded, setAlsoPlayExpanded] = useLocaleStableState(
+    'content.life.also-play-expanded',
+    false,
+  );
   const t = useTranslations('sections.life');
 
   return (
@@ -82,7 +85,10 @@ export default function LifeSection({
       </div>
       <div ref={lifeContentAreaRef} className={styles.lifeContentArea}>
         {/* Game Tab */}
-        <div ref={lifeGameTabRef} className={`${styles.lifeTabContent} ${activeLifeTab === 'game' ? styles.activeContent : ''}`}>
+        <div
+          ref={lifeGameTabRef}
+          className={`${styles.lifeTabContent} ${activeLifeTab === 'game' ? styles.activeContent : ''}`}
+        >
           <div className={styles.gameGrid}>
             {gameData.map((game: LifeItem) => (
               <ProjectCard
@@ -97,13 +103,15 @@ export default function LifeSection({
           <div className={styles.earlySection}>
             <button
               className={`${styles.earlySectionToggle} ${alsoPlayExpanded ? styles.expanded : ''}`}
-              onClick={() => setAlsoPlayExpanded(prev => !prev)}
+              onClick={() => setAlsoPlayExpanded((prev) => !prev)}
             >
               <span className={styles.earlySectionToggleIcon}>{alsoPlayExpanded ? '▾' : '▸'}</span>
               <span>{t('alsoPlayThese')}</span>
               <span className={styles.earlySectionCount}>{alsoPlayGames.length}</span>
             </button>
-            <div className={`${styles.earlySectionContent} ${alsoPlayExpanded ? styles.expanded : ''}`}>
+            <div
+              className={`${styles.earlySectionContent} ${alsoPlayExpanded ? styles.expanded : ''}`}
+            >
               <div className={styles.smallGameGrid}>
                 {alsoPlayGames.map((gameName: string) => (
                   <div key={gameName} className={styles.smallGameCard}>
@@ -115,7 +123,10 @@ export default function LifeSection({
           </div>
         </div>
         {/* Travel Tab */}
-        <div ref={lifeTravelTabRef} className={`${styles.lifeTabContent} ${activeLifeTab === 'travel' ? styles.activeContent : ''}`}>
+        <div
+          ref={lifeTravelTabRef}
+          className={`${styles.lifeTabContent} ${activeLifeTab === 'travel' ? styles.activeContent : ''}`}
+        >
           <div className={styles.travelGrid}>
             {travelData.map((place: LifeItem) => (
               <ProjectCard
@@ -129,13 +140,19 @@ export default function LifeSection({
           </div>
         </div>
         {/* Art Tab */}
-        <div ref={lifeArtTabRef} className={`${styles.lifeTabContent} ${activeLifeTab === 'art' ? styles.activeContent : ''}`}>
+        <div
+          ref={lifeArtTabRef}
+          className={`${styles.lifeTabContent} ${activeLifeTab === 'art' ? styles.activeContent : ''}`}
+        >
           <div className={styles.compactTextContainer}>
             <p>{artPlaceholderText}</p>
           </div>
         </div>
         {/* Other Tab */}
-        <div ref={lifeOtherTabRef} className={`${styles.lifeTabContent} ${activeLifeTab === 'other' ? styles.activeContent : ''} ${styles.compactTabContent}`}>
+        <div
+          ref={lifeOtherTabRef}
+          className={`${styles.lifeTabContent} ${activeLifeTab === 'other' ? styles.activeContent : ''} ${styles.compactTabContent}`}
+        >
           <div className={styles.gameGrid}>
             {otherData.map((item: LifeItem) => (
               <ProjectCard

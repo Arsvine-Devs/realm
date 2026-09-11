@@ -52,7 +52,9 @@ describe('AboutSection adaptive performance', () => {
   });
 
   it('renders the noise layer in full mode', () => {
-    const { container } = render(<AboutSection aboutSectionRef={{ current: null }} aboutContentRef={{ current: null }} />);
+    const { container } = render(
+      <AboutSection aboutSectionRef={{ current: null }} aboutContentRef={{ current: null }} />,
+    );
     expect(screen.getByTestId('noise-effect')).toBeTruthy();
     const aboutSection = container.querySelector('#about-section');
     expect(aboutSection?.classList.contains(styles.contentSection)).toBe(true);
@@ -66,7 +68,9 @@ describe('AboutSection adaptive performance', () => {
       allowDecorativeMotion: false,
     });
 
-    render(<AboutSection aboutSectionRef={{ current: null }} aboutContentRef={{ current: null }} />);
+    render(
+      <AboutSection aboutSectionRef={{ current: null }} aboutContentRef={{ current: null }} />,
+    );
     expect(screen.queryByTestId('noise-effect')).toBeNull();
   });
 });

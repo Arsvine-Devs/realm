@@ -8,8 +8,8 @@
 
 .detailMeta {
   display: flex;
-  flex-wrap: wrap; 
-  gap: 20px; 
+  flex-wrap: wrap;
+  gap: 20px;
   margin-bottom: 25px;
   font-family: var(--font-mono);
   font-size: var(--fs-body);
@@ -29,23 +29,22 @@
 }
 
 .detailBody {
-  margin-bottom: 30px; 
+  margin-bottom: 30px;
 }
 
 .detailParagraph {
-  font-family: var(--font-hud); 
-  font-size: var(--fs-sub); 
-  color: var(--ark-text); 
-  line-height: 1.9; 
+  font-family: var(--font-hud);
+  font-size: var(--fs-sub);
+  color: var(--ark-text);
+  line-height: 1.9;
   opacity: 0.9;
-  margin-bottom: 1em; 
+  margin-bottom: 1em;
 }
 
-
 .relatedImagesSection {
-  margin-top: 40px; 
-  padding-top: 20px; 
-  border-top: 1px solid var(--ark-border); 
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--ark-border);
 }
 
 .relatedImagesTitle {
@@ -62,10 +61,10 @@
   border: none;
   padding: 0;
   cursor: none;
-  border: 1px solid transparent; 
+  border: 1px solid transparent;
   transition: border-color 0.2s ease;
-  overflow: hidden; 
-  background-color: rgba(var(--ark-primary-rgb), 0.05); 
+  overflow: hidden;
+  background-color: rgba(var(--ark-primary-rgb), 0.05);
 
   &:hover {
     border-color: var(--ark-primary);
@@ -75,12 +74,12 @@
 .thumbnailImage {
   display: block;
   width: 100%;
-  height: 100%; 
-  object-fit: contain; 
+  height: 100%;
+  object-fit: contain;
   transition: transform 0.3s ease;
 
   .thumbnailButton:hover & {
-    transform: scale(1.05); 
+    transform: scale(1.05);
   }
 }
 
@@ -97,15 +96,15 @@
   }
 
   .detailMeta {
-     color: var(--ark-text-secondary);
+    color: var(--ark-text-secondary);
   }
 
   .metaLabel {
-     color: var(--ark-text-secondary);
-     opacity: 0.8;
+    color: var(--ark-text-secondary);
+    opacity: 0.8;
   }
-  
+
   .detailParagraph {
-     color: var(--ark-text); 
+    color: var(--ark-text);
   }
 }

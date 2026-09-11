@@ -4,14 +4,14 @@
 
 ## 清单
 
-| 脚本 | 入口 | 何时用 |
-|---|---|---|
-| `dev-host-setup.cmd` (`.ps1`) | 双击 / `.\scripts\dev-host-setup.cmd` | 本地开发，让 `cdn.arsvine.com` 通过 Referer 白名单（写 hosts + 启动 dev server，退出自动清理） |
-| `fetch-google-fonts.mjs` | `node scripts/fetch-google-fonts.mjs` | 改 Google Fonts 选择后，重新生成 `public/_fonts-staging/` 上传到 COS `shared/fonts/` |
-| `convert-images.mjs` | `node scripts/convert-images.mjs [format] [opts]` | 批量图片格式转换（webp/jpg/png/avif），输出到 `scripts/images/out/` |
-| `regen-favicons.mjs` | `node scripts/regen-favicons.mjs` | 从透明源图重新生成 `public/favicon*` + `public/icons/*` 全套 |
-| `jpg-to-transparent-png.mjs` | `node scripts/jpg-to-transparent-png.mjs <src.jpg> <dst.png>` | 白底 JPG → 真透明 PNG（alpha unmix 算法，颜色不会染白边） |
-| `make-white.mjs` | `node scripts/make-white.mjs <src> <dst>` | 透明 PNG → 白底（OG / Twitter 卡片预览底色用） |
+| 脚本                          | 入口                                                          | 何时用                                                                                         |
+| ----------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `dev-host-setup.cmd` (`.ps1`) | 双击 / `.\scripts\dev-host-setup.cmd`                         | 本地开发，让 `cdn.arsvine.com` 通过 Referer 白名单（写 hosts + 启动 dev server，退出自动清理） |
+| `fetch-google-fonts.mjs`      | `node scripts/fetch-google-fonts.mjs`                         | 改 Google Fonts 选择后，重新生成 `public/_fonts-staging/` 上传到 COS `shared/fonts/`           |
+| `convert-images.mjs`          | `node scripts/convert-images.mjs [format] [opts]`             | 批量图片格式转换（webp/jpg/png/avif），输出到 `scripts/images/out/`                            |
+| `regen-favicons.mjs`          | `node scripts/regen-favicons.mjs`                             | 从透明源图重新生成 `public/favicon*` + `public/icons/*` 全套                                   |
+| `jpg-to-transparent-png.mjs`  | `node scripts/jpg-to-transparent-png.mjs <src.jpg> <dst.png>` | 白底 JPG → 真透明 PNG（alpha unmix 算法，颜色不会染白边）                                      |
+| `make-white.mjs`              | `node scripts/make-white.mjs <src> <dst>`                     | 透明 PNG → 白底（OG / Twitter 卡片预览底色用）                                                 |
 
 ## `dev-host-setup` 详细
 

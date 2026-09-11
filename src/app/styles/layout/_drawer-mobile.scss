@@ -113,11 +113,13 @@
       left: 0;
       right: 0;
       height: 1px;
-      background: linear-gradient(90deg,
-          transparent 10%,
-          var(--ark-highlight-green) 40%,
-          var(--ark-highlight-green) 60%,
-          transparent 90%);
+      background: linear-gradient(
+        90deg,
+        transparent 10%,
+        var(--ark-highlight-green) 40%,
+        var(--ark-highlight-green) 60%,
+        transparent 90%
+      );
       opacity: 0.1;
     }
 
@@ -127,14 +129,16 @@
       top: -1px;
       width: 35%;
       height: 2px;
-      background: linear-gradient(90deg,
-          transparent 0%,
-          rgba(var(--ark-highlight-green-rgb), 0.02) 15%,
-          rgba(var(--ark-highlight-green-rgb), 0.06) 35%,
-          rgba(var(--ark-highlight-green-rgb), 0.15) 55%,
-          rgba(var(--ark-highlight-green-rgb), 0.4) 78%,
-          var(--ark-highlight-green) 95%,
-          rgba(var(--ark-highlight-green-rgb), 0.6) 100%);
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(var(--ark-highlight-green-rgb), 0.02) 15%,
+        rgba(var(--ark-highlight-green-rgb), 0.06) 35%,
+        rgba(var(--ark-highlight-green-rgb), 0.15) 55%,
+        rgba(var(--ark-highlight-green-rgb), 0.4) 78%,
+        var(--ark-highlight-green) 95%,
+        rgba(var(--ark-highlight-green-rgb), 0.6) 100%
+      );
       filter: drop-shadow(0 0 3px var(--ark-highlight-green));
       animation: scanBottomBar 4s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
       pointer-events: none;
@@ -154,7 +158,8 @@
   color: var(--ark-text-secondary, rgba(var(--ark-primary-rgb), 0.5));
   font-family: var(--font-hud);
   cursor: none;
-  transition: color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+  transition:
+    color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
     background-color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
     transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
     text-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -200,7 +205,8 @@
 .bottomBarIcon {
   font-size: var(--fs-xl);
   line-height: 1;
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+  transition:
+    transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
     filter 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   .bottomBarActive & {
@@ -221,7 +227,9 @@
     border-radius: 1px;
     opacity: 0;
     transform: scaleX(0);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
     box-shadow: 0 0 4px var(--ark-primary-glow, rgba(150, 150, 150, 0.3));
 
     .bottomBarCurrent & {
@@ -232,7 +240,6 @@
 }
 
 @keyframes bottomBarBreath {
-
   0%,
   100% {
     opacity: 0.55;
@@ -244,7 +251,6 @@
     text-shadow: 0 0 6px var(--ark-highlight-green);
   }
 }
-
 
 .hudTopLeftContent {
   display: flex;

@@ -45,19 +45,25 @@ export default async function handler(request: Request) {
     RATE_LIMIT_WINDOW_MS,
   );
   if (!limiter.ok) {
-    return jsonResponse({ error: 'rate_limited' }, {
-      status: 429,
-      headers: {
-        'Cache-Control': 'private, no-store',
-        'Retry-After': String(Math.ceil(limiter.retryAfterMs / 1000)),
+    return jsonResponse(
+      { error: 'rate_limited' },
+      {
+        status: 429,
+        headers: {
+          'Cache-Control': 'private, no-store',
+          'Retry-After': String(Math.ceil(limiter.retryAfterMs / 1000)),
+        },
       },
-    });
+    );
   }
 
   if (cache && cache.expiresAt > Date.now()) {
-    return jsonResponse({ text: cache.text }, {
-      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' },
-    });
+    return jsonResponse(
+      { text: cache.text },
+      {
+        headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' },
+      },
+    );
   }
 
   const controller = new AbortController();
@@ -71,9 +77,12 @@ export default async function handler(request: Request) {
     const text = typeof data?.hitokoto === 'string' ? data.hitokoto.trim() : '';
     if (!text) throw new Error('empty hitokoto');
     cache = { text, expiresAt: Date.now() + CACHE_TTL_MS };
-    return jsonResponse({ text }, {
-      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' },
-    });
+    return jsonResponse(
+      { text },
+      {
+        headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' },
+      },
+    );
   } catch (err) {
     clearTimeout(timeoutId);
     // 仅记录摘要，避免 Vercel 日志噪音

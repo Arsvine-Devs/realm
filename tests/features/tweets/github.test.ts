@@ -25,12 +25,14 @@ describe('tweet GitHub source', () => {
       }
 
       if (path === 'tweets/2026-07.json') {
-        return Promise.resolve([{
-          id: 'available',
-          createdAt: '2026-07-01T00:00:00+08:00',
-          content: 'Available month',
-          visibility: 'public',
-        }]);
+        return Promise.resolve([
+          {
+            id: 'available',
+            createdAt: '2026-07-01T00:00:00+08:00',
+            content: 'Available month',
+            visibility: 'public',
+          },
+        ]);
       }
 
       return Promise.reject(new Error('Failed to fetch tweets/2026-06.json: 502 Bad Gateway'));

@@ -15,14 +15,12 @@ $c-dim: rgba(var(--ark-primary-rgb), 0.25);
 }
 
 .tesseractMode {
-
   .hLine,
   .vLine {
     opacity: 0;
   }
 
   .dot {
-
     &::before,
     &::after {
       opacity: 0;
@@ -103,7 +101,9 @@ $c-dim: rgba(var(--ark-primary-rgb), 0.25);
   transform-origin: center center;
   will-change: left, top, opacity;
   opacity: 0;
-  transition: opacity 0.22s ease, transform 0.28s ease;
+  transition:
+    opacity 0.22s ease,
+    transform 0.28s ease;
 
   &.hidden {
     opacity: 0;
@@ -146,7 +146,9 @@ $c-dim: rgba(var(--ark-primary-rgb), 0.25);
     height: 2px;
     transform: translate(-50%, -50%);
     background: $c;
-    transition: opacity 0.22s ease, transform 0.28s ease;
+    transition:
+      opacity 0.22s ease,
+      transform 0.28s ease;
   }
 
   &::after {
@@ -158,7 +160,9 @@ $c-dim: rgba(var(--ark-primary-rgb), 0.25);
     height: 24px;
     transform: translate(-50%, -50%);
     background: $c;
-    transition: opacity 0.22s ease, transform 0.28s ease;
+    transition:
+      opacity 0.22s ease,
+      transform 0.28s ease;
   }
 
   &.hidden {
@@ -166,7 +170,6 @@ $c-dim: rgba(var(--ark-primary-rgb), 0.25);
   }
 
   &.hovering {
-
     &::before,
     &::after {
       opacity: 0;

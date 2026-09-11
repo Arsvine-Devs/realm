@@ -38,11 +38,7 @@ export default function NotFoundView() {
             <p className={styles.description}>{t('description')}</p>
             <p className={styles.hint}>{t('hint')}</p>
 
-            <p
-              className={styles.pathLine}
-              hidden={!requestedPath}
-              aria-hidden={!requestedPath}
-            >
+            <p className={styles.pathLine} hidden={!requestedPath} aria-hidden={!requestedPath}>
               <span className={styles.pathLabel}>{t('pathLabel')}</span>
               <code className={styles.pathValue}>{requestedPath || '\u00A0'}</code>
             </p>

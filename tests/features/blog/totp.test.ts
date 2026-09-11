@@ -44,41 +44,103 @@ describe('verifyTotp (pure helper)', () => {
     const period = 30;
     const step = BigInt(Math.floor(mockedNow / 1000 / period));
     const code = computeCodeForStep(FIXED_SECRET, step, 6);
-    expect(verifyTotp({ token: code, secretBase32: FIXED_SECRET, period, digits: 6, window: 0, nowMs: mockedNow })).toBe(true);
+    expect(
+      verifyTotp({
+        token: code,
+        secretBase32: FIXED_SECRET,
+        period,
+        digits: 6,
+        window: 0,
+        nowMs: mockedNow,
+      }),
+    ).toBe(true);
   });
 
   it('accepts a code from the previous step when window=1', () => {
     const period = 30;
-    const previous = computeCodeForStep(FIXED_SECRET, BigInt(Math.floor(mockedNow / 1000 / period)) - BigInt(1), 6);
-    expect(verifyTotp({ token: previous, secretBase32: FIXED_SECRET, period, digits: 6, window: 1, nowMs: mockedNow })).toBe(true);
+    const previous = computeCodeForStep(
+      FIXED_SECRET,
+      BigInt(Math.floor(mockedNow / 1000 / period)) - BigInt(1),
+      6,
+    );
+    expect(
+      verifyTotp({
+        token: previous,
+        secretBase32: FIXED_SECRET,
+        period,
+        digits: 6,
+        window: 1,
+        nowMs: mockedNow,
+      }),
+    ).toBe(true);
   });
 
   it('accepts a code from the next step when window=1', () => {
     const period = 30;
-    const next = computeCodeForStep(FIXED_SECRET, BigInt(Math.floor(mockedNow / 1000 / period)) + BigInt(1), 6);
-    expect(verifyTotp({ token: next, secretBase32: FIXED_SECRET, period, digits: 6, window: 1, nowMs: mockedNow })).toBe(true);
+    const next = computeCodeForStep(
+      FIXED_SECRET,
+      BigInt(Math.floor(mockedNow / 1000 / period)) + BigInt(1),
+      6,
+    );
+    expect(
+      verifyTotp({
+        token: next,
+        secretBase32: FIXED_SECRET,
+        period,
+        digits: 6,
+        window: 1,
+        nowMs: mockedNow,
+      }),
+    ).toBe(true);
   });
 
   it('rejects a code from outside the window', () => {
     const period = 30;
-    const far = computeCodeForStep(FIXED_SECRET, BigInt(Math.floor(mockedNow / 1000 / period)) + BigInt(5), 6);
-    expect(verifyTotp({ token: far, secretBase32: FIXED_SECRET, period, digits: 6, window: 1, nowMs: mockedNow })).toBe(false);
+    const far = computeCodeForStep(
+      FIXED_SECRET,
+      BigInt(Math.floor(mockedNow / 1000 / period)) + BigInt(5),
+      6,
+    );
+    expect(
+      verifyTotp({
+        token: far,
+        secretBase32: FIXED_SECRET,
+        period,
+        digits: 6,
+        window: 1,
+        nowMs: mockedNow,
+      }),
+    ).toBe(false);
   });
 
   it('rejects a token of wrong length or non-digits', () => {
-    expect(verifyTotp({ token: '12345', secretBase32: FIXED_SECRET, nowMs: mockedNow })).toBe(false);
-    expect(verifyTotp({ token: '12345a7', secretBase32: FIXED_SECRET, nowMs: mockedNow })).toBe(false);
+    expect(verifyTotp({ token: '12345', secretBase32: FIXED_SECRET, nowMs: mockedNow })).toBe(
+      false,
+    );
+    expect(verifyTotp({ token: '12345a7', secretBase32: FIXED_SECRET, nowMs: mockedNow })).toBe(
+      false,
+    );
     expect(verifyTotp({ token: '', secretBase32: FIXED_SECRET, nowMs: mockedNow })).toBe(false);
   });
 
   it('rejects when secret base32 contains illegal characters', () => {
-    expect(() => verifyTotp({ token: '000000', secretBase32: 'JBSWY3DPEHPK3P!@', nowMs: mockedNow })).toThrow(/Invalid base32/);
+    expect(() =>
+      verifyTotp({ token: '000000', secretBase32: 'JBSWY3DPEHPK3P!@', nowMs: mockedNow }),
+    ).toThrow(/Invalid base32/);
   });
 
   it('ignores base32 padding and whitespace', () => {
     const code = computeCodeForStep(FIXED_SECRET, BigInt(Math.floor(mockedNow / 1000 / 30)), 6);
-    expect(verifyTotp({ token: code, secretBase32: `${FIXED_SECRET}====`, nowMs: mockedNow })).toBe(true);
-    expect(verifyTotp({ token: code, secretBase32: FIXED_SECRET.match(/.{1,4}/g)!.join(' '), nowMs: mockedNow })).toBe(true);
+    expect(verifyTotp({ token: code, secretBase32: `${FIXED_SECRET}====`, nowMs: mockedNow })).toBe(
+      true,
+    );
+    expect(
+      verifyTotp({
+        token: code,
+        secretBase32: FIXED_SECRET.match(/.{1,4}/g)!.join(' '),
+        nowMs: mockedNow,
+      }),
+    ).toBe(true);
   });
 });
 
@@ -108,7 +170,11 @@ describe('verifyTotpGroupToken', () => {
   it('falls back to a previous secret during rotation', () => {
     const period = 30;
     const previousSecret = 'KRSXG5BAONSWG4TFOQ';
-    const previousCode = computeCodeForStep(previousSecret, BigInt(Math.floor(mockedNow / 1000 / period)), 6);
+    const previousCode = computeCodeForStep(
+      previousSecret,
+      BigInt(Math.floor(mockedNow / 1000 / period)),
+      6,
+    );
     setTotpGroups({
       'friends-a': {
         current: FIXED_SECRET,

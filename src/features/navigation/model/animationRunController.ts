@@ -3,7 +3,7 @@ export interface QueuedNavigation {
   options?: { scroll?: boolean };
 }
 
-export function isAnimationCancellation(error: unknown) {
+function isAnimationCancellation(error: unknown) {
   return error instanceof DOMException && error.name === 'AbortError';
 }
 

@@ -1,0 +1,24 @@
+{
+  "$schema": "../node_modules/knip/schema.json",
+  // Operational CLIs documented in scripts/AGENTS.md; next-intl uses a string entry.
+  "entry": [
+    "scripts/convert-images.mjs",
+    "scripts/regen-favicons.mjs",
+    "scripts/jpg-to-transparent-png.mjs",
+    "scripts/make-white.mjs",
+    "src/app/i18n/request.ts",
+    "src/features/*/public.ts",
+  ],
+  // public.ts defines the documented feature API, even with no current caller.
+  "project": [
+    "src/**/*.{ts,tsx,js,scss,sass}",
+    "scripts/**/*.{mjs,js}",
+    "tests/**/*.{ts,tsx}",
+    "*.{js,mjs,ts}",
+  ],
+  // Typed namespace registries in src/app/i18n/data.ts consume these module objects.
+  "ignoreIssues": {
+    "src/features/{portfolio,life,experience}/contracts/data/*.ts": ["exports"],
+    "src/features/profile/contracts/{friendLinks,skills}/*.ts": ["exports"],
+  },
+}

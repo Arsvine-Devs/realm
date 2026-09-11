@@ -184,7 +184,9 @@ describe('post variant metadata', () => {
         },
       ],
     });
-    fetchGitHubContentMock.mockResolvedValue(`---\ntitle: Ignored frontmatter title\n---\n${'word '.repeat(116)}`);
+    fetchGitHubContentMock.mockResolvedValue(
+      `---\ntitle: Ignored frontmatter title\n---\n${'word '.repeat(116)}`,
+    );
 
     const indexed = await getPostMetaBySlugAndLocale('metadata-paths', 'en');
     const loaded = await getPostBySlugAndContentLocale('metadata-paths', 'en');
@@ -200,15 +202,17 @@ describe('post variant metadata', () => {
 
 describe('getProtectedPostPublicMeta', () => {
   it('strips preview fields for protected content', () => {
-    expect(getProtectedPostPublicMeta({
-      slug: 'protected-post',
-      title: 'Protected Post',
-      date: '2026-05-12',
-      excerpt: 'Secret excerpt',
-      tags: ['private'],
-      readingMinutes: 9,
-      access: { mode: 'totp', group: 'family' },
-    })).toMatchObject({
+    expect(
+      getProtectedPostPublicMeta({
+        slug: 'protected-post',
+        title: 'Protected Post',
+        date: '2026-05-12',
+        excerpt: 'Secret excerpt',
+        tags: ['private'],
+        readingMinutes: 9,
+        access: { mode: 'totp', group: 'family' },
+      }),
+    ).toMatchObject({
       slug: 'protected-post',
       title: 'Protected Post',
       date: '2026-05-12',

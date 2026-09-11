@@ -8,7 +8,8 @@ export const gameData: LifeItem[] = [
   {
     ...lifeSourceFields('arknights'),
     title: 'Arknights',
-    description: 'Not just a strategy tower defense game, but a long-term specimen of order, catastrophe, ideals, and system design. Terra feels like a cold archive, and also like a still-running slice of civilisation.',
+    description:
+      'Not just a strategy tower defense game, but a long-term specimen of order, catastrophe, ideals, and system design. Terra feels like a cold archive, and also like a still-running slice of civilisation.',
     tech: ['Strategy', 'Tower Defense', 'Mobile', 'Official'],
     link: '#',
     articleContent: `For me, Arknights is not just a strategy tower defense mobile game. What truly draws me in is the way it builds a complex and brutal world with a cold, restrained, and highly designed sensibility: the Infected, mobile cities, Catastrophes, national conflicts, corporations, and organisations. None of these settings exists simply to look cool. Together, they support the heavy and convincing order of Terra.
@@ -28,7 +29,8 @@ To me, what makes Arknights special is how completely it brings together strateg
   {
     ...lifeSourceFields('arknights-endfield'),
     title: 'Arknights: Endfield',
-    description: 'What I look forward to is not a simple 3D version of Arknights, but the moment a worldbuilding system moves from tactical maps to a frontier site: wiring, production, combat, and the rebuilding of order on a wasteland.',
+    description:
+      'What I look forward to is not a simple 3D version of Arknights, but the moment a worldbuilding system moves from tactical maps to a frontier site: wiring, production, combat, and the rebuilding of order on a wasteland.',
     tech: ['3D RPG', 'Strategy', 'Action', 'Factory Building', 'Cross-platform'],
     link: '#',
     articleContent: `For me, the most attractive thing about Arknights: Endfield is not simply that it inherits the name Arknights, but that it extends the mood and texture of Terra into a space that is broader, stranger, and closer to a frontier narrative. It is no longer only about Rhodes Island moving between mobile cities and the Infected question; instead, the perspective is pushed toward Talos-II, toward Endfield Industries, and toward a borderland that needs to be explored, built, and understood again.
@@ -48,7 +50,8 @@ And of course, one more thing: Big Scallion, Little Scallion? I want both.`,
   {
     ...lifeSourceFields('death-stranding'),
     title: 'Death Stranding',
-    description: 'It turns walking, burden, loneliness, and connection into something playable. Not a grand speech about saving the world, but a small stretch of road left for those who come after.',
+    description:
+      'It turns walking, burden, loneliness, and connection into something playable. Not a grand speech about saving the world, but a small stretch of road left for those who come after.',
     tech: ['Action', 'Open-world', 'Strand game', 'PS4/PS5'],
     link: '#',
     articleContent: `It is hard for me to simply classify my experience with Death Stranding as finishing a game. What makes it special is not how thrilling the combat is, but how it turns walking, delivery, loneliness, and connection into a real emotional experience. Much of the time, I was only carrying cargo across wastelands, climbing snowy mountains, and avoiding timefall, yet on that long and quiet road I felt a strange weight: not the weight of the mission, but the meaning of placing something into someone else's hands.
@@ -70,7 +73,8 @@ export const travelData: LifeItem[] = [
   {
     ...lifeSourceFields('zhenjiang'),
     title: 'Zhenjiang',
-    description: 'Not really a journey, more like a slow recognition after temporary residence: an old Jiangnan city that does not force itself to be impressive, quiet and relaxed, with its own folds and traces.',
+    description:
+      'Not really a journey, more like a slow recognition after temporary residence: an old Jiangnan city that does not force itself to be impressive, quiet and relaxed, with its own folds and traces.',
     tech: ['Temporary Stay', 'Travel'],
     link: '#',
     articleContent: `It really does not count as travel, because I study here.
@@ -92,7 +96,8 @@ export const otherData: LifeItem[] = [
   {
     ...lifeSourceFields('game-dev'),
     title: 'Game Development & Design',
-    description: 'Creating the worlds in my mind, while studying how systems, interfaces, rules, and narrative hold a world together. I am still on the way, but the path itself is already interesting enough.',
+    description:
+      'Creating the worlds in my mind, while studying how systems, interfaces, rules, and narrative hold a world together. I am still on the way, but the path itself is already interesting enough.',
     tech: ['Programming', 'Design'],
     articleContent: `My path into game development did not begin with I want to make a complete game. It began with the worlds, characters, mechanics, and scenes in my mind. I have always liked this way of creating, where imagination can become an interactive experience: not just writing down a piece of setting, and not just drawing an image, but letting players truly step into that world and feel its rules, atmosphere, and emotions.
 

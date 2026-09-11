@@ -58,6 +58,20 @@ export default function LifeDetailPage({
   );
 }
 
+function handleGalleryKeyDown(
+  event: React.KeyboardEvent<HTMLDivElement>,
+  index: number,
+  openLightbox: (
+    index: number,
+    event?: { currentTarget?: EventTarget | null } | null,
+    sourceType?: string,
+  ) => void,
+) {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  event.preventDefault();
+  openLightbox(index, event, 'gallery');
+}
+
 function LifeDetailContent({
   locale,
   item,
@@ -101,7 +115,10 @@ function LifeDetailContent({
   });
 
   const paragraphs = item.articleContent
-    ? item.articleContent.split(/\n\s*\n+/).map((paragraph) => paragraph.trim()).filter(Boolean)
+    ? item.articleContent
+        .split(/\n\s*\n+/)
+        .map((paragraph) => paragraph.trim())
+        .filter(Boolean)
     : [];
   const galleryImages = item.galleryImages || [];
   const links = item.links || [];
@@ -132,10 +149,13 @@ function LifeDetailContent({
     showPrevImage,
   } = useGalleryLightbox(galleryImages.length);
 
-  const handleBack = useCallback((event: React.MouseEvent<HTMLElement>) => {
-    event.preventDefault();
-    navigateTo(`/${locale}/content#life`);
-  }, [locale, navigateTo]);
+  const handleBack = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      event.preventDefault();
+      navigateTo(`/${locale}/content#life`);
+    },
+    [locale, navigateTo],
+  );
 
   const coverImage = resolveImageUrl(item.imageUrl, 'large');
   let revealCursor = 0;
@@ -200,6 +220,11 @@ function LifeDetailContent({
                   key={`${resolveImageUrl(image.src, 'card')}-${index}`}
                   className={styles.galleryItem}
                   onClick={(event) => openLightbox(index, event, 'gallery')}
+                  onKeyDown={(event) => handleGalleryKeyDown(event, index, openLightbox)}
+                  /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- the gallery thumbnail is a custom lightbox control. */
+                  role="button"
+                  tabIndex={0}
+                  aria-label={image.caption || `${item.title} gallery ${index + 1}`}
                   ref={(element) => {
                     bindThumbnailRef(`gallery_${index}`)(element);
                     setRef(revealIndex)(element);
@@ -215,9 +240,7 @@ function LifeDetailContent({
                   <div className={styles.galleryOverlay} />
                   <div className={styles.galleryCornerTL} />
                   <div className={styles.galleryCornerBR} />
-                  {image.caption && (
-                    <div className={styles.galleryCaption}>{image.caption}</div>
-                  )}
+                  {image.caption && <div className={styles.galleryCaption}>{image.caption}</div>}
                 </div>
               );
             })}
@@ -235,30 +258,34 @@ function LifeDetailContent({
 
         <DetailFooterNav
           styles={styles}
-          previous={prevItem
-            ? {
-                href: `/${locale}/life/${prevItem.id}`,
-                title: prevItem.title,
-                cursorLabel: 'PREVIOUS',
-                onNavigateIntent: () => prefetchOnIntent(`/${locale}/life/${prevItem.id}`),
-                onClick: (event) => {
-                  event.preventDefault();
-                  navigateTo(`/${locale}/life/${prevItem.id}`);
-                },
-              }
-            : null}
-          next={nextItem
-            ? {
-                href: `/${locale}/life/${nextItem.id}`,
-                title: nextItem.title,
-                cursorLabel: 'NEXT',
-                onNavigateIntent: () => prefetchOnIntent(`/${locale}/life/${nextItem.id}`),
-                onClick: (event) => {
-                  event.preventDefault();
-                  navigateTo(`/${locale}/life/${nextItem.id}`);
-                },
-              }
-            : null}
+          previous={
+            prevItem
+              ? {
+                  href: `/${locale}/life/${prevItem.id}`,
+                  title: prevItem.title,
+                  cursorLabel: 'PREVIOUS',
+                  onNavigateIntent: () => prefetchOnIntent(`/${locale}/life/${prevItem.id}`),
+                  onClick: (event) => {
+                    event.preventDefault();
+                    navigateTo(`/${locale}/life/${prevItem.id}`);
+                  },
+                }
+              : null
+          }
+          next={
+            nextItem
+              ? {
+                  href: `/${locale}/life/${nextItem.id}`,
+                  title: nextItem.title,
+                  cursorLabel: 'NEXT',
+                  onNavigateIntent: () => prefetchOnIntent(`/${locale}/life/${nextItem.id}`),
+                  onClick: (event) => {
+                    event.preventDefault();
+                    navigateTo(`/${locale}/life/${nextItem.id}`);
+                  },
+                }
+              : null
+          }
           fallback={{
             href: `/${locale}/content#life`,
             title: tCommon('returnToMain'),

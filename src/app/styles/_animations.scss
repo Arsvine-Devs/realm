@@ -67,8 +67,12 @@
 
 // 角标淡入动画
 @keyframes fadeInCorner {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 // LOGO展开动画
@@ -121,21 +125,80 @@
 }
 
 // 共享动画 (保持不变)
-@keyframes scanHud { 0% { background-position: 0 0; } 100% { background-position: 0 6px; } }
+@keyframes scanHud {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 6px;
+  }
+}
 
-@keyframes fadeInScanlines { from { opacity: 0; } to { opacity: 0.2; } } // 修改: 透明度从 0.8 降到 0.2
+@keyframes fadeInScanlines {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.2;
+  }
+} // 修改: 透明度从 0.8 降到 0.2
 
-@keyframes fadeInArkCorner { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInArkCorner {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 
-@keyframes fadeInImageHud { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeInImageHud {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-@keyframes fadeInImageHudCentered { from { opacity: 0; transform: translateY(calc(50% + 5px)); } to { opacity: 1; transform: translateY(50%); } }
+@keyframes fadeInImageHudCentered {
+  from {
+    opacity: 0;
+    transform: translateY(calc(50% + 5px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(50%);
+  }
+}
 
 // Restore hudExpandBox0 for WORKS
 @keyframes hudExpandBox0 {
-  0% { transform: translate(-50%, -50%) scale(0.7) rotate(0deg) skewX(0deg); border-color: transparent; opacity: 0; width: 75%; height: 75%; border-radius: 0; background: transparent; }
-  50% { transform: translate(-50%, -50%) scale(1.05) rotate(7deg) skewX(-12deg); border: 1px solid var(--ark-highlight-green); opacity: 1; }
-  100% { transform: translate(-50%, -50%) scale(1.05) rotate(7deg) skewX(-12deg); border: 1px solid var(--ark-highlight-green); opacity: 1; width: 75%; height: 75%; border-radius: 0; background: transparent; }
+  0% {
+    transform: translate(-50%, -50%) scale(0.7) rotate(0deg) skewX(0deg);
+    border-color: transparent;
+    opacity: 0;
+    width: 75%;
+    height: 75%;
+    border-radius: 0;
+    background: transparent;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.05) rotate(7deg) skewX(-12deg);
+    border: 1px solid var(--ark-highlight-green);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.05) rotate(7deg) skewX(-12deg);
+    border: 1px solid var(--ark-highlight-green);
+    opacity: 1;
+    width: 75%;
+    height: 75%;
+    border-radius: 0;
+    background: transparent;
+  }
 }
 
 // WORKS: Blueprint Draw (using border) - No longer used by default for column 0
@@ -148,21 +211,24 @@
     border-bottom-color: transparent;
     opacity: 0;
   }
-  30% { // Draw top and left border
+  30% {
+    // Draw top and left border
     width: 70%;
     height: 80%;
     border-right-color: transparent;
     border-bottom-color: transparent;
     opacity: 1;
   }
-  60% { // Draw right border
+  60% {
+    // Draw right border
     width: 70%;
     height: 80%;
     border-bottom-color: transparent;
     border-right-color: var(--ark-highlight-green);
     opacity: 1;
   }
-  100% { // Draw bottom border
+  100% {
+    // Draw bottom border
     width: 70%;
     height: 80%;
     border-color: var(--ark-highlight-green);
@@ -188,7 +254,8 @@
     opacity: 0.7; // 修改: 初始透明度稍低
     border-width: 1px; // 修改: 初始边框宽度为 1px (细)
   }
-  70% { // 在动画 70% 时达到最大宽度
+  70% {
+    // 在动画 70% 时达到最大宽度
     opacity: 0.1; // 透明度降低
     border-width: 4px; // 修改: 边框宽度增加到 4px (粗)
   }
@@ -207,78 +274,107 @@
     border: 0 solid var(--ark-highlight-green);
     opacity: 0;
   }
-  30% { // Corners appear far out
+  30% {
+    // Corners appear far out
     width: 80%;
     height: 90%;
     border-width: 0px;
     opacity: 1;
     // Simulate corners using box-shadow trick
-    box-shadow: inset 10px 10px 0 -8px var(--ark-highlight-green),  /* Top-Left */
-                inset -10px 10px 0 -8px var(--ark-highlight-green), /* Top-Right */
-                inset 10px -10px 0 -8px var(--ark-highlight-green), /* Bottom-Left */
-                inset -10px -10px 0 -8px var(--ark-highlight-green);/* Bottom-Right */
+    box-shadow:
+      inset 10px 10px 0 -8px var(--ark-highlight-green),
+      /* Top-Left */ inset -10px 10px 0 -8px var(--ark-highlight-green),
+      /* Top-Right */ inset 10px -10px 0 -8px var(--ark-highlight-green),
+      /* Bottom-Left */ inset -10px -10px 0 -8px var(--ark-highlight-green); /* Bottom-Right */
   }
-  100% { // Corners move inwards
+  100% {
+    // Corners move inwards
     width: 60%;
     height: 70%;
     border-width: 0px;
     opacity: 1;
-    box-shadow: inset 10px 10px 0 -8px var(--ark-highlight-green),
-                inset -10px 10px 0 -8px var(--ark-highlight-green),
-                inset 10px -10px 0 -8px var(--ark-highlight-green),
-                inset -10px -10px 0 -8px var(--ark-highlight-green),
-                0 0 10px rgba(var(--ark-highlight-green-rgb), 0.4); // Final glow
+    box-shadow:
+      inset 10px 10px 0 -8px var(--ark-highlight-green),
+      inset -10px 10px 0 -8px var(--ark-highlight-green),
+      inset 10px -10px 0 -8px var(--ark-highlight-green),
+      inset -10px -10px 0 -8px var(--ark-highlight-green),
+      0 0 10px rgba(var(--ark-highlight-green-rgb), 0.4); // Final glow
   }
 }
 
 // Keyframes for Task List Animation
 @keyframes revealTaskSquare {
-  from { opacity: 0; transform: scale(0.5); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 // Changed text reveal to use clip-path
 @keyframes revealTaskTextClip {
-  from { 
+  from {
     opacity: 1; // Make visible from start
-    clip-path: inset(0 100% 0 0); 
+    clip-path: inset(0 100% 0 0);
   }
-  to { 
+  to {
     opacity: 1;
-    clip-path: inset(0 0 0 0); 
+    clip-path: inset(0 0 0 0);
   }
 }
 
 @keyframes drawTaskLine {
-  from { opacity: 0; transform: scaleY(0); }
-  to { opacity: 0.65; transform: scaleY(1); } 
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  to {
+    opacity: 0.65;
+    transform: scaleY(1);
+  }
 }
 
 // Keyframe for ECG scroll
 @keyframes ecgScroll {
-  from { background-position-x: 0px; }
-  to { background-position-x: -100px; } // Scroll by the new background-size width
+  from {
+    background-position-x: 0px;
+  }
+  to {
+    background-position-x: -100px;
+  } // Scroll by the new background-size width
 }
 
 // Keyframe for ECG fade-in
 @keyframes fadeInEcg {
-  from { opacity: 0; }
-  to { opacity: 0.8; } // Fade to desired opacity
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.8;
+  } // Fade to desired opacity
 }
 
 // --- 新增: 光标闪烁动画 ---
 @keyframes blinkCursor {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
-// --- New Keyframe for Meteor Trail (Top->Bottom) --- 
- @keyframes pulseMeteor {
+// --- New Keyframe for Meteor Trail (Top->Bottom) ---
+@keyframes pulseMeteor {
   0% {
     background-position: 50% -100%; // Adjust start position
     opacity: 0;
   }
-  20% { 
+  20% {
     opacity: 1; // Fade in quickly
   }
   80% {
@@ -287,8 +383,8 @@
   100% {
     background-position: 50% 100%; // End below
     opacity: 0; // Fade out
-  } 
-} 
+  }
+}
 
 // MODIFIED: Now animates Top->Bottom like pulseMeteor
 @keyframes pulseMeteorReverse {
@@ -297,7 +393,7 @@
     background-position: center -200%; // Was: center 100%
     opacity: 0;
   }
-  20% { 
+  20% {
     opacity: 1; // Fade in quickly
   }
   80% {
@@ -325,22 +421,22 @@
 @keyframes slideOutLeft {
   from {
     opacity: 0;
-    transform: translateX(0) ; // 保持倾斜
+    transform: translateX(0); // 保持倾斜
   }
   to {
     opacity: 1;
-    transform: translateX(-28px) ; // 修改：向左移动距离减小
+    transform: translateX(-28px); // 修改：向左移动距离减小
   }
 }
 
 @keyframes slideOutRight {
   from {
     opacity: 0;
-    transform: translateX(0) ; // 保持倾斜
+    transform: translateX(0); // 保持倾斜
   }
   to {
     opacity: 1;
-    transform: translateX(30px) ; // 修改：向右移动距离减小，并略大于左侧绝对值
+    transform: translateX(30px); // 修改：向右移动距离减小，并略大于左侧绝对值
   }
 }
 
@@ -368,31 +464,66 @@
 
 // ===== 移动端面板/底部栏动画 =====
 @keyframes mobileCornerBreath {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.7; }
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 @keyframes mobileScanlineScroll {
-  from { background-position: 0 0; }
-  to { background-position: 0 8px; }
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 8px;
+  }
 }
 
 @keyframes scanBottomBar {
-  0% { left: -35%; opacity: 0; }
-  8% { opacity: 0.8; }
-  15% { opacity: 1; }
-  85% { opacity: 1; }
-  92% { opacity: 0.8; }
-  100% { left: 100%; opacity: 0; }
+  0% {
+    left: -35%;
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.8;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 0.8;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
 }
 
 // Column retract animations (mirror of loading)
 @keyframes lineRetract {
-  from { opacity: 0.5; transform: scaleY(1); }
-  to   { opacity: 0;   transform: scaleY(0); }
+  from {
+    opacity: 0.5;
+    transform: scaleY(1);
+  }
+  to {
+    opacity: 0;
+    transform: scaleY(0);
+  }
 }
 
 @keyframes charRetract {
-  from { opacity: 1; transform: scale(1) translateY(0); }
-  to   { opacity: 0; transform: scale(1) translateY(5px); }
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1) translateY(5px);
+  }
 }

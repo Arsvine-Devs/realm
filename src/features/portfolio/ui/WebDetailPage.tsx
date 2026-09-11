@@ -137,7 +137,7 @@ function WebDetailContent({
     project.highlights?.length ?? 0,
     project.liveUrl ?? '',
     project.githubUrl ?? '',
-    Array.isArray(project.videoUrl) ? project.videoUrl.join('|') : project.videoUrl ?? '',
+    Array.isArray(project.videoUrl) ? project.videoUrl.join('|') : (project.videoUrl ?? ''),
   ].join('|');
   const { visible, setRef } = useDetailScrollReveal(wrapperRef, detailDepsKey);
   const { activeNav, bindSectionRef, isPastHero, scrollToSection } = useDetailSectionNav({
@@ -153,15 +153,15 @@ function WebDetailContent({
   });
 
   const paragraphs = project.articleContent
-    ? project.articleContent.split(/\n\s*\n+/).map((paragraph) => paragraph.trim()).filter(Boolean)
+    ? project.articleContent
+        .split(/\n\s*\n+/)
+        .map((paragraph) => paragraph.trim())
+        .filter(Boolean)
     : [];
   const galleryImages = project.galleryImages || [];
   const highlights = project.highlights || [];
 
-  const signalLinks = useMemo(
-    () => buildSignalLinks(project, tCommon),
-    [project, tCommon],
-  );
+  const signalLinks = useMemo(() => buildSignalLinks(project, tCommon), [project, tCommon]);
 
   const navItems = useMemo<DetailSectionNavItem[]>(() => {
     const items: DetailSectionNavItem[] = [{ id: 'hero', label: tNav('top') }];
@@ -178,7 +178,15 @@ function WebDetailContent({
       items.push({ id: 'signal', label: tNav('signal') });
     }
     return items;
-  }, [galleryImages.length, highlights.length, paragraphs.length, project.role, project.tech.length, signalLinks.length, tNav]);
+  }, [
+    galleryImages.length,
+    highlights.length,
+    paragraphs.length,
+    project.role,
+    project.tech.length,
+    signalLinks.length,
+    tNav,
+  ]);
 
   const {
     bindThumbnailRef,
@@ -199,27 +207,32 @@ function WebDetailContent({
     window.setTimeout(() => setCopiedId(null), 1500);
   }, []);
 
-  const handleBack = useCallback((event: React.MouseEvent<HTMLElement>) => {
-    event.preventDefault();
-    navigateTo(`/${locale}/content#works`);
-  }, [locale, navigateTo]);
+  const handleBack = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      event.preventDefault();
+      navigateTo(`/${locale}/content#works`);
+    },
+    [locale, navigateTo],
+  );
 
   const showHero = !project.noHero && !project.isConfidential && !!project.imageUrl;
   const baseCover = resolveImageUrl(project.imageUrl, 'large');
-  const invertedCover = project.invertedImageUrl ? resolveImageUrl(project.invertedImageUrl, 'large') : '';
+  const invertedCover = project.invertedImageUrl
+    ? resolveImageUrl(project.invertedImageUrl, 'large')
+    : '';
   const coverImage = isInverted && invertedCover ? invertedCover : baseCover;
 
   type WebGalleryGroup =
     | {
         kind: 'single';
-        image: typeof galleryImages[number];
+        image: (typeof galleryImages)[number];
         index: number;
         revealIndex: number;
       }
     | {
         kind: 'pair';
-        left: typeof galleryImages[number];
-        right: typeof galleryImages[number];
+        left: (typeof galleryImages)[number];
+        right: (typeof galleryImages)[number];
         leftIndex: number;
         rightIndex: number;
         leftRevealIndex: number;
@@ -236,7 +249,11 @@ function WebDetailContent({
       const image = galleryImages[galleryIndex];
       const revealIndex = revealCursor++;
 
-      if (image.isMobile && galleryIndex + 1 < galleryImages.length && galleryImages[galleryIndex + 1].isMobile) {
+      if (
+        image.isMobile &&
+        galleryIndex + 1 < galleryImages.length &&
+        galleryImages[galleryIndex + 1].isMobile
+      ) {
         const nextIndex = galleryIndex + 1;
         const nextImage = galleryImages[nextIndex];
         const nextRevealIndex = revealCursor++;
@@ -266,8 +283,10 @@ function WebDetailContent({
 
   const webGalleryItems = webGalleryGroups.map((group) => {
     if (group.kind === 'pair') {
-      const leftImageSrc = isInverted && group.left.invertedSrc ? group.left.invertedSrc : group.left.src;
-      const rightImageSrc = isInverted && group.right.invertedSrc ? group.right.invertedSrc : group.right.src;
+      const leftImageSrc =
+        isInverted && group.left.invertedSrc ? group.left.invertedSrc : group.left.src;
+      const rightImageSrc =
+        isInverted && group.right.invertedSrc ? group.right.invertedSrc : group.right.src;
 
       return (
         <div
@@ -282,35 +301,73 @@ function WebDetailContent({
           <div
             className={styles.mobileGalleryItem}
             onClick={(event) => openLightbox(group.leftIndex, event, 'gallery')}
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter' && event.key !== ' ') return;
+              event.preventDefault();
+              openLightbox(group.leftIndex, event, 'gallery');
+            }}
+            /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- the gallery thumbnail is a custom lightbox control. */
+            role="button"
+            tabIndex={0}
+            aria-label={group.left.caption || `${project.title} mobile ${group.leftIndex + 1}`}
             ref={(element) => {
               bindThumbnailRef(`gallery_${group.leftIndex}`)(element);
               setRef(group.leftRevealIndex)(element);
             }}
             data-reveal-idx={group.leftRevealIndex}
           >
-            <LazyImage src={leftImageSrc} alt={group.left.caption || `${project.title} mobile ${group.leftIndex + 1}`} quality="high" preset="card" />
+            <LazyImage
+              src={leftImageSrc}
+              alt={group.left.caption || `${project.title} mobile ${group.leftIndex + 1}`}
+              quality="high"
+              preset="card"
+            />
           </div>
           <div
             className={styles.mobileGalleryItem}
             onClick={(event) => openLightbox(group.rightIndex, event, 'gallery')}
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter' && event.key !== ' ') return;
+              event.preventDefault();
+              openLightbox(group.rightIndex, event, 'gallery');
+            }}
+            /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- the gallery thumbnail is a custom lightbox control. */
+            role="button"
+            tabIndex={0}
+            aria-label={group.right.caption || `${project.title} mobile ${group.rightIndex + 1}`}
             ref={(element) => {
               bindThumbnailRef(`gallery_${group.rightIndex}`)(element);
               setRef(group.rightRevealIndex)(element);
             }}
             data-reveal-idx={group.rightRevealIndex}
           >
-            <LazyImage src={rightImageSrc} alt={group.right.caption || `${project.title} mobile ${group.rightIndex + 1}`} quality="high" preset="card" />
+            <LazyImage
+              src={rightImageSrc}
+              alt={group.right.caption || `${project.title} mobile ${group.rightIndex + 1}`}
+              quality="high"
+              preset="card"
+            />
           </div>
         </div>
       );
     }
 
-    const imageSrc = isInverted && group.image.invertedSrc ? group.image.invertedSrc : group.image.src;
+    const imageSrc =
+      isInverted && group.image.invertedSrc ? group.image.invertedSrc : group.image.src;
     return (
       <div
         key={`gallery-${group.index}`}
         className={`${styles.webGalleryItem} ${visible.has(group.revealIndex) ? styles.visible : ''}`}
         onClick={(event) => openLightbox(group.index, event, 'gallery')}
+        onKeyDown={(event) => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          openLightbox(group.index, event, 'gallery');
+        }}
+        /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- the gallery thumbnail is a custom lightbox control. */
+        role="button"
+        tabIndex={0}
+        aria-label={group.image.caption || `${project.title} gallery ${group.index + 1}`}
         ref={(element) => {
           bindThumbnailRef(`gallery_${group.index}`)(element);
           setRef(group.revealIndex)(element);
@@ -322,7 +379,12 @@ function WebDetailContent({
           transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
         }}
       >
-        <LazyImage src={imageSrc} alt={group.image.caption || `${project.title} gallery ${group.index + 1}`} quality="high" preset="card" />
+        <LazyImage
+          src={imageSrc}
+          alt={group.image.caption || `${project.title} gallery ${group.index + 1}`}
+          quality="high"
+          preset="card"
+        />
       </div>
     );
   });
@@ -417,30 +479,34 @@ function WebDetailContent({
 
         <DetailFooterNav
           styles={styles}
-          previous={prevProject
-            ? {
-                href: `/${locale}/web/${prevProject.id}`,
-                title: prevProject.title,
-                cursorLabel: 'PREVIOUS',
-                onNavigateIntent: () => prefetchOnIntent(`/${locale}/web/${prevProject.id}`),
-                onClick: (event) => {
-                  event.preventDefault();
-                  navigateTo(`/${locale}/web/${prevProject.id}`);
-                },
-              }
-            : null}
-          next={nextProject
-            ? {
-                href: `/${locale}/web/${nextProject.id}`,
-                title: nextProject.title,
-                cursorLabel: 'NEXT',
-                onNavigateIntent: () => prefetchOnIntent(`/${locale}/web/${nextProject.id}`),
-                onClick: (event) => {
-                  event.preventDefault();
-                  navigateTo(`/${locale}/web/${nextProject.id}`);
-                },
-              }
-            : null}
+          previous={
+            prevProject
+              ? {
+                  href: `/${locale}/web/${prevProject.id}`,
+                  title: prevProject.title,
+                  cursorLabel: 'PREVIOUS',
+                  onNavigateIntent: () => prefetchOnIntent(`/${locale}/web/${prevProject.id}`),
+                  onClick: (event) => {
+                    event.preventDefault();
+                    navigateTo(`/${locale}/web/${prevProject.id}`);
+                  },
+                }
+              : null
+          }
+          next={
+            nextProject
+              ? {
+                  href: `/${locale}/web/${nextProject.id}`,
+                  title: nextProject.title,
+                  cursorLabel: 'NEXT',
+                  onNavigateIntent: () => prefetchOnIntent(`/${locale}/web/${nextProject.id}`),
+                  onClick: (event) => {
+                    event.preventDefault();
+                    navigateTo(`/${locale}/web/${nextProject.id}`);
+                  },
+                }
+              : null
+          }
           fallback={{
             href: `/${locale}/content#works`,
             title: tCommon('returnToMain'),
@@ -460,24 +526,27 @@ function WebDetailContent({
         onNavigateSection={scrollToSection}
       />
 
-      {isLightboxOpen && galleryImages.length > 0 && (() => {
-        const lightboxImage = galleryImages[currentLightboxImageIndex];
-        const effectiveImage = isInverted && lightboxImage.invertedSrc
-          ? { ...lightboxImage, src: lightboxImage.invertedSrc }
-          : lightboxImage;
-        return (
-          <Lightbox
-            image={effectiveImage}
-            onClose={closeLightbox}
-            onPrev={galleryImages.length > 1 ? showPrevImage : null}
-            onNext={galleryImages.length > 1 ? showNextImage : null}
-            thumbnailRect={clickedThumbnailRect}
-            currentIndex={currentLightboxImageIndex}
-            totalImages={galleryImages.length}
-            getClosingRectForIndex={getClosingRect}
-          />
-        );
-      })()}
+      {isLightboxOpen &&
+        galleryImages.length > 0 &&
+        (() => {
+          const lightboxImage = galleryImages[currentLightboxImageIndex];
+          const effectiveImage =
+            isInverted && lightboxImage.invertedSrc
+              ? { ...lightboxImage, src: lightboxImage.invertedSrc }
+              : lightboxImage;
+          return (
+            <Lightbox
+              image={effectiveImage}
+              onClose={closeLightbox}
+              onPrev={galleryImages.length > 1 ? showPrevImage : null}
+              onNext={galleryImages.length > 1 ? showNextImage : null}
+              thumbnailRect={clickedThumbnailRect}
+              currentIndex={currentLightboxImageIndex}
+              totalImages={galleryImages.length}
+              getClosingRectForIndex={getClosingRect}
+            />
+          );
+        })()}
     </div>
   );
 }

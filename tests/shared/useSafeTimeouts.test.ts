@@ -132,9 +132,8 @@ describe('useSafeTimeouts', () => {
   });
 
   it('still fires callbacks when mounted under React.StrictMode', () => {
-    const StrictModeWrapper = ({ children }: { children: React.ReactNode }) => (
-      React.createElement(React.StrictMode, null, children)
-    );
+    const StrictModeWrapper = ({ children }: { children: React.ReactNode }) =>
+      React.createElement(React.StrictMode, null, children);
     const { result } = renderHook(() => useSafeTimeouts(), {
       wrapper: StrictModeWrapper,
     });

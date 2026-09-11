@@ -30,18 +30,14 @@ export default function RevealParagraphSection({
   renderParagraph,
 }: RevealParagraphSectionProps) {
   return (
-    <section
-      className={className}
-      ref={sectionRef}
-      data-nav-id={sectionId}
-    >
+    <section className={className} ref={sectionRef} data-nav-id={sectionId}>
       <h2 className={styles.sectionHeader}>{title}</h2>
       {paragraphs.map((paragraph, index) => {
         const revealIndex = revealIndices[index];
         return (
           <div
             key={`${sectionId}-${index}`}
-            className={`${itemClassName} ${visible.has(revealIndex) ? styles.visible ?? '' : ''}`}
+            className={`${itemClassName} ${visible.has(revealIndex) ? (styles.visible ?? '') : ''}`}
             data-reveal-idx={revealIndex}
             ref={setRef(revealIndex)}
           >

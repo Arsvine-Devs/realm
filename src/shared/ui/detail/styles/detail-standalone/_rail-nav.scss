@@ -13,7 +13,9 @@
   gap: 8px;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
 
   &.visible {
     opacity: 1;
@@ -36,7 +38,11 @@
   cursor: none;
   position: relative;
   font-size: 0;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s, opacity 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    border-color 0.3s,
+    opacity 0.3s;
   opacity: 0.7;
   backdrop-filter: blur(4px);
   font-family: 'Dosis', monospace;
@@ -50,7 +56,9 @@
     font-size: 1.1rem;
     line-height: 1;
     color: inherit;
-    transition: color 0.3s, opacity 0.3s;
+    transition:
+      color 0.3s,
+      opacity 0.3s;
   }
 
   &:hover {
@@ -85,7 +93,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   opacity: 0.6;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s, opacity 0.3s, padding-left 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    border-color 0.3s,
+    opacity 0.3s,
+    padding-left 0.3s;
 
   &:hover {
     background: var(--ark-primary);
@@ -101,4 +114,3 @@
     opacity: 1;
   }
 }
-

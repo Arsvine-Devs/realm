@@ -5,7 +5,10 @@ vi.mock('@/shared/hooks/useMediaQuery', () => ({
   useResponsive: () => ({ isMobile: false, isDesktop: true }),
 }));
 
-import { LayoutAnchorsProvider, useLayoutAnchors } from '@/features/navigation/model/LayoutAnchorsContext';
+import {
+  LayoutAnchorsProvider,
+  useLayoutAnchors,
+} from '@/features/navigation/model/LayoutAnchorsContext';
 
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => {

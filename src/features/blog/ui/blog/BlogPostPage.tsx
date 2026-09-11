@@ -131,15 +131,17 @@ export default function BlogPostPage({
         signalLabel={tCommon('signalFragment')}
         statusText={viewState === 'loadFailed' ? tCommon('loading') : tCommon('decoding')}
         error={loadError}
-        action={loadError ? (
-          <button
-            type="button"
-            className={styles.articleLocaleRetry}
-            onClick={retryRequestedContentLocale}
-          >
-            {tCommon('retry')}
-          </button>
-        ) : null}
+        action={
+          loadError ? (
+            <button
+              type="button"
+              className={styles.articleLocaleRetry}
+              onClick={retryRequestedContentLocale}
+            >
+              {tCommon('retry')}
+            </button>
+          ) : null
+        }
         isProtected={isProtected}
       />
     );
@@ -183,7 +185,10 @@ function BlogDetailContent({
   updateContentLocaleQuery,
   loadError,
   retryRequestedContentLocale,
-}: Omit<BlogPostPageProps, 'messages' | 'contentVariants' | 'access' | 'isProtected' | 'actualContentLocale' | 'mdxSource'> & {
+}: Omit<
+  BlogPostPageProps,
+  'messages' | 'contentVariants' | 'access' | 'isProtected' | 'actualContentLocale' | 'mdxSource'
+> & {
   mdxSource: MDXRemoteSerializeResult;
   viewState: BlogPostViewState;
   selectedContentLocale: BlogContentLocale;
@@ -218,9 +223,10 @@ function BlogDetailContent({
       innerSelector: `.${styles.charInner}`,
       revealDelay: 0.4,
       stagger: 0.06,
-      onComplete: () => startTransition(() => {
-        setCompletedTitleKey(titleAnimationKey);
-      }),
+      onComplete: () =>
+        startTransition(() => {
+          setCompletedTitleKey(titleAnimationKey);
+        }),
     });
   }, [titleAnimationKey]);
 
@@ -250,10 +256,14 @@ function BlogDetailContent({
           el.style.transitionDelay = `${i * 0.07}s`;
           el.style.opacity = '1';
           el.style.transform = 'translateY(0)';
-          el.addEventListener('transitionend', () => {
-            el.style.transitionDelay = '';
-            el.style.transform = 'none';
-          }, { once: true });
+          el.addEventListener(
+            'transitionend',
+            () => {
+              el.style.transitionDelay = '';
+              el.style.transform = 'none';
+            },
+            { once: true },
+          );
           observer.unobserve(el);
         });
       },
@@ -270,20 +280,18 @@ function BlogDetailContent({
     };
   }, [titleDone, selectedContentLocale]);
 
-  const handleContentLocaleChange = useCallback((nextContentLocale: BlogContentLocale) => {
-    if (loadingLang) {
-      return;
-    }
-    if (nextContentLocale === selectedContentLocale && viewState !== 'loadFailed') {
-      return;
-    }
-    updateContentLocaleQuery(nextContentLocale);
-  }, [
-    loadingLang,
-    selectedContentLocale,
-    updateContentLocaleQuery,
-    viewState,
-  ]);
+  const handleContentLocaleChange = useCallback(
+    (nextContentLocale: BlogContentLocale) => {
+      if (loadingLang) {
+        return;
+      }
+      if (nextContentLocale === selectedContentLocale && viewState !== 'loadFailed') {
+        return;
+      }
+      updateContentLocaleQuery(nextContentLocale);
+    },
+    [loadingLang, selectedContentLocale, updateContentLocaleQuery, viewState],
+  );
 
   return (
     <>
@@ -294,10 +302,15 @@ function BlogDetailContent({
         defaultContentLocale={defaultContentLocale}
         headerEntered={entered}
         scrollRootRef={wrapperRef}
-        headerContent={(
+        headerContent={
           <>
             {translationStatus !== 'source' && (
-              <LocaleFallbackBanner requestedLocale={locale} actualLocale={actualLocale} originLocale={originLocale} status={translationStatus} />
+              <LocaleFallbackBanner
+                requestedLocale={locale}
+                actualLocale={actualLocale}
+                originLocale={originLocale}
+                status={translationStatus}
+              />
             )}
 
             <div className={styles.headerContent}>
@@ -316,7 +329,10 @@ function BlogDetailContent({
                 {readingLabel && <span className={styles.headerReadingTime}>{readingLabel}</span>}
               </div>
               {availableContentLocales.length > 1 && (
-                <div className={styles.articleLocaleSwitcher} aria-label="Article language switcher">
+                <div
+                  className={styles.articleLocaleSwitcher}
+                  aria-label="Article language switcher"
+                >
                   {availableContentLocales.map((contentLocale) => (
                     <button
                       key={contentLocale}
@@ -346,14 +362,16 @@ function BlogDetailContent({
               {meta.tags.length > 0 && (
                 <div className={styles.headerTags}>
                   {meta.tags.map((tag) => (
-                    <span key={tag} className={styles.headerTag}>{tag}</span>
+                    <span key={tag} className={styles.headerTag}>
+                      {tag}
+                    </span>
                   ))}
                 </div>
               )}
             </div>
           </>
-        )}
-        contentContent={(
+        }
+        contentContent={
           <>
             {(!titleDone || viewState === 'loadingVariant') && (
               <div className={styles.loadingIndicator}>
@@ -364,7 +382,7 @@ function BlogDetailContent({
               <MDXRemote {...mdxSource} components={MDXComponents} />
             </div>
           </>
-        )}
+        }
       />
     </>
   );

@@ -7,7 +7,7 @@
 ## 开发基线
 
 - Next.js 16 App Router、React 19、TypeScript。
-- Node.js `24.x`，pnpm `11.7.0`。
+- Node.js `24.x`，pnpm 版本以 `package.json#packageManager` 为准。
 - SCSS Modules 与共享 SCSS partials。
 - `next-intl` 4，UI locale 为 `zh-CN`、`zh-TW`、`en`。
 - Vitest + `jsdom`，测试统一位于 `tests/`。
@@ -39,10 +39,13 @@ pnpm install --frozen-lockfile
 
 ```bash
 pnpm dev
+pnpm format
+pnpm format:check
 pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm quality
 pnpm check
 ```
 
@@ -73,23 +76,23 @@ server.js               本地开发与可选自托管入口
 
 ## 常见修改入口
 
-| 需求 | 优先位置 |
-|---|---|
-| 站点 metadata、SEO、字体、社交链接 | `src/shared/config/site.ts` |
-| UI 文案 | `src/app/locales/*.json` |
-| locale 合约 | `src/shared/contracts/locale.ts` |
-| 多语言结构化数据 | `src/features/<feature>/contracts/data/` |
-| 博客和推文运行时内容 | 外部 GitHub 内容仓库 |
-| 内置博客 fallback | `content/blog/init/` |
-| MDX renderer | `src/features/blog/ui/mdx/` |
-| protected post 状态 | `src/features/blog/model/blogPostState.ts` |
-| 导航过渡 | `src/features/navigation/model/TransitionProvider.tsx` |
-| hash 导航 | `src/features/navigation/model/contentHashNavigation.ts` |
-| HUD 与左面板 | `src/features/hud/`、`src/app/shell/MainLayout.tsx` |
-| 音乐播放 | `src/features/music/` |
-| 资产 Catalog | `src/features/assets/`、`scripts/assets-*.mjs` |
-| 远程图片 host | `config/image-hosts.js` |
-| 全局 token 和 z-index | `src/app/styles/globals.scss` |
+| 需求                               | 优先位置                                                 |
+| ---------------------------------- | -------------------------------------------------------- |
+| 站点 metadata、SEO、字体、社交链接 | `src/shared/config/site.ts`                              |
+| UI 文案                            | `src/app/locales/*.json`                                 |
+| locale 合约                        | `src/shared/contracts/locale.ts`                         |
+| 多语言结构化数据                   | `src/features/<feature>/contracts/data/`                 |
+| 博客和推文运行时内容               | 外部 GitHub 内容仓库                                     |
+| 内置博客 fallback                  | `content/blog/init/`                                     |
+| MDX renderer                       | `src/features/blog/ui/mdx/`                              |
+| protected post 状态                | `src/features/blog/model/blogPostState.ts`               |
+| 导航过渡                           | `src/features/navigation/model/TransitionProvider.tsx`   |
+| hash 导航                          | `src/features/navigation/model/contentHashNavigation.ts` |
+| HUD 与左面板                       | `src/features/hud/`、`src/app/shell/MainLayout.tsx`      |
+| 音乐播放                           | `src/features/music/`                                    |
+| 资产 Catalog                       | `src/features/assets/`、`scripts/assets-*.mjs`           |
+| 远程图片 host                      | `config/image-hosts.js`                                  |
+| 全局 token 和 z-index              | `src/app/styles/globals.scss`                            |
 
 ## App Router 边界
 
@@ -106,7 +109,7 @@ server.js               本地开发与可选自托管入口
 内部导航必须使用：
 
 ```ts
-useTransition().navigateTo(url)
+useTransition().navigateTo(url);
 ```
 
 locale 切换使用同一 context 的 `switchLocale()`。不要用 `router.push()` 绕过 home/content/detail 动画。
@@ -159,16 +162,16 @@ pnpm assets:publish -- --dry-run
 
 ## 维护脚本
 
-| 脚本 | 用途 |
-|---|---|
-| `scripts/sync-env-files.mjs` | 同步环境文件注册表 |
-| `scripts/prepare-cos-workspace.mjs` | 规范化旧 COS mirror |
-| `scripts/assets-build.mjs` | hash、验证并生成 Catalog |
-| `scripts/assets-publish.mjs` | 上传、验证、切换 pointer、revalidate |
-| `scripts/convert-images.mjs` | 批量转换图片 |
-| `scripts/fetch-google-fonts.mjs` | 下载并重写字体 CSS |
-| `scripts/regen-favicons.mjs` | 生成 favicon 与 PWA icons |
-| `scripts/dev-host-setup.cmd` | Windows 本地 COS Referer 环境 |
+| 脚本                                | 用途                                 |
+| ----------------------------------- | ------------------------------------ |
+| `scripts/sync-env-files.mjs`        | 同步环境文件注册表                   |
+| `scripts/prepare-cos-workspace.mjs` | 规范化旧 COS mirror                  |
+| `scripts/assets-build.mjs`          | hash、验证并生成 Catalog             |
+| `scripts/assets-publish.mjs`        | 上传、验证、切换 pointer、revalidate |
+| `scripts/convert-images.mjs`        | 批量转换图片                         |
+| `scripts/fetch-google-fonts.mjs`    | 下载并重写字体 CSS                   |
+| `scripts/regen-favicons.mjs`        | 生成 favicon 与 PWA icons            |
+| `scripts/dev-host-setup.cmd`        | Windows 本地 COS Referer 环境        |
 
 运行不熟悉的脚本前先阅读其参数和 [`ASSETS.md`](./ASSETS.md)。
 
@@ -176,9 +179,11 @@ pnpm assets:publish -- --dry-run
 
 - 使用 pnpm，不生成 npm/yarn lockfile。
 - pnpm workspace 配置位于 `pnpm-workspace.yaml`，不要移到 `package.json#pnpm`。
-- `postcss` override 暂时固定为 `8.5.10`。
-- `@react-three/fiber` 精确固定为 `9.6.1`，并应用 `patches/@react-three__fiber@9.6.1.patch`。
+- 安全 override 的当前版本以 `pnpm-workspace.yaml` 为准。
+- `@react-three/fiber` 精确固定为 `9.7.0`，并应用 `patches/@react-three__fiber@9.7.0.patch`。
+- `cos-request` 通过 workspace override 固定为 `1.3.3`，并应用 `patches/cos-request@1.3.3.patch`，避免 Node.js 24 的 `url.parse()` deprecation；升级 COS SDK 时必须重新验证该 patch。
 - 升级 Fiber 必须重建 patch 并保持 `tests/repo/react-three-fiber-timer-patch.test.ts` 通过。
+- 升级 `cos-request` 必须保持 `tests/repo/cos-request-url-patch.test.ts` 通过，并用 `NODE_OPTIONS=--trace-deprecation pnpm build` 检查构建日志。
 - 网络安装失败时先检查代理或 registry，不要把网络问题误判为代码问题。
 
 ## 完成前检查

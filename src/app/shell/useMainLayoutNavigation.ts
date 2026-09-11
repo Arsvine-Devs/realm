@@ -36,20 +36,25 @@ export function useLeftPanelNavigation({
     const nextHref = `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
     const currentHref = `${window.location.pathname}${window.location.search}${window.location.hash}`;
     if (nextHref !== currentHref) window.history.pushState(window.history.state, '', nextHref);
-    document.getElementById(`section-${link.hash}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document
+      .getElementById(`section-${link.hash}`)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
-  return useCallback((link: LeftNavigationLink) => {
-    closeDrawer();
-    if (link.hash && isContentPage) {
-      if (isDetailOpen()) {
-        handleBack();
-        window.setTimeout(() => updateContentHashAndScroll(link), CONTENT_DETAIL_EXIT_DELAY_MS);
-      } else {
-        updateContentHashAndScroll(link);
+  return useCallback(
+    (link: LeftNavigationLink) => {
+      closeDrawer();
+      if (link.hash && isContentPage) {
+        if (isDetailOpen()) {
+          handleBack();
+          window.setTimeout(() => updateContentHashAndScroll(link), CONTENT_DETAIL_EXIT_DELAY_MS);
+        } else {
+          updateContentHashAndScroll(link);
+        }
+        return;
       }
-      return;
-    }
-    navigateTo(link.href);
-  }, [closeDrawer, handleBack, isContentPage, isDetailOpen, navigateTo, updateContentHashAndScroll]);
+      navigateTo(link.href);
+    },
+    [closeDrawer, handleBack, isContentPage, isDetailOpen, navigateTo, updateContentHashAndScroll],
+  );
 }

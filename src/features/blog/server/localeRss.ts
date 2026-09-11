@@ -29,8 +29,8 @@ function buildFallbackExcerpt(content: string): string {
     .replace(/`[^`\n]*`/g, ' ')
     .replace(/<\/?[a-zA-Z][^>]*>/g, ' ')
     .replace(/^\s*(?:import|export)\s.+$/gm, ' ')
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')                          // markdown 图
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')                        // markdown 链接保留文字
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ') // markdown 图
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1') // markdown 链接保留文字
     .replace(/[#>*_~`-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
@@ -110,31 +110,34 @@ export async function buildLocaleRssResponse(locale: Locale) {
 
   // 按 updated ?? date 排序，新文章在前；与之前按 date 排序的行为基本一致，
   // 只有修订过的旧文会上浮 —— 这是预期效果。
-  const posts = [...await getPublicPostsForLocale(locale)].sort((a, b) => {
-    const ta = (getPostLastModified(a)?.getTime() ?? 0);
-    const tb = (getPostLastModified(b)?.getTime() ?? 0);
+  const posts = [...(await getPublicPostsForLocale(locale))].sort((a, b) => {
+    const ta = getPostLastModified(a)?.getTime() ?? 0;
+    const tb = getPostLastModified(b)?.getTime() ?? 0;
     return tb - ta;
   });
 
-  const items: RssItemInput[] = await Promise.all(posts.map(async (meta) => {
-    // excerpt 缺失才读正文做兜底，避免对每篇文章都重读一次 MDX。
-    let description = meta.excerpt;
-    if (!description) {
-      try {
-        const { content } = await getPostBySlugAndLocale(meta.slug, locale);
-        description = buildFallbackExcerpt(content);
-      } catch {
-        description = '';
+  const items: RssItemInput[] = await Promise.all(
+    posts.map(async (meta) => {
+      // excerpt 缺失才读正文做兜底，避免对每篇文章都重读一次 MDX。
+      let description = meta.excerpt;
+      if (!description) {
+        try {
+          const { content } = await getPostBySlugAndLocale(meta.slug, locale);
+          description = buildFallbackExcerpt(content);
+        } catch {
+          description = '';
+        }
       }
-    }
-    return {
-      meta,
-      description,
-      lastModified: getPostLastModified(meta),
-    };
-  }));
+      return {
+        meta,
+        description,
+        lastModified: getPostLastModified(meta),
+      };
+    }),
+  );
 
-  const siteMessages = (messages.pages as Record<string, { title?: string; rssDescription?: string }>)?.site ?? {};
+  const siteMessages =
+    (messages.pages as Record<string, { title?: string; rssDescription?: string }>)?.site ?? {};
   const xml = generateRssXml(
     locale,
     items,

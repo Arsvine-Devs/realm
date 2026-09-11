@@ -91,10 +91,7 @@ describe('/api/post-variant', () => {
     const response = await handler(createRequest('arsvine_post_access=signed-token'));
 
     expect(response.status).toBe(200);
-    expect(getPostBySlugAndContentLocaleMock).toHaveBeenCalledWith(
-      'protected-post',
-      'zh-CN',
-    );
+    expect(getPostBySlugAndContentLocaleMock).toHaveBeenCalledWith('protected-post', 'zh-CN');
     expect(serializeMock).toHaveBeenCalledWith('# secret');
   });
 });

@@ -14,10 +14,13 @@ export default async function handler(request: Request) {
     60_000,
   );
   if (!limiter.ok) {
-    return jsonResponse({ message: 'Too many requests' }, {
-      status: 429,
-      headers: { 'Retry-After': String(Math.ceil(limiter.retryAfterMs / 1000)) },
-    });
+    return jsonResponse(
+      { message: 'Too many requests' },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(Math.ceil(limiter.retryAfterMs / 1000)) },
+      },
+    );
   }
 
   const auth = await authenticateRevalidation(request);
@@ -25,9 +28,7 @@ export default async function handler(request: Request) {
   const { body } = auth;
 
   const slug =
-    typeof body.slug === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(body.slug)
-      ? body.slug
-      : '';
+    typeof body.slug === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(body.slug) ? body.slug : '';
   const contentPaths = locales.map((locale) => `/${locale}/content`);
   const blogPaths = slug ? locales.map((locale) => `/${locale}/blog/${slug}`) : [];
 

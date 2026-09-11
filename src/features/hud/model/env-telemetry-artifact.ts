@@ -102,12 +102,12 @@ function deriveWind(envData: EnvData, variantSeed: number) {
 }
 
 function deriveVisibility(envData: EnvData, variantSeed: number) {
-  const raw = 9.4 - ((variantSeed % 5) * 1.1) - ((envData.rad - 200) / 180);
+  const raw = 9.4 - (variantSeed % 5) * 1.1 - (envData.rad - 200) / 180;
   return Math.max(0.8, Math.min(9.4, Number(raw.toFixed(1))));
 }
 
 function derivePh(envData: EnvData, variantSeed: number) {
-  const raw = 3.1 + ((variantSeed % 4) * 0.4) - ((envData.o2 - 8) * 0.2);
+  const raw = 3.1 + (variantSeed % 4) * 0.4 - (envData.o2 - 8) * 0.2;
   return Math.max(2.8, Math.min(5.8, Number(raw.toFixed(1))));
 }
 
@@ -168,7 +168,7 @@ function createSeededRandom(seed: string) {
     state = (state + 0x6d2b79f5) | 0;
     let t = Math.imul(state ^ (state >>> 15), 1 | state);
     t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
-    return (((t ^ (t >>> 14)) >>> 0) / 4294967296);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
 
@@ -231,7 +231,10 @@ function readableFragmentsFromLines(lines: string[]) {
 
 function graftFragment(base: string, donor: string, random: () => number, aggressive = false) {
   const fragments = readableFragmentsFromLines([donor]);
-  const fragment = fragments.length > 0 ? pickOne(fragments, random) : donor.replace(/[^A-Z0-9°/%]/g, '').slice(0, 6);
+  const fragment =
+    fragments.length > 0
+      ? pickOne(fragments, random)
+      : donor.replace(/[^A-Z0-9°/%]/g, '').slice(0, 6);
   if (!fragment) {
     return base;
   }
@@ -310,7 +313,11 @@ function buildStageOneLines(snapshot: TelemetrySnapshot, random: () => number) {
   });
 }
 
-function buildStageTwoLines(snapshot: TelemetrySnapshot, previousBuffer: string, random: () => number) {
+function buildStageTwoLines(
+  snapshot: TelemetrySnapshot,
+  previousBuffer: string,
+  random: () => number,
+) {
   const previousLines = splitLines(previousBuffer || snapshot.text);
 
   return snapshot.lines.map((line, index) => {
@@ -325,9 +332,7 @@ function buildStageTwoLines(snapshot: TelemetrySnapshot, previousBuffer: string,
 
     const [rawLabel, ...rest] = next.split(':');
     const donorLine = previousLines[index] || previousLines[index - 1];
-    const stableLabel = random() > 0.68
-      ? corruptAnchor(rawLabel, random, 2)
-      : rawLabel;
+    const stableLabel = random() > 0.68 ? corruptAnchor(rawLabel, random, 2) : rawLabel;
     let value = rest.join(':').trim();
     value = duplicateBurst(value, random, 2, 2);
     if (random() > 0.42) {
@@ -343,7 +348,11 @@ function buildStageTwoLines(snapshot: TelemetrySnapshot, previousBuffer: string,
   });
 }
 
-function buildStageThreeLines(snapshot: TelemetrySnapshot, previousBuffer: string, random: () => number) {
+function buildStageThreeLines(
+  snapshot: TelemetrySnapshot,
+  previousBuffer: string,
+  random: () => number,
+) {
   const previousLines = splitLines(previousBuffer || snapshot.text);
 
   return snapshot.lines.map((line, index) => {
@@ -352,17 +361,13 @@ function buildStageThreeLines(snapshot: TelemetrySnapshot, previousBuffer: strin
     const donorLine = previousLines[index] || previousLines[Math.max(0, index - 1)];
 
     if (index < 3) {
-      const label = random() > 0.55
-        ? corruptAnchor(rawLabel, random, 2)
-        : rawLabel;
+      const label = random() > 0.55 ? corruptAnchor(rawLabel, random, 2) : rawLabel;
       let value = corruptTelemetryValue(rawValue, random, 2);
       value = mergeTelemetryValue(value, donorLine, random);
       return capKeyValueLine(label, value, 28);
     }
 
-    const label = random() > 0.45
-      ? corruptAnchor(rawLabel, random, index === 5 ? 2 : 3)
-      : rawLabel;
+    const label = random() > 0.45 ? corruptAnchor(rawLabel, random, index === 5 ? 2 : 3) : rawLabel;
     let value = corruptAnchor(rawValue, random, index === 5 ? 3 : 2);
     value = mergeTelemetryValue(value, previousLines[index - 1] || donorLine, random);
     if (index === 5 && !/OXYGEN|DEPLETION/.test(value)) {
@@ -372,15 +377,44 @@ function buildStageThreeLines(snapshot: TelemetrySnapshot, previousBuffer: strin
   });
 }
 
-function buildStageFourLines(snapshot: TelemetrySnapshot, previousBuffer: string, random: () => number, envData: EnvData) {
+function buildStageFourLines(
+  snapshot: TelemetrySnapshot,
+  previousBuffer: string,
+  random: () => number,
+  envData: EnvData,
+) {
   const previousLines = splitLines(previousBuffer || snapshot.text);
   const lines = [
-    capKeyValueLine(corruptAnchor('TEMP', random, 2), corruptTelemetryValue(`${envData.temp.toFixed(1)}°C`, random, 3), 28),
-    capKeyValueLine(corruptAnchor('RAD', random, 2), corruptTelemetryValue(`${envData.rad}mSv/h`, random, 3), 28),
-    capKeyValueLine(corruptAnchor('O2', random, 1), corruptTelemetryValue(`${envData.o2.toFixed(1)}%`, random, 2), 28),
-    capKeyValueLine(corruptAnchor('POLLUTION', random, 2), corruptAnchor(envData.pollution, random, 2), 28),
-    capKeyValueLine(corruptAnchor('ACID RAIN', random, 2), corruptAnchor(envData.acidRain, random, 2), 28),
-    capKeyValueLine(corruptAnchor(pickOne(['URGENT', 'ALERT', 'CAUTION'], random), random, 2), corruptAnchor('OXYGEN DEPLETION', random, 3), 30),
+    capKeyValueLine(
+      corruptAnchor('TEMP', random, 2),
+      corruptTelemetryValue(`${envData.temp.toFixed(1)}°C`, random, 3),
+      28,
+    ),
+    capKeyValueLine(
+      corruptAnchor('RAD', random, 2),
+      corruptTelemetryValue(`${envData.rad}mSv/h`, random, 3),
+      28,
+    ),
+    capKeyValueLine(
+      corruptAnchor('O2', random, 1),
+      corruptTelemetryValue(`${envData.o2.toFixed(1)}%`, random, 2),
+      28,
+    ),
+    capKeyValueLine(
+      corruptAnchor('POLLUTION', random, 2),
+      corruptAnchor(envData.pollution, random, 2),
+      28,
+    ),
+    capKeyValueLine(
+      corruptAnchor('ACID RAIN', random, 2),
+      corruptAnchor(envData.acidRain, random, 2),
+      28,
+    ),
+    capKeyValueLine(
+      corruptAnchor(pickOne(['URGENT', 'ALERT', 'CAUTION'], random), random, 2),
+      corruptAnchor('OXYGEN DEPLETION', random, 3),
+      30,
+    ),
   ];
 
   return lines.map((line, index) => {

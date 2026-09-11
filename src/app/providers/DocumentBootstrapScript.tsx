@@ -8,10 +8,7 @@ interface DocumentBootstrapScriptProps {
 
 export default function DocumentBootstrapScript({ script }: DocumentBootstrapScriptProps) {
   useServerInsertedHTML(() => (
-    <script
-      id="document-bootstrap"
-      dangerouslySetInnerHTML={{ __html: script }}
-    />
+    <script id="document-bootstrap" dangerouslySetInnerHTML={{ __html: script }} />
   ));
 
   return null;

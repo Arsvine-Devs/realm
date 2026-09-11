@@ -9,12 +9,15 @@ export interface TerminalConsoleRef {
   container: HTMLDivElement | null;
 }
 
-function TerminalConsole({ logLines, ref }: TerminalConsoleProps & { ref?: React.Ref<TerminalConsoleRef> }) {
+function TerminalConsole({
+  logLines,
+  ref,
+}: TerminalConsoleProps & { ref?: React.Ref<TerminalConsoleRef> }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useImperativeHandle(ref, () => ({
-    container: containerRef.current
+    container: containerRef.current,
   }));
 
   useEffect(() => {
@@ -29,7 +32,7 @@ function TerminalConsole({ logLines, ref }: TerminalConsoleProps & { ref?: React
         <span className={styles.header_title}>SYSTEM LOG</span>
       </div>
       <div className={styles.console_content} ref={contentRef}>
-        {logLines.map(line => (
+        {logLines.map((line) => (
           <div key={line.id} className={styles.log_line}>
             <span className={styles.log_prefix}>&gt;</span>
             <span className={styles.log_text}>{line.text}</span>

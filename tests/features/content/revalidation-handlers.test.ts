@@ -68,31 +68,38 @@ describe('revalidation handlers', () => {
 
   it('rejects requests when the server secret is not configured', async () => {
     delete process.env.REVALIDATE_SECRET;
-    const missing = await revalidateAssets(postRequest('/api/revalidate-assets', { secret: 'test-secret' }));
+    const missing = await revalidateAssets(
+      postRequest('/api/revalidate-assets', { secret: 'test-secret' }),
+    );
     expect(missing.status).toBe(401);
   });
 
   it('preserves the legacy tweets GET query secret', async () => {
-    const response = await revalidateTweets(new Request(
-      'https://arsvine.com/api/revalidate?secret=test-secret',
-    ));
+    const response = await revalidateTweets(
+      new Request('https://arsvine.com/api/revalidate?secret=test-secret'),
+    );
 
     expect(response.status).toBe(200);
     expect((await response.json()).revalidated).toBe(true);
   });
 
-  it.each(endpointCases)('rate limits the %s endpoint before authentication', async (_name, path, handler) => {
-    enforceRateLimitMock.mockResolvedValue({ ok: false, remaining: 0, retryAfterMs: 12_400 });
-    const response = await handler(postRequest(path, { secret: 'test-secret' }));
+  it.each(endpointCases)(
+    'rate limits the %s endpoint before authentication',
+    async (_name, path, handler) => {
+      enforceRateLimitMock.mockResolvedValue({ ok: false, remaining: 0, retryAfterMs: 12_400 });
+      const response = await handler(postRequest(path, { secret: 'test-secret' }));
 
-    expect(response.status).toBe(429);
-    expect(response.headers.get('Retry-After')).toBe('13');
-    expect(await response.json()).toEqual({ message: 'Too many requests' });
-    expect(revalidatePathMock).not.toHaveBeenCalled();
-  });
+      expect(response.status).toBe(429);
+      expect(response.headers.get('Retry-After')).toBe('13');
+      expect(await response.json()).toEqual({ message: 'Too many requests' });
+      expect(revalidatePathMock).not.toHaveBeenCalled();
+    },
+  );
 
   it('uses the dedicated assets limiter key', async () => {
-    const response = await revalidateAssets(postRequest('/api/revalidate-assets', { secret: 'test-secret' }));
+    const response = await revalidateAssets(
+      postRequest('/api/revalidate-assets', { secret: 'test-secret' }),
+    );
 
     expect(response.status).toBe(200);
     expect((await response.json()).revalidated).toBe(true);

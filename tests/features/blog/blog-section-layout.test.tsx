@@ -17,15 +17,17 @@ describe('BlogSection layout', () => {
         blogSectionRef={{ current: null }}
         locale="en"
         handleBlogItemClick={vi.fn()}
-        posts={[{
-          slug: 'signal',
-          title: 'Signal',
-          date: '2026-07-12',
-          excerpt: 'A layout regression test post.',
-          tags: [],
-          readingMinutes: 1,
-          access: { mode: 'public' },
-        }]}
+        posts={[
+          {
+            slug: 'signal',
+            title: 'Signal',
+            date: '2026-07-12',
+            excerpt: 'A layout regression test post.',
+            tags: [],
+            readingMinutes: 1,
+            access: { mode: 'public' },
+          },
+        ]}
       />,
     );
 
@@ -44,15 +46,17 @@ describe('BlogSection layout', () => {
         locale="en"
         handleBlogItemClick={handleBlogItemClick}
         handleBlogItemIntent={handleBlogItemIntent}
-        posts={[{
-          slug: 'signal',
-          title: 'Signal',
-          date: '2026-07-12',
-          excerpt: 'A navigation intent test post.',
-          tags: [],
-          readingMinutes: 1,
-          access: { mode: 'public' },
-        }]}
+        posts={[
+          {
+            slug: 'signal',
+            title: 'Signal',
+            date: '2026-07-12',
+            excerpt: 'A navigation intent test post.',
+            tags: [],
+            readingMinutes: 1,
+            access: { mode: 'public' },
+          },
+        ]}
       />,
     );
     const card = screen.getByRole('link');

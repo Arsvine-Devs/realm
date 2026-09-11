@@ -22,7 +22,10 @@
     padding: 1px 6px;
     margin: 0 -6px;
     border-radius: 2px;
-    transition: background-color 0.25s ease, color 0.25s ease, opacity 0.25s ease;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease,
+      opacity 0.25s ease;
 
     &:hover {
       background-color: #e6e6e6;
@@ -118,11 +121,10 @@
 }
 
 .aboutContentInner {
-
-  &>.siteStatsContainer,
-  &>.aboutLinks,
-  &>.footerInfo,
-  &>.aboutImageContainer {
+  & > .siteStatsContainer,
+  & > .aboutLinks,
+  & > .footerInfo,
+  & > .aboutImageContainer {
     margin-top: 5px;
   }
 }
@@ -147,7 +149,9 @@
   margin: 0;
 
   .logIconContainer {
-    transition: background-color 0.3s, border-color 0.3s;
+    transition:
+      background-color 0.3s,
+      border-color 0.3s;
   }
 }
 

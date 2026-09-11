@@ -10,7 +10,9 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('next-intl', () => ({
   NextIntlClientProvider: ({ children, locale }: { children: React.ReactNode; locale: string }) => (
-    <div data-testid="intl-provider" data-locale={locale}>{children}</div>
+    <div data-testid="intl-provider" data-locale={locale}>
+      {children}
+    </div>
   ),
 }));
 
@@ -32,7 +34,11 @@ import LocaleClientProviders from '@/app/providers/LocaleClientProviders';
 
 function StatefulChild() {
   const [count, setCount] = useState(0);
-  return <button type="button" onClick={() => setCount((value) => value + 1)}>{count}</button>;
+  return (
+    <button type="button" onClick={() => setCount((value) => value + 1)}>
+      {count}
+    </button>
+  );
 }
 
 describe('locale hot switch providers', () => {

@@ -69,7 +69,7 @@ export function useMusicPlayerState({ playlist }: UseMusicPlayerStateOptions) {
     setCurrentTrackIndex(
       persistedTrackIndex >= 0
         ? persistedTrackIndex
-        : initialPersistedState?.currentTrackIndex ?? 0,
+        : (initialPersistedState?.currentTrackIndex ?? 0),
     );
   }, [initialPersistedState?.currentTrackIndex, initialPersistedState?.trackId, playlist]);
 
@@ -82,44 +82,52 @@ export function useMusicPlayerState({ playlist }: UseMusicPlayerStateOptions) {
     stateRef.current = { currentTrackIndex: resolvedTrackIndex, currentTime, isPlaying };
   }, [currentTime, isPlaying, resolvedTrackIndex]);
 
-  const persistPlayerState = useCallback((force = false) => {
-    if (typeof window === 'undefined') return;
-    const now = Date.now();
-    if (!force && now - lastPersistedAtRef.current < PERSIST_INTERVAL_MS) return;
+  const persistPlayerState = useCallback(
+    (force = false) => {
+      if (typeof window === 'undefined') return;
+      const now = Date.now();
+      if (!force && now - lastPersistedAtRef.current < PERSIST_INTERVAL_MS) return;
 
-    const snapshot = stateRef.current;
-    const audio = audioRef.current;
-    const hasLoadedSource = Boolean(audio?.currentSrc || audio?.getAttribute('src'));
-    if (!playlist.length && !hasLoadedSource) return;
-    const nextState = {
-      currentTrackIndex: snapshot.currentTrackIndex,
-      currentTime: hasLoadedSource ? audio?.currentTime ?? snapshot.currentTime : snapshot.currentTime,
-      trackId: playlist[snapshot.currentTrackIndex]?.id ?? initialPersistedState?.trackId,
-    };
-    const serialized = JSON.stringify(nextState);
-    window.sessionStorage.setItem(MUSIC_PLAYER_STORAGE_KEY, serialized);
-    window.localStorage.setItem(MUSIC_PLAYER_STORAGE_KEY, serialized);
-    lastPersistedAtRef.current = now;
-  }, [initialPersistedState?.trackId, playlist]);
+      const snapshot = stateRef.current;
+      const audio = audioRef.current;
+      const hasLoadedSource = Boolean(audio?.currentSrc || audio?.getAttribute('src'));
+      if (!playlist.length && !hasLoadedSource) return;
+      const nextState = {
+        currentTrackIndex: snapshot.currentTrackIndex,
+        currentTime: hasLoadedSource
+          ? (audio?.currentTime ?? snapshot.currentTime)
+          : snapshot.currentTime,
+        trackId: playlist[snapshot.currentTrackIndex]?.id ?? initialPersistedState?.trackId,
+      };
+      const serialized = JSON.stringify(nextState);
+      window.sessionStorage.setItem(MUSIC_PLAYER_STORAGE_KEY, serialized);
+      window.localStorage.setItem(MUSIC_PLAYER_STORAGE_KEY, serialized);
+      lastPersistedAtRef.current = now;
+    },
+    [initialPersistedState?.trackId, playlist],
+  );
 
   const requestPlayback = useCallback(() => {
     desiredPlayingRef.current = true;
     setPlayRequest((request) => request + 1);
   }, []);
 
-  const syncPlayState = useCallback((shouldPlay: boolean) => {
-    hasUserInteractedRef.current = true;
-    if (shouldPlay) {
-      requestPlayback();
-      return;
-    }
+  const syncPlayState = useCallback(
+    (shouldPlay: boolean) => {
+      hasUserInteractedRef.current = true;
+      if (shouldPlay) {
+        requestPlayback();
+        return;
+      }
 
-    desiredPlayingRef.current = false;
-    playAttemptRef.current += 1;
-    audioRef.current?.pause();
-    setIsPlaying(false);
-    persistPlayerState(true);
-  }, [persistPlayerState, requestPlayback]);
+      desiredPlayingRef.current = false;
+      playAttemptRef.current += 1;
+      audioRef.current?.pause();
+      setIsPlaying(false);
+      persistPlayerState(true);
+    },
+    [persistPlayerState, requestPlayback],
+  );
 
   const handlePrev = useCallback(() => {
     if (!playlist.length) return;
@@ -135,17 +143,20 @@ export function useMusicPlayerState({ playlist }: UseMusicPlayerStateOptions) {
     setCurrentTrackIndex((previous) => (previous + 1) % playlist.length);
   }, [playlist.length]);
 
-  const selectTrack = useCallback((index: number) => {
-    if (index < 0 || index >= playlist.length) return;
-    hasUserInteractedRef.current = true;
-    resumeTimeRef.current = 0;
-    desiredPlayingRef.current = true;
+  const selectTrack = useCallback(
+    (index: number) => {
+      if (index < 0 || index >= playlist.length) return;
+      hasUserInteractedRef.current = true;
+      resumeTimeRef.current = 0;
+      desiredPlayingRef.current = true;
 
-    if (index !== resolvedTrackIndex) {
-      setCurrentTrackIndex(index);
-    }
-    requestPlayback();
-  }, [playlist.length, requestPlayback, resolvedTrackIndex]);
+      if (index !== resolvedTrackIndex) {
+        setCurrentTrackIndex(index);
+      }
+      requestPlayback();
+    },
+    [playlist.length, requestPlayback, resolvedTrackIndex],
+  );
 
   const handleAudioError = useCallback(() => {
     desiredPlayingRef.current = false;
@@ -186,9 +197,10 @@ export function useMusicPlayerState({ playlist }: UseMusicPlayerStateOptions) {
     };
     const setAudioData = () => {
       if (resumeTimeRef.current !== null) {
-        audio.currentTime = audio.duration > 0
-          ? Math.min(resumeTimeRef.current, audio.duration)
-          : resumeTimeRef.current;
+        audio.currentTime =
+          audio.duration > 0
+            ? Math.min(resumeTimeRef.current, audio.duration)
+            : resumeTimeRef.current;
         resumeTimeRef.current = null;
       }
       setDuration(Number.isFinite(audio.duration) ? audio.duration : 0);

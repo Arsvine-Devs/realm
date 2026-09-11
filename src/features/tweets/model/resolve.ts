@@ -1,10 +1,7 @@
 import type { Locale } from '@/shared/contracts/locale';
 import type { ResolvedTweetContent, TweetItem } from './types';
 
-export function resolveTweetContent(
-  tweet: TweetItem,
-  locale: Locale,
-): ResolvedTweetContent {
+export function resolveTweetContent(tweet: TweetItem, locale: Locale): ResolvedTweetContent {
   const translation = tweet.translations?.[locale];
   if (translation?.content && translation.stale !== true) {
     return {

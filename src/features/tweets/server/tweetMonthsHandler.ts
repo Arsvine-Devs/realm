@@ -13,14 +13,20 @@ export default async function handler(request: Request) {
     const offset = parsePositiveInt(searchParams.get('offset'), 0);
     const limit = parsePositiveInt(searchParams.get('limit'), 1);
     const result = await getTweetMonthGroupsPage(offset, limit);
-    return jsonResponse({
-      ...result,
-      generatedAt: new Date().toISOString(),
-    }, { headers: { 'Cache-Control': 'private, no-store, must-revalidate' } });
+    return jsonResponse(
+      {
+        ...result,
+        generatedAt: new Date().toISOString(),
+      },
+      { headers: { 'Cache-Control': 'private, no-store, must-revalidate' } },
+    );
   } catch (error) {
     console.error('[api/tweets/months] source unavailable:', error);
-    return jsonResponse({
-      error: 'tweets_source_unavailable',
-    }, { status: 500 });
+    return jsonResponse(
+      {
+        error: 'tweets_source_unavailable',
+      },
+      { status: 500 },
+    );
   }
 }

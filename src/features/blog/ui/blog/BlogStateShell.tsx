@@ -58,13 +58,15 @@ export default function BlogStateShell({
         allPosts={allPosts}
         defaultContentLocale={defaultContentLocale}
         headerEntered={entered}
-        headerContent={(
+        headerContent={
           <div className={styles.headerContent}>
             <span className={styles.headerSignal}>{signalLabel}</span>
             <h1 className={styles.headerTitle}>{meta.title}</h1>
             <div className={styles.headerMeta}>
               {meta.date && <span className={styles.headerDate}>{meta.date}</span>}
-              {meta.readingMinutes > 0 ? <span className={styles.headerReadingTime}>{meta.readingMinutes}m</span> : null}
+              {meta.readingMinutes > 0 ? (
+                <span className={styles.headerReadingTime}>{meta.readingMinutes}m</span>
+              ) : null}
             </div>
             {description ? <p className={styles.headerExcerpt}>{description}</p> : null}
             {error ? (
@@ -74,12 +76,12 @@ export default function BlogStateShell({
               </div>
             ) : null}
           </div>
-        )}
-        contentContent={(
+        }
+        contentContent={
           <div className={styles.loadingIndicator}>
             <span className={styles.loadingText}>{statusText}</span>
           </div>
-        )}
+        }
       />
     </>
   );

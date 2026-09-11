@@ -15,7 +15,8 @@ export default function useGalleryLightbox(imageCount: number) {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [currentLightboxImageIndex, setCurrentLightboxImageIndex] = useState(0);
   const [clickedThumbnailRect, setClickedThumbnailRect] = useState<DOMRect | null>(null);
-  const [currentLightboxSourceInfo, setCurrentLightboxSourceInfo] = useState<LightboxSourceInfo | null>(null);
+  const [currentLightboxSourceInfo, setCurrentLightboxSourceInfo] =
+    useState<LightboxSourceInfo | null>(null);
   const thumbnailRefs = useRef<Record<string, HTMLElement | null>>({});
 
   const bindThumbnailRef = useCallback(
@@ -25,32 +26,35 @@ export default function useGalleryLightbox(imageCount: number) {
     [],
   );
 
-  const openLightbox = useCallback((
-    index: number,
-    event?: LightboxTriggerEventLike | null,
-    sourceType: LightboxSourceType = 'thumb',
-  ) => {
-    if (index < 0 || index >= imageCount) {
-      return;
-    }
-
-    let rect: DOMRect | null = null;
-    const currentTarget = event?.currentTarget;
-
-    if (currentTarget instanceof Element) {
-      rect = currentTarget.getBoundingClientRect();
-    } else {
-      const thumb = thumbnailRefs.current[`${sourceType}_${index}`];
-      if (thumb) {
-        rect = thumb.getBoundingClientRect();
+  const openLightbox = useCallback(
+    (
+      index: number,
+      event?: LightboxTriggerEventLike | null,
+      sourceType: LightboxSourceType = 'thumb',
+    ) => {
+      if (index < 0 || index >= imageCount) {
+        return;
       }
-    }
 
-    setClickedThumbnailRect(rect);
-    setCurrentLightboxImageIndex(index);
-    setCurrentLightboxSourceInfo({ index, type: sourceType });
-    setIsLightboxOpen(true);
-  }, [imageCount]);
+      let rect: DOMRect | null = null;
+      const currentTarget = event?.currentTarget;
+
+      if (currentTarget instanceof Element) {
+        rect = currentTarget.getBoundingClientRect();
+      } else {
+        const thumb = thumbnailRefs.current[`${sourceType}_${index}`];
+        if (thumb) {
+          rect = thumb.getBoundingClientRect();
+        }
+      }
+
+      setClickedThumbnailRect(rect);
+      setCurrentLightboxImageIndex(index);
+      setCurrentLightboxSourceInfo({ index, type: sourceType });
+      setIsLightboxOpen(true);
+    },
+    [imageCount],
+  );
 
   const closeLightbox = useCallback(() => {
     setIsLightboxOpen(false);

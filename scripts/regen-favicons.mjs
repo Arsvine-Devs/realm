@@ -56,12 +56,12 @@ const dirs = pngs.map((buf, i) => {
   const d = Buffer.alloc(16);
   d.writeUInt8(icoSizes[i] === 256 ? 0 : icoSizes[i], 0); // width
   d.writeUInt8(icoSizes[i] === 256 ? 0 : icoSizes[i], 1); // height
-  d.writeUInt8(0, 2);                                     // palette colors
-  d.writeUInt8(0, 3);                                     // reserved
-  d.writeUInt16LE(1, 4);                                  // planes
-  d.writeUInt16LE(32, 6);                                 // bpp
-  d.writeUInt32LE(buf.length, 8);                         // data size
-  d.writeUInt32LE(offset, 12);                            // data offset
+  d.writeUInt8(0, 2); // palette colors
+  d.writeUInt8(0, 3); // reserved
+  d.writeUInt16LE(1, 4); // planes
+  d.writeUInt16LE(32, 6); // bpp
+  d.writeUInt32LE(buf.length, 8); // data size
+  d.writeUInt32LE(offset, 12); // data offset
   offset += buf.length;
   return d;
 });

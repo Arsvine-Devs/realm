@@ -25,18 +25,20 @@ describe('sync-env-files script', () => {
       ].join('\n'),
       'utf-8',
     );
-    await writeFile(examplePath, '# old example\nLEGACY_PUBLIC_ASSET_BASE=https://cdn.arsvine.com\n', 'utf-8');
+    await writeFile(
+      examplePath,
+      '# old example\nLEGACY_PUBLIC_ASSET_BASE=https://cdn.arsvine.com\n',
+      'utf-8',
+    );
 
     const scriptPath = path.join(process.cwd(), 'scripts', 'sync-env-files.mjs');
-    await execFileAsync(process.execPath, [
-      scriptPath,
-      '--local',
-      localPath,
-      '--example',
-      examplePath,
-    ], {
-      cwd: process.cwd(),
-    });
+    await execFileAsync(
+      process.execPath,
+      [scriptPath, '--local', localPath, '--example', examplePath],
+      {
+        cwd: process.cwd(),
+      },
+    );
 
     const localOutput = await readFile(localPath, 'utf-8');
     const exampleOutput = await readFile(examplePath, 'utf-8');

@@ -11,7 +11,9 @@
   background-color: transparent;
   border: 1px solid rgba(var(--ark-border-rgb), 0.4);
   padding: 0;
-  transition: border-color 0.4s ease, background-color 0.4s ease;
+  transition:
+    border-color 0.4s ease,
+    background-color 0.4s ease;
   box-sizing: border-box;
   overflow: hidden;
   cursor: none;
@@ -25,8 +27,11 @@
     height: 100%;
     background: var(--ark-border);
     opacity: 0.3;
-    transition: opacity 0.4s ease, background 0.4s ease, width 0.4s ease,
-                box-shadow 0.4s ease;
+    transition:
+      opacity 0.4s ease,
+      background 0.4s ease,
+      width 0.4s ease,
+      box-shadow 0.4s ease;
   }
 
   &:hover {
@@ -74,7 +79,9 @@
   text-orientation: mixed;
   flex-shrink: 0;
   line-height: 1;
-  transition: color 0.4s ease, opacity 0.4s ease;
+  transition:
+    color 0.4s ease,
+    opacity 0.4s ease;
   align-self: stretch;
   display: flex;
   align-items: center;
@@ -125,7 +132,10 @@
   vertical-align: 0.12em;
   line-height: 1.2;
   text-transform: uppercase;
-  transition: color 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease,
+    background-color 0.3s ease;
 }
 
 .card.pinned::before {
@@ -187,7 +197,9 @@
   letter-spacing: 0.15em;
   text-transform: uppercase;
   padding: 1px 0;
-  transition: color 0.3s ease, opacity 0.3s ease;
+  transition:
+    color 0.3s ease,
+    opacity 0.3s ease;
 
   &::before {
     content: '#';
@@ -215,7 +227,9 @@
   color: var(--ark-text-secondary);
   opacity: 0;
   transform: translateX(-6px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
   flex-shrink: 0;
   align-self: center;
 }

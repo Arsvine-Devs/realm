@@ -26,7 +26,10 @@ User-facing pages live under `/<locale>/...` with UI locales `zh-CN`, `zh-TW`, a
 pnpm dev        # node server.js
 pnpm build      # next build
 pnpm start      # cross-env NODE_ENV=production node server.js
-pnpm lint       # eslint .
+pnpm lint       # Oxlint + ESLint compatibility rules
+pnpm format     # Prettier; configuration in config/
+pnpm quality    # Knip + JSCPD maintenance scans
+pnpm check      # format, maintenance, lint, types, Knip, JSCPD, tests, build
 pnpm typecheck  # tsc --noEmit
 pnpm test       # vitest run
 ```
@@ -53,19 +56,19 @@ pnpm vitest run -t "name pattern"
 
 ## Where to edit common things
 
-| Need | Edit first |
-|---|---|
-| Site metadata, SEO, fonts, social links | `src/shared/config/site.ts` |
-| Music playlist / cloud audio catalog | `src/app/api/assets/audio`, `src/features/assets/server/catalog/`, `src/features/music/` |
-| Projects / experience / life / skills / friend links | `src/features/<feature>/contracts/data/*.ts` |
-| UI copy | `src/app/locales/*.json` |
-| Remote image domains | `config/image-hosts.js` |
-| Blog fallback post | `content/blog/init/` |
-| Runtime blog/tweet source | `.env.local` external GitHub content repo variables |
-| Protected-post access | `ACCESS_GRANT_SECRET`, `TOTP_GROUPS_JSON`, access helpers under `src/shared/lib/content/` |
-| Route transitions | `src/features/navigation/model/TransitionProvider.tsx`, route mode hooks |
-| Global HUD / left panel | `src/features/hud/`, `src/app/shell/MainLayout.tsx` |
-| MDX rendering | `src/features/blog/ui/mdx/`, `src/features/blog/styles/MDXContent.module.scss` |
+| Need                                                 | Edit first                                                                                |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Site metadata, SEO, fonts, social links              | `src/shared/config/site.ts`                                                               |
+| Music playlist / cloud audio catalog                 | `src/app/api/assets/audio`, `src/features/assets/server/catalog/`, `src/features/music/`  |
+| Projects / experience / life / skills / friend links | `src/features/<feature>/contracts/data/*.ts`                                              |
+| UI copy                                              | `src/app/locales/*.json`                                                                  |
+| Remote image domains                                 | `config/image-hosts.js`                                                                   |
+| Blog fallback post                                   | `content/blog/init/`                                                                      |
+| Runtime blog/tweet source                            | `.env.local` external GitHub content repo variables                                       |
+| Protected-post access                                | `ACCESS_GRANT_SECRET`, `TOTP_GROUPS_JSON`, access helpers under `src/shared/lib/content/` |
+| Route transitions                                    | `src/features/navigation/model/TransitionProvider.tsx`, route mode hooks                  |
+| Global HUD / left panel                              | `src/features/hud/`, `src/app/shell/MainLayout.tsx`                                       |
+| MDX rendering                                        | `src/features/blog/ui/mdx/`, `src/features/blog/styles/MDXContent.module.scss`            |
 
 ## Validation expectation
 

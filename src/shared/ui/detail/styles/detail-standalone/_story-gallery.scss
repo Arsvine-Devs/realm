@@ -12,7 +12,6 @@
   }
 }
 
-
 .timelineText {
   font-family: var(--font-hud);
   font-size: clamp(0.85rem, 1.2vw, 1.05rem);
@@ -27,7 +26,9 @@
   margin-bottom: clamp(16px, 2.5vw, 32px);
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  transition:
+    opacity 0.8s ease-out,
+    transform 0.8s ease-out;
 
   &.visible {
     opacity: 1;
@@ -66,6 +67,11 @@
   background: rgba(var(--white-rgb), 0.02);
   cursor: none;
   transition: border-color 0.4s ease;
+
+  &:focus-visible {
+    outline: 1px solid var(--ark-primary);
+    outline-offset: 4px;
+  }
 
   @include breakpoints.tablet-down {
     cursor: pointer;
@@ -162,11 +168,12 @@
   text-transform: uppercase;
   transform: translateY(100%);
   opacity: 0;
-  transition: transform 0.4s ease, opacity 0.4s ease;
+  transition:
+    transform 0.4s ease,
+    opacity 0.4s ease;
   z-index: 2;
   pointer-events: none;
 }
-
 
 /* ==================== WEB GALLERY SECTION (VVD STYLE) ==================== */
 
@@ -199,7 +206,12 @@
   background: rgba(var(--white-rgb), 0.02);
   transition: border-color 0.4s ease;
   overflow: hidden;
-  
+
+  &:focus-visible {
+    outline: 1px solid var(--ark-primary);
+    outline-offset: 4px;
+  }
+
   &:hover {
     border-color: rgba(var(--white-rgb), 0.15);
   }
@@ -208,7 +220,7 @@
   :global(.lazyImageContainer) {
     height: auto !important;
   }
-  
+
   img {
     width: 100%;
     height: auto;
@@ -236,6 +248,11 @@
   overflow: hidden;
   cursor: none;
 
+  &:focus-visible {
+    outline: 1px solid var(--ark-primary);
+    outline-offset: 4px;
+  }
+
   @include breakpoints.tablet-down {
     cursor: pointer;
   }
@@ -261,4 +278,3 @@
 .galleryItemMobile {
   aspect-ratio: unset;
 }
-

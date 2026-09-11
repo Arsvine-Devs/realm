@@ -1,10 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import {
-  getClientAddress,
-  parseCookieHeader,
-  secureStringEqual,
-} from '@/shared/server/http';
+import { getClientAddress, parseCookieHeader, secureStringEqual } from '@/shared/server/http';
 
 const ORIGINAL_TRUST_PROXY = process.env.TRUST_PROXY;
 const ORIGINAL_VERCEL = process.env.VERCEL;

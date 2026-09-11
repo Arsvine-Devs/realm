@@ -16,7 +16,9 @@ describe('AnimatedTitleChars', () => {
   });
 
   it('preserves case when explicitly requested by blog titles', () => {
-    const { container } = render(<AnimatedTitleChars text="Signal lost" uppercase={false} {...props} />);
+    const { container } = render(
+      <AnimatedTitleChars text="Signal lost" uppercase={false} {...props} />,
+    );
     expect(container.textContent).toBe('Signal lost');
   });
 });

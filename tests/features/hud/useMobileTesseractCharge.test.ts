@@ -12,13 +12,15 @@ describe('useMobileTesseractCharge', () => {
     const chargeBattery = vi.fn();
     const deactivateTesseract = vi.fn();
 
-    renderHook(() => useMobileTesseractCharge({
-      shouldUseAutoChargeFallback: true,
-      isTesseractActivated: true,
-      powerLevel: 40,
-      chargeBattery,
-      deactivateTesseract,
-    }));
+    renderHook(() =>
+      useMobileTesseractCharge({
+        shouldUseAutoChargeFallback: true,
+        isTesseractActivated: true,
+        powerLevel: 40,
+        chargeBattery,
+        deactivateTesseract,
+      }),
+    );
 
     act(() => {
       vi.advanceTimersByTime(600);
@@ -32,21 +34,24 @@ describe('useMobileTesseractCharge', () => {
     const chargeBattery = vi.fn();
     const deactivateTesseract = vi.fn();
 
-    const { rerender } = renderHook((props: {
-      shouldUseAutoChargeFallback: boolean;
-      isTesseractActivated: boolean;
-      powerLevel: number;
-      chargeBattery: () => void;
-      deactivateTesseract: () => void;
-    }) => useMobileTesseractCharge(props), {
-      initialProps: {
-        shouldUseAutoChargeFallback: true,
-        isTesseractActivated: true,
-        powerLevel: 88,
-        chargeBattery,
-        deactivateTesseract,
+    const { rerender } = renderHook(
+      (props: {
+        shouldUseAutoChargeFallback: boolean;
+        isTesseractActivated: boolean;
+        powerLevel: number;
+        chargeBattery: () => void;
+        deactivateTesseract: () => void;
+      }) => useMobileTesseractCharge(props),
+      {
+        initialProps: {
+          shouldUseAutoChargeFallback: true,
+          isTesseractActivated: true,
+          powerLevel: 88,
+          chargeBattery,
+          deactivateTesseract,
+        },
       },
-    });
+    );
 
     rerender({
       shouldUseAutoChargeFallback: true,

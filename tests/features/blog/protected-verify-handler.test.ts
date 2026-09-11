@@ -46,10 +46,12 @@ afterEach(() => {
 
 describe('/api/protected-verify', () => {
   it('does not trust caller-provided forwarding headers by default', async () => {
-    const response = await handler(request(
-      { group: 'friends', token: '123456', next: '/en/blog/private' },
-      { 'X-Forwarded-For': '203.0.113.25' },
-    ));
+    const response = await handler(
+      request(
+        { group: 'friends', token: '123456', next: '/en/blog/private' },
+        { 'X-Forwarded-For': '203.0.113.25' },
+      ),
+    );
 
     expect(response.status).toBe(200);
     expect(enforceRateLimitMock).toHaveBeenCalledWith('totp:unknown:friends', 5, 60_000);
@@ -59,10 +61,12 @@ describe('/api/protected-verify', () => {
 
   it('uses the trusted address when proxy trust is explicitly enabled', async () => {
     process.env.TRUST_PROXY = '1';
-    await handler(request(
-      { group: 'friends', token: '123456' },
-      { 'X-Forwarded-For': '203.0.113.25, 10.0.0.1' },
-    ));
+    await handler(
+      request(
+        { group: 'friends', token: '123456' },
+        { 'X-Forwarded-For': '203.0.113.25, 10.0.0.1' },
+      ),
+    );
 
     expect(enforceRateLimitMock).toHaveBeenCalledWith('totp:203.0.113.25:friends', 5, 60_000);
   });

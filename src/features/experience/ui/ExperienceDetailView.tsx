@@ -31,34 +31,39 @@ const ExperienceDetailView = ({ item }: { item: ExperienceItem | null }) => {
         <span className={styles.detailDuration}>
           <span className={styles.metaLabel}>Duration:</span>
           {typeof duration === 'string' && duration ? (
-            duration.split(' - ').map((part: string, index: number, arr: string[]) =>
-               <span key={index} className={styles.timelineNumber}>
-                 {part}{index < arr.length - 1 ? ' - ' : ''}
-               </span>
-            )
+            duration.split(' - ').map((part: string, index: number, arr: string[]) => (
+              <span key={index} className={styles.timelineNumber}>
+                {part}
+                {index < arr.length - 1 ? ' - ' : ''}
+              </span>
+            ))
           ) : (
             <span className={styles.timelineNumber}>N/A</span>
           )}
         </span>
         {location && (
-           <span className={styles.detailLocation}>
-              <span className={styles.metaLabel}>Location:</span>
-              {location}
-           </span>
+          <span className={styles.detailLocation}>
+            <span className={styles.metaLabel}>Location:</span>
+            {location}
+          </span>
         )}
       </div>
 
       <div className={styles.detailBody}>
-         {details && details.map((line: string, index: number) => (
+        {details &&
+          details.map((line: string, index: number) => (
             <p key={index} className={styles.detailParagraph}>
-
               {line.split(/(\d{4}(?:\.\d{2})?)/g).map((part: string, partIndex: number) =>
-                 /\d{4}(?:\.\d{2})?/.test(part) ?
-                 <span key={partIndex} className={styles.timelineNumber}>{part}</span> :
-                 part
+                /\d{4}(?:\.\d{2})?/.test(part) ? (
+                  <span key={partIndex} className={styles.timelineNumber}>
+                    {part}
+                  </span>
+                ) : (
+                  part
+                ),
               )}
             </p>
-         ))}
+          ))}
       </div>
 
       {imagesForGallery.length > 0 && (
@@ -91,11 +96,10 @@ const ExperienceDetailView = ({ item }: { item: ExperienceItem | null }) => {
           onPrev={imagesForGallery.length > 1 ? showPrevImage : null}
           thumbnailRect={clickedThumbnailRect} // Pass thumbnailRect
           currentIndex={currentLightboxImageIndex} // Pass currentIndex
-          totalImages={imagesForGallery.length}   // Pass totalImages
+          totalImages={imagesForGallery.length} // Pass totalImages
           getClosingRectForIndex={getClosingRect}
         />
       )}
-
     </div>
   );
 };

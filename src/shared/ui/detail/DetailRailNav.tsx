@@ -1,15 +1,6 @@
 import type { MouseEventHandler } from 'react';
 import type { DetailSectionNavItem } from '@/shared/hooks/useDetailSectionNav';
 
-interface DetailRailNavStyles {
-  rightNav: string;
-  visible: string;
-  rightNavBack: string;
-  rightNavDivider: string;
-  rightNavLink: string;
-  active: string;
-}
-
 interface DetailRailNavProps {
   styles: Record<string, string>;
   isPastHero: boolean;

@@ -19,7 +19,16 @@ interface LightboxProps {
   getClosingRectForIndex?: (() => DOMRect | null) | null;
 }
 
-const Lightbox = ({ image, onClose, onPrev, onNext, thumbnailRect, currentIndex, totalImages, getClosingRectForIndex }: LightboxProps) => {
+const Lightbox = ({
+  image,
+  onClose,
+  onPrev,
+  onNext,
+  thumbnailRect,
+  currentIndex,
+  totalImages,
+  getClosingRectForIndex,
+}: LightboxProps) => {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
@@ -113,7 +122,8 @@ const Lightbox = ({ image, onClose, onPrev, onNext, thumbnailRect, currentIndex,
           imgElement.style.transform = 'scale(0.92)';
           imgElement.style.opacity = '0';
           requestAnimationFrame(() => {
-            imgElement.style.transition = 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out';
+            imgElement.style.transition =
+              'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out';
             imgElement.style.transform = 'scale(1)';
             imgElement.style.opacity = '1';
           });
@@ -131,7 +141,8 @@ const Lightbox = ({ image, onClose, onPrev, onNext, thumbnailRect, currentIndex,
 
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            imgElement.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out 0.1s';
+            imgElement.style.transition =
+              'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out 0.1s';
             imgElement.style.transform = 'translate(0px, 0px) scale(1)';
             imgElement.style.opacity = '1';
           });
@@ -159,7 +170,8 @@ const Lightbox = ({ image, onClose, onPrev, onNext, thumbnailRect, currentIndex,
       imgElement.style.opacity = '0';
       imgElement.style.visibility = 'visible';
       requestAnimationFrame(() => {
-        imgElement.style.transition = 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out';
+        imgElement.style.transition =
+          'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out';
         imgElement.style.transform = 'scale(1)';
         imgElement.style.opacity = '1';
       });
@@ -194,7 +206,8 @@ const Lightbox = ({ image, onClose, onPrev, onNext, thumbnailRect, currentIndex,
       const translateX = targetRectForClose.left - finalRect.left;
       const translateY = targetRectForClose.top - finalRect.top;
 
-      imgElement.style.transition = 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.05s';
+      imgElement.style.transition =
+        'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.05s';
       imgElement.style.transformOrigin = 'top left';
       imgElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`;
       imgElement.style.opacity = '0';
@@ -204,7 +217,8 @@ const Lightbox = ({ image, onClose, onPrev, onNext, thumbnailRect, currentIndex,
         setIsAnimatingOut(false);
       }, 450);
     } else if (imgElement) {
-      imgElement.style.transition = 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out';
+      imgElement.style.transition =
+        'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out';
       imgElement.style.transformOrigin = 'center center';
       imgElement.style.transform = 'scale(0.5)';
       imgElement.style.opacity = '0';
@@ -288,16 +302,33 @@ const Lightbox = ({ image, onClose, onPrev, onNext, thumbnailRect, currentIndex,
   if (!image) return null;
 
   return ReactDOM.createPortal(
-    <div ref={overlayRef} className={`${styles.lightboxOverlay} ${isAnimatingOut ? styles.fadeOut : ''}`} onClick={handleClose} role="dialog" aria-modal="true" aria-labelledby="lightbox-caption"
+    // The dialog backdrop owns pointer dismissal; Escape and the document key handler own keyboard dismissal.
+    // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- a dialog container owns backdrop dismissal and cannot be replaced by a button.
+    <div
+      ref={overlayRef}
+      className={`${styles.lightboxOverlay} ${isAnimatingOut ? styles.fadeOut : ''}`}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) handleClose();
+      }}
+      /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- a dialog container is the correct accessible role for this lightbox surface. */
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="lightbox-caption"
+      tabIndex={-1}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') handleClose();
+      }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className={styles.lightboxContainer} onClick={(e) => e.stopPropagation()}>
-
+      <div className={styles.lightboxContainer}>
         {onPrev && (
           <button
             className={`${styles.lightboxButton} ${styles.prevButton}`}
-            onClick={(e) => { e.stopPropagation(); handleInternalPrev(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleInternalPrev();
+            }}
             aria-label="Previous image"
             data-cursor-label="PREVIOUS IMAGE"
           />
@@ -311,13 +342,18 @@ const Lightbox = ({ image, onClose, onPrev, onNext, thumbnailRect, currentIndex,
           style={{ willChange: 'transform, opacity' }}
         />
         {image.caption && (
-          <div id="lightbox-caption" className={styles.lightboxCaption}>{image.caption}</div>
+          <div id="lightbox-caption" className={styles.lightboxCaption}>
+            {image.caption}
+          </div>
         )}
 
         {onNext && (
           <button
             className={`${styles.lightboxButton} ${styles.nextButton}`}
-            onClick={(e) => { e.stopPropagation(); handleInternalNext(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleInternalNext();
+            }}
             aria-label="Next image"
             data-cursor-label="NEXT IMAGE"
           />
@@ -335,7 +371,7 @@ const Lightbox = ({ image, onClose, onPrev, onNext, thumbnailRect, currentIndex,
         )}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 

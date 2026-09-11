@@ -55,7 +55,7 @@ Value: Cache-Control: public, max-age=31536000, immutable
 ## 6. 内部导航必须使用 `navigateTo()`
 
 ```ts
-useTransition().navigateTo(url)
+useTransition().navigateTo(url);
 ```
 
 直接 `router.push()` 会跳过页面过渡、column retract/expand 和 detail choreography。
@@ -223,8 +223,8 @@ tests/scripts/
 ## 29. Fiber 精确固定并应用 Timer patch
 
 ```text
-package.json: @react-three/fiber = 9.6.1
-pnpm-workspace.yaml: patches/@react-three__fiber@9.6.1.patch
+package.json: @react-three/fiber = 9.7.0
+pnpm-workspace.yaml: patches/@react-three__fiber@9.7.0.patch
 ```
 
 补丁把 Fiber built dist 的 `THREE.Clock` 改成 `THREE.Timer` compatibility clock，使 Tesseract 在详情页可安全切换 `frameloop="never"` 暂停、恢复后继续渲染。
@@ -240,6 +240,12 @@ pnpm-workspace.yaml: patches/@react-three__fiber@9.6.1.patch
 `textVisible` 只是动画序列可见性，不等于标签页可见性。循环必须额外监听 `document.visibilitychange`：隐藏时整个 effect 拆除（清超时 + abort 进行中的 hitokoto 请求 + 清空 buffer），回到前台从预设轮重新开始。与 `useRealtimeStats` / `useEnvParamsTypingEffect` 的可见性处理保持一致。
 
 不要把 `isFateTypingActive` 改成跟随 `document.hidden`——它只控制 CSS class，应跟随 `textVisible`。
+
+## 31. Node.js 24 的 COS request URL patch
+
+`cos-nodejs-sdk-v5@3.0.0` 仍依赖 `cos-request@1.3.3` 的 legacy `url.parse()`。workspace override 将它固定到 `1.3.3`，`patches/cos-request@1.3.3.patch` 让绝对 URL 走 WHATWG `URL`，并补齐 request 继续使用的 `path` / `query` / `auth` 字段。
+
+不要删除该 patch 或直接把 `url.parse()` 调用改成裸 `new URL()`：request 还兼容旧式 URL 对象和相对 URL 输入。升级 COS SDK 或 `cos-request` 后，先运行 `tests/repo/cos-request-url-patch.test.ts`，再用 `NODE_OPTIONS=--trace-deprecation pnpm build` 确认 warning 没有回来。
 
 后端 `hitokotoHandler` 另有 IP 限流（30 次/10 分钟）作为纵深防御，拦截绕过 edge 缓存的突发爬虫。回归测试：`tests/features/hud/useTypingEffect.test.tsx`（隐藏暂停）、`tests/shared/hitokoto-handler.test.ts`（限流）。
 

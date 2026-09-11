@@ -36,29 +36,35 @@ function LogoTitle({ ref }: { ref?: React.Ref<LogoTitleRef> }) {
       });
 
       // Animate subtitle
-      const subTitle = logoAreaRef.current?.querySelector(`.${styles.logo_subtitle}`) as HTMLElement;
+      const subTitle = logoAreaRef.current?.querySelector(
+        `.${styles.logo_subtitle}`,
+      ) as HTMLElement;
       if (subTitle) {
         gsap.set(subTitle, { opacity: 0 }); // Ensure it starts invisible immediately
-        gsap.to(subTitle, 
-          { opacity: 1, duration: 1.5, delay: delay + 0.3, ease: 'power2.inOut', onStart: () => { gsap.set(subTitle, { visibility: 'visible' }) } }
-        );
+        gsap.to(subTitle, {
+          opacity: 1,
+          duration: 1.5,
+          delay: delay + 0.3,
+          ease: 'power2.inOut',
+          onStart: () => {
+            gsap.set(subTitle, { visibility: 'visible' });
+          },
+        });
       }
       animationCleanupRef.current = () => {
         cleanupTitle();
         if (subTitle) gsap.killTweensOf(subTitle);
       };
-    }
+    },
   }));
 
   return (
     <div ref={logoAreaRef} className={styles.logo_area}>
       <div className={styles.title_container}>
         <h1 ref={mainTitleRef} className={styles.main_title}>
-          {siteConfig.name.split("").map((char, index) => (
+          {siteConfig.name.split('').map((char, index) => (
             <span key={`site-${char}-${index}`} className={styles.char_wrapper}>
-              <span className={styles.char_inner}>
-                {char === " " ? " " : char}
-              </span>
+              <span className={styles.char_inner}>{char === ' ' ? ' ' : char}</span>
             </span>
           ))}
         </h1>

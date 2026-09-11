@@ -68,10 +68,12 @@ describe('useBlogPostState article synchronization', () => {
     rerender({ hydrationReady: true });
 
     expect(send).toHaveBeenCalledTimes(1);
-    expect(send).toHaveBeenCalledWith(expect.objectContaining({
-      type: 'ARTICLE_CHANGED',
-      hydrationReady: true,
-      slug: 'init',
-    }));
+    expect(send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'ARTICLE_CHANGED',
+        hydrationReady: true,
+        slug: 'init',
+      }),
+    );
   });
 });

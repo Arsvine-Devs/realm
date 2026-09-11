@@ -9,26 +9,35 @@ export default function SectionPageLayout({ children }: { children: ReactNode })
   const containerRef = useRef<HTMLDivElement | null>(null);
   const restoreFrameRef = useRef<number | null>(null);
 
-  const setContainer = useCallback((element: HTMLDivElement | null) => {
-    containerRef.current = element;
-    if (!element) return;
+  const setContainer = useCallback(
+    (element: HTMLDivElement | null) => {
+      containerRef.current = element;
+      if (!element) return;
 
-    const savedScrollTop = pageStateStore.read<number>('section.scroll-top') ?? 0;
-    restoreFrameRef.current = window.requestAnimationFrame(() => {
-      element.scrollTop = Math.min(savedScrollTop, Math.max(0, element.scrollHeight - element.clientHeight));
-      restoreFrameRef.current = null;
-    });
-  }, [pageStateStore]);
+      const savedScrollTop = pageStateStore.read<number>('section.scroll-top') ?? 0;
+      restoreFrameRef.current = window.requestAnimationFrame(() => {
+        element.scrollTop = Math.min(
+          savedScrollTop,
+          Math.max(0, element.scrollHeight - element.clientHeight),
+        );
+        restoreFrameRef.current = null;
+      });
+    },
+    [pageStateStore],
+  );
 
   const handleScroll = useCallback(() => {
     pageStateStore.write('section.scroll-top', containerRef.current?.scrollTop ?? 0);
   }, [pageStateStore]);
 
-  useEffect(() => () => {
-    if (restoreFrameRef.current !== null) {
-      window.cancelAnimationFrame(restoreFrameRef.current);
-    }
-  }, []);
+  useEffect(
+    () => () => {
+      if (restoreFrameRef.current !== null) {
+        window.cancelAnimationFrame(restoreFrameRef.current);
+      }
+    },
+    [],
+  );
 
   return (
     <div

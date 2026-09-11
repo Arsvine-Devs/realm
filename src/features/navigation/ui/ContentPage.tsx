@@ -23,13 +23,16 @@ import { setHudTypingOverlaySuppressed } from '@/shared/lib/hud-typing-visibilit
 import { markCursorTargetsDirty } from '@/shared/lib/cursor-targets';
 import { siteConfig } from '@/shared/config/site';
 import type { Locale } from '@/shared/contracts/locale';
-import type { BlogPostMeta, Project, LifeItem, ExperienceItem, SkillCategory } from '../../../shared/types';
+import type {
+  BlogPostMeta,
+  Project,
+  LifeItem,
+  ExperienceItem,
+  SkillCategory,
+} from '../../../shared/types';
 import useNavigationIntentPrefetch from '../model/useNavigationIntentPrefetch';
 import { CONTENT_DETAIL_EXIT_DELAY_MS } from '@/shared/lib/ui-timings';
-import {
-  useLocalePageStateStore,
-  useLocaleStableState,
-} from '../model/LocalePageState';
+import { useLocalePageStateStore, useLocaleStableState } from '../model/LocalePageState';
 
 type DetailSelection =
   | { type: 'none' }
@@ -126,24 +129,40 @@ export default function ContentPage({
       return item ? { type: 'experience', item } : { type: 'none' };
     }
     if (detailSelection.type === 'life') {
-      const item = [...gameData, ...travelData, ...otherData].find(({ id }) => id === detailSelection.id);
+      const item = [...gameData, ...travelData, ...otherData].find(
+        ({ id }) => id === detailSelection.id,
+      );
       return item ? { type: 'life', item } : { type: 'none' };
     }
     return { type: 'none' };
-  }, [detailSelection, earlyProjects, experienceData, gameData, gameProjects, otherData, travelData]);
+  }, [
+    detailSelection,
+    earlyProjects,
+    experienceData,
+    gameData,
+    gameProjects,
+    otherData,
+    travelData,
+  ]);
   const isDetailMounted = detail.type !== 'none';
 
-  const setContentScrollContainer = useCallback((element: HTMLDivElement | null) => {
-    scrollContainerRef.current = element;
-    registerScrollContainer(element);
-    if (!element) return;
+  const setContentScrollContainer = useCallback(
+    (element: HTMLDivElement | null) => {
+      scrollContainerRef.current = element;
+      registerScrollContainer(element);
+      if (!element) return;
 
-    const savedScrollTop = pageStateStore.read<number>('content.scroll-top') ?? 0;
-    restoreScrollFrameRef.current = window.requestAnimationFrame(() => {
-      element.scrollTop = Math.min(savedScrollTop, Math.max(0, element.scrollHeight - element.clientHeight));
-      restoreScrollFrameRef.current = null;
-    });
-  }, [pageStateStore, registerScrollContainer]);
+      const savedScrollTop = pageStateStore.read<number>('content.scroll-top') ?? 0;
+      restoreScrollFrameRef.current = window.requestAnimationFrame(() => {
+        element.scrollTop = Math.min(
+          savedScrollTop,
+          Math.max(0, element.scrollHeight - element.clientHeight),
+        );
+        restoreScrollFrameRef.current = null;
+      });
+    },
+    [pageStateStore, registerScrollContainer],
+  );
 
   const handleContentScroll = useCallback(() => {
     pageStateStore.write('content.scroll-top', scrollContainerRef.current?.scrollTop ?? 0);
@@ -179,84 +198,117 @@ export default function ContentPage({
     };
   }, [isClosing, isDetailMounted]);
 
-  const openDetail = useCallback((selection: DetailSelection) => {
-    if (detailCloseTimeoutRef.current !== null) {
-      window.clearTimeout(detailCloseTimeoutRef.current);
-      detailCloseTimeoutRef.current = null;
-    }
-    isClosingRef.current = false;
-    setIsClosing(false);
-    if (scrollContainerRef.current) {
-      scrollPositionRef.current = scrollContainerRef.current.scrollTop;
-    }
-    setDetailSelection(selection);
-  }, [setDetailSelection]);
+  const openDetail = useCallback(
+    (selection: DetailSelection) => {
+      if (detailCloseTimeoutRef.current !== null) {
+        window.clearTimeout(detailCloseTimeoutRef.current);
+        detailCloseTimeoutRef.current = null;
+      }
+      isClosingRef.current = false;
+      setIsClosing(false);
+      if (scrollContainerRef.current) {
+        scrollPositionRef.current = scrollContainerRef.current.scrollTop;
+      }
+      setDetailSelection(selection);
+    },
+    [setDetailSelection],
+  );
 
-  const handleWorkTabClick = useCallback((tabName: string) => {
-    setActiveWorkTab(tabName);
-  }, [setActiveWorkTab]);
+  const handleWorkTabClick = useCallback(
+    (tabName: string) => {
+      setActiveWorkTab(tabName);
+    },
+    [setActiveWorkTab],
+  );
 
-  const handleWorkItemClick = useCallback((item: Project) => {
-    const coverImg = resolveImageUrl(item.imageUrl, 'large');
-    if (coverImg) {
-      const img = new Image();
-      img.src = coverImg;
-    }
-    const isWeb = webProjects.some((p) => p.id === item.id);
-    if (isWeb) {
-      navigateTo(`/${locale}/web/${item.id}`);
-    } else {
-      openDetail({ type: 'work', id: item.id });
-    }
-  }, [openDetail, navigateTo, webProjects, locale]);
+  const handleWorkItemClick = useCallback(
+    (item: Project) => {
+      const coverImg = resolveImageUrl(item.imageUrl, 'large');
+      if (coverImg) {
+        const img = new Image();
+        img.src = coverImg;
+      }
+      const isWeb = webProjects.some((p) => p.id === item.id);
+      if (isWeb) {
+        navigateTo(`/${locale}/web/${item.id}`);
+      } else {
+        openDetail({ type: 'work', id: item.id });
+      }
+    },
+    [openDetail, navigateTo, webProjects, locale],
+  );
 
-  const handleWorkItemIntent = useCallback((item: Project) => {
-    if (webProjects.some((project) => project.id === item.id)) {
-      prefetchOnIntent(`/${locale}/web/${item.id}`);
-    }
-  }, [locale, prefetchOnIntent, webProjects]);
+  const handleWorkItemIntent = useCallback(
+    (item: Project) => {
+      if (webProjects.some((project) => project.id === item.id)) {
+        prefetchOnIntent(`/${locale}/web/${item.id}`);
+      }
+    },
+    [locale, prefetchOnIntent, webProjects],
+  );
 
-  const handleExperienceItemClick = useCallback((item: ExperienceItem) => {
-    openDetail({ type: 'experience', id: item.id });
-  }, [openDetail]);
+  const handleExperienceItemClick = useCallback(
+    (item: ExperienceItem) => {
+      openDetail({ type: 'experience', id: item.id });
+    },
+    [openDetail],
+  );
 
-  const handleLifeTabClick = useCallback((tabName: string) => {
-    setActiveLifeTab(tabName);
-  }, [setActiveLifeTab]);
+  const handleLifeTabClick = useCallback(
+    (tabName: string) => {
+      setActiveLifeTab(tabName);
+    },
+    [setActiveLifeTab],
+  );
 
-  const handleLifeItemClick = useCallback((item: LifeItem) => {
-    const coverImg = resolveImageUrl(item.imageUrl, 'large');
-    if (coverImg) {
-      const img = new Image();
-      img.src = coverImg;
-    }
-    navigateTo(`/${locale}/life/${item.id}`);
-  }, [navigateTo, locale]);
+  const handleLifeItemClick = useCallback(
+    (item: LifeItem) => {
+      const coverImg = resolveImageUrl(item.imageUrl, 'large');
+      if (coverImg) {
+        const img = new Image();
+        img.src = coverImg;
+      }
+      navigateTo(`/${locale}/life/${item.id}`);
+    },
+    [navigateTo, locale],
+  );
 
-  const handleLifeItemIntent = useCallback((item: LifeItem) => {
-    prefetchOnIntent(`/${locale}/life/${item.id}`);
-  }, [locale, prefetchOnIntent]);
+  const handleLifeItemIntent = useCallback(
+    (item: LifeItem) => {
+      prefetchOnIntent(`/${locale}/life/${item.id}`);
+    },
+    [locale, prefetchOnIntent],
+  );
 
   const handleCopyEmail = useCallback(() => {
-    navigator.clipboard.writeText(siteConfig.email).then(() => {
-      setIsEmailCopied(true);
-      setTimeout(() => setIsEmailCopied(false), 1500);
-    }).catch(err => console.error('Failed to copy email:', err));
+    navigator.clipboard
+      .writeText(siteConfig.email)
+      .then(() => {
+        setIsEmailCopied(true);
+        setTimeout(() => setIsEmailCopied(false), 1500);
+      })
+      .catch((err) => console.error('Failed to copy email:', err));
   }, []);
 
   const handleShowFriendLinks = useCallback(() => {
     navigateTo(`/${locale}/friends`);
   }, [navigateTo, locale]);
 
-  const handleBlogItemClick = useCallback((post: BlogPostMeta) => {
-    navigateTo(buildBlogPostHref(locale, post.slug, locale));
-  }, [navigateTo, locale]);
+  const handleBlogItemClick = useCallback(
+    (post: BlogPostMeta) => {
+      navigateTo(buildBlogPostHref(locale, post.slug, locale));
+    },
+    [navigateTo, locale],
+  );
 
-  const handleBlogItemIntent = useCallback((post: BlogPostMeta) => {
-    if (post.access.mode === 'public') {
-      prefetchOnIntent(buildBlogPostHref(locale, post.slug, locale));
-    }
-  }, [locale, prefetchOnIntent]);
+  const handleBlogItemIntent = useCallback(
+    (post: BlogPostMeta) => {
+      if (post.access.mode === 'public') {
+        prefetchOnIntent(buildBlogPostHref(locale, post.slug, locale));
+      }
+    },
+    [locale, prefetchOnIntent],
+  );
 
   const handleBackFromDetail = useCallback(() => {
     if (isClosingRef.current) return;
@@ -278,18 +330,21 @@ export default function ContentPage({
     return () => setBackOverride(null);
   }, [isDetailMounted, isClosing, setBackOverride, handleBackFromDetail]);
 
-  const handleDetailAnimEnd = useCallback((e: React.AnimationEvent) => {
-    if (e.target !== detailRef.current) return;
-    if (isClosingRef.current) {
-      if (detailCloseTimeoutRef.current !== null) {
-        window.clearTimeout(detailCloseTimeoutRef.current);
-        detailCloseTimeoutRef.current = null;
+  const handleDetailAnimEnd = useCallback(
+    (e: React.AnimationEvent) => {
+      if (e.target !== detailRef.current) return;
+      if (isClosingRef.current) {
+        if (detailCloseTimeoutRef.current !== null) {
+          window.clearTimeout(detailCloseTimeoutRef.current);
+          detailCloseTimeoutRef.current = null;
+        }
+        setDetailSelection({ type: 'none' });
+        setIsClosing(false);
+        isClosingRef.current = false;
       }
-      setDetailSelection({ type: 'none' });
-      setIsClosing(false);
-      isClosingRef.current = false;
-    }
-  }, [setDetailSelection]);
+    },
+    [setDetailSelection],
+  );
 
   return (
     <>
@@ -298,9 +353,7 @@ export default function ContentPage({
         onScroll={handleContentScroll}
         className={`${styles.contentWrapper}${
           isDetailMounted && !isClosing ? ` ${styles.detailOpen}` : ''
-        }${
-          isClosing ? ` ${styles.detailClosing}` : ''
-        }`}
+        }${isClosing ? ` ${styles.detailClosing}` : ''}`}
       >
         <div id="section-works" className={contentStyles.sectionAnchor}>
           <WorksSection
@@ -368,10 +421,7 @@ export default function ContentPage({
         </div>
 
         <div id="section-about" className={contentStyles.sectionAnchor}>
-          <AboutSection
-            aboutSectionRef={aboutSectionRef}
-            aboutContentRef={aboutContentRef}
-          />
+          <AboutSection aboutSectionRef={aboutSectionRef} aboutContentRef={aboutContentRef} />
         </div>
       </div>
 
@@ -384,11 +434,12 @@ export default function ContentPage({
           onAnimationEnd={handleDetailAnimEnd}
         >
           <button
+            type="button"
             className={styles.globalBackButton}
             onClick={handleBackFromDetail}
+            aria-label="BACK"
             style={{ position: 'fixed', zIndex: 10 }}
-          >
-          </button>
+          ></button>
           {detail.type === 'work' && <WorkDetailView item={detail.item} />}
           {detail.type === 'experience' && <ExperienceDetailView item={detail.item} />}
           {detail.type === 'life' && <LifeDetailView item={detail.item} />}

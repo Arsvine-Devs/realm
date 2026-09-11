@@ -49,9 +49,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom,
-      transparent 50%,
-      rgba(0, 0, 0, 0.15) 50%);
+  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.15) 50%);
   background-size: 100% 4px;
   opacity: 0.2;
   pointer-events: none;
@@ -116,7 +114,9 @@
   text-decoration: none;
   border: 1px solid var(--ark-primary);
   padding: 8px 15px;
-  transition: background-color 0.3s, color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
   text-transform: uppercase;
   letter-spacing: 1px;
   cursor: none;
@@ -208,7 +208,7 @@
   }
 }
 
-// --- ADD 文章图片样式 (从 LifeDetailView 复制) --- 
+// --- ADD 文章图片样式 (从 LifeDetailView 复制) ---
 .articleImageFigure {
   margin: 25px 0; // 在图片周围添加垂直空间
   text-align: center; // 居中图片内容
@@ -216,7 +216,9 @@
 
 .clickableFigure {
   cursor: none; // 添加指针光标以指示可点击性
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     transform: scale(1.02); // 悬停时略微放大

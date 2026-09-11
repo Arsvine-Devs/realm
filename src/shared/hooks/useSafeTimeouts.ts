@@ -67,10 +67,13 @@ export function useSafeTimeouts() {
     window.clearInterval(id);
   }, []);
 
-  return useMemo(() => ({
-    setTimeout: scheduleTimeout,
-    setInterval: scheduleInterval,
-    clearTimeout: clearScheduledTimeout,
-    clearInterval: clearScheduledInterval,
-  }), [scheduleTimeout, scheduleInterval, clearScheduledTimeout, clearScheduledInterval]);
+  return useMemo(
+    () => ({
+      setTimeout: scheduleTimeout,
+      setInterval: scheduleInterval,
+      clearTimeout: clearScheduledTimeout,
+      clearInterval: clearScheduledInterval,
+    }),
+    [scheduleTimeout, scheduleInterval, clearScheduledTimeout, clearScheduledInterval],
+  );
 }

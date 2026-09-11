@@ -34,7 +34,7 @@ pnpm --version
 pnpm vitest run tests/repo/react-three-fiber-timer-patch.test.ts
 ```
 
-确认 `package.json` 精确使用 `@react-three/fiber: 9.6.1`，`pnpm-workspace.yaml` 的 patch key 与 `patches/@react-three__fiber@9.6.1.patch` 一致。不要用 caret 绕过失败。
+确认 `package.json` 精确使用 `@react-three/fiber: 9.7.0`，`pnpm-workspace.yaml` 的 patch key 与 `patches/@react-three__fiber@9.7.0.patch` 一致。不要用 caret 绕过失败。
 
 依赖下载慢或失败时检查当前 shell 的 proxy/registry。只设置临时进程级代理，不提交代理配置。
 
@@ -205,8 +205,8 @@ curl -I -H "Referer: https://arsvine.com/" https://cdn.arsvine.com/shared/fonts/
 先检查 `<html>` performance capability：
 
 ```js
-document.documentElement.dataset.performanceTier
-document.documentElement.dataset.performanceReason
+document.documentElement.dataset.performanceTier;
+document.documentElement.dataset.performanceReason;
 ```
 
 再检查：reduced motion、Save-Data、runtime FPS、lazy import error、`webglcontextlost`、canvas 是否因 transition 反复 unmount。

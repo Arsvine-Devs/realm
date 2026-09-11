@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { useBox } from '@react-three/cannon';
 import * as THREE from 'three';
@@ -68,17 +62,20 @@ function Tesseract({
   const ndcMargin = 0.1;
   const dragMinY = -3 + halfOuter + 0.05;
 
-  const [, api] = useBox(() => ({
-    mass: 1,
-    position: position ? [position[0], Math.max(position[1], 8), position[2]] : [0, 8, 0],
-    args: [outerSize, outerSize, outerSize],
-    linearDamping: 0.1,
-    angularDamping: 0.5,
-    allowSleep: false,
-    material: {
-      restitution: 0.8,
-    },
-  }), groupRef);
+  const [, api] = useBox(
+    () => ({
+      mass: 1,
+      position: position ? [position[0], Math.max(position[1], 8), position[2]] : [0, 8, 0],
+      args: [outerSize, outerSize, outerSize],
+      linearDamping: 0.1,
+      angularDamping: 0.5,
+      allowSleep: false,
+      material: {
+        restitution: 0.8,
+      },
+    }),
+    groupRef,
+  );
 
   const lineGeometry = useMemo(
     () => createTesseractLineGeometry(outerSize, innerSize),
@@ -124,14 +121,21 @@ function Tesseract({
     event.stopPropagation();
   };
 
-  useImperativeHandle(ref, () => ({
-    getPosition: () => groupRef.current?.position,
-    meshRef: groupRef,
-  }), []);
+  useImperativeHandle(
+    ref,
+    () => ({
+      getPosition: () => groupRef.current?.position,
+      meshRef: groupRef,
+    }),
+    [],
+  );
 
-  useEffect(() => () => {
-    emitCursorHover(false);
-  }, []);
+  useEffect(
+    () => () => {
+      emitCursorHover(false);
+    },
+    [],
+  );
 
   useFrame(() => {
     if (!groupRef.current) {
@@ -190,10 +194,7 @@ function Tesseract({
 
       <mesh ref={coreRef} castShadow>
         <octahedronGeometry args={[0.08]} />
-        <meshBasicMaterial
-          color={isInverted ? '#E08FFF' : '#B2F2BB'}
-          wireframe
-        />
+        <meshBasicMaterial color={isInverted ? '#E08FFF' : '#B2F2BB'} wireframe />
       </mesh>
 
       <mesh

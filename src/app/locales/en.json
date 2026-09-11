@@ -23,7 +23,9 @@
   },
   "musicPlayer": {
     "playTitle": "Play",
-    "pauseTitle": "Pause"
+    "pauseTitle": "Pause",
+    "openTitle": "Open music player",
+    "closeTitle": "Close music player"
   },
   "nav": {
     "top": "Top",

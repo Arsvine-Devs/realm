@@ -7,7 +7,7 @@ import { useHudAnimation, useHudPower, useHudTyping } from '../../model/HudProvi
 import { useReducedMotion, useResponsive } from '@/shared/hooks/useMediaQuery';
 import type { ColumnPhase } from '@/features/hud/contracts/state';
 
-const sectionNames = ["PORTFOLIO", "EXPERIENCE", "BLOG", "LIFE", "CONTACT", "ABOUT"];
+const sectionNames = ['PORTFOLIO', 'EXPERIENCE', 'BLOG', 'LIFE', 'CONTACT', 'ABOUT'];
 
 interface NavigationColumnsProps {
   activeSection: string;
@@ -49,8 +49,10 @@ export default function NavigationColumns({
   handleColumnMouseLeave,
 }: NavigationColumnsProps) {
   const {
-    handleActivateTesseract, isTesseractActivated,
-    handleDischargeLeverPull, isDischarging,
+    handleActivateTesseract,
+    isTesseractActivated,
+    handleDischargeLeverPull,
+    isDischarging,
     powerLevel,
   } = useHudPower();
   const { leversVisible, mainVisible } = useHudAnimation();
@@ -83,26 +85,33 @@ export default function NavigationColumns({
 
     columns.forEach((col, i) => {
       gsap.set(col, { opacity: 0, x: 30, scale: 0.97 });
-      tl.to(col, {
-        opacity: 1, x: 0, scale: 1,
-        duration: 0.35, ease: 'power2.out',
-      }, 0.2 + i * 0.09);
+      tl.to(
+        col,
+        {
+          opacity: 1,
+          x: 0,
+          scale: 1,
+          duration: 0.35,
+          ease: 'power2.out',
+        },
+        0.2 + i * 0.09,
+      );
     });
 
     return () => {
       tl.kill();
       if (mobilePanel) gsap.set(mobilePanel, { clearProps: 'all' });
-      columns.forEach(col => gsap.set(col, { clearProps: 'all' }));
+      columns.forEach((col) => gsap.set(col, { clearProps: 'all' }));
     };
   }, [mainVisible, isMobile, reducedMotion]);
 
   return (
-    <main
-      className={styles.mainLayout}
-      style={{ opacity: 1, pointerEvents: 'auto' }}
-    >
+    <main className={styles.mainLayout} style={{ opacity: 1, pointerEvents: 'auto' }}>
       {/* 导航列（桌面端垂直列 / 平板移动端横向条） */}
-      <div className={`${styles.rightPanel}${columnPhase === 'retracting' ? ` ${styles.columnsRetracting}` : ''}`} ref={rightPanelRef}>
+      <div
+        className={`${styles.rightPanel}${columnPhase === 'retracting' ? ` ${styles.columnsRetracting}` : ''}`}
+        ref={rightPanelRef}
+      >
         {/* 移动端面板 — 桌面端 LeftPanel 完整移植 */}
         <div className={styles.mobilePanel}>
           {/* 顶部行: 电量 + 拉杆 */}
@@ -150,7 +159,9 @@ export default function NavigationColumns({
           {/* 底部行: 盲文(左) + 命运文字(右) */}
           <div className={styles.mobilePanelBottomRow}>
             <div className={styles.mobilePanelBraille}>⠝⠊⠕⠍⠡⠸⠬⠉⠄⠅⠢⠛⠳</div>
-            <div className={`${styles.mobilePanelFate} ${isFateTypingActive ? styles.mobilePanelTyping : ''}`}>
+            <div
+              className={`${styles.mobilePanelFate} ${isFateTypingActive ? styles.mobilePanelTyping : ''}`}
+            >
               <span className={styles.mobilePanelFateText}>{displayedFateText}</span>
             </div>
           </div>
@@ -189,17 +200,26 @@ export default function NavigationColumns({
               key={name}
               className={`${styles.column} ${styles['column' + index]} ${!animationsComplete ? styles.nonInteractive : ''}`}
               onClick={animationsComplete ? () => handleColumnClick(index) : undefined}
-              onKeyDown={animationsComplete ? (event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault();
-                  handleColumnClick(index);
-                }
-              } : undefined}
-              onPointerDown={animationsComplete ? (event) => {
-                if (event.button === 0) handleColumnNavigateIntent?.(index);
-              } : undefined}
+              onKeyDown={
+                animationsComplete
+                  ? (event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        handleColumnClick(index);
+                      }
+                    }
+                  : undefined
+              }
+              onPointerDown={
+                animationsComplete
+                  ? (event) => {
+                      if (event.button === 0) handleColumnNavigateIntent?.(index);
+                    }
+                  : undefined
+              }
               onMouseEnter={() => handleColumnMouseEnter(index)}
               onMouseLeave={() => handleColumnMouseLeave(index)}
+              /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- the column contains composed HUD visuals and task rows. */
               role="button"
               tabIndex={animationsComplete ? 0 : -1}
               aria-label={name}
@@ -229,31 +249,45 @@ export default function NavigationColumns({
                           <span className={styles.taskText}>{task}</span>
                         </div>
                       </div>,
-                      taskIdx < tasks.length - 1 && <div key={`line-${taskIdx}`} className={styles.taskLine}></div>
+                      taskIdx < tasks.length - 1 && (
+                        <div key={`line-${taskIdx}`} className={styles.taskLine}></div>
+                      ),
                     ])}
                   </div>
                 )}
                 {index === 1 && (
                   <>
-                    <div className={`${styles.branchContainer} ${styles.branch1} ${styles.rightBranch}`}>
+                    <div
+                      className={`${styles.branchContainer} ${styles.branch1} ${styles.rightBranch}`}
+                    >
                       <span className={styles.branchSquare}></span>
                       <pre className={styles.branchText}>{branchText1}</pre>
                     </div>
-                    <div className={`${styles.branchContainer} ${styles.branch2} ${styles.leftBranch}`}>
+                    <div
+                      className={`${styles.branchContainer} ${styles.branch2} ${styles.leftBranch}`}
+                    >
                       <span className={styles.branchSquare}></span>
                       <pre className={styles.branchText}>{branchText2}</pre>
                     </div>
-                    <div className={`${styles.branchContainer} ${styles.branch3} ${styles.rightBranch}`}>
+                    <div
+                      className={`${styles.branchContainer} ${styles.branch3} ${styles.rightBranch}`}
+                    >
                       <span className={styles.branchSquare}></span>
                       <pre className={styles.branchText}>{branchText3}</pre>
                     </div>
-                    <div className={`${styles.branchContainer} ${styles.branch4} ${styles.leftBranch}`}>
+                    <div
+                      className={`${styles.branchContainer} ${styles.branch4} ${styles.leftBranch}`}
+                    >
                       <span className={styles.branchSquare}></span>
                       <pre className={styles.branchText}>{branchText4}</pre>
                     </div>
                   </>
                 )}
-                {index === 3 && <span className={`${styles.lifeScanlines} ${isInverted ? styles.invertedScanlines : ''}`}></span>}
+                {index === 3 && (
+                  <span
+                    className={`${styles.lifeScanlines} ${isInverted ? styles.invertedScanlines : ''}`}
+                  ></span>
+                )}
                 {index === 4 && (
                   <>
                     <div className={`${styles.radarRipple} ${styles.ripple1}`}></div>
@@ -286,7 +320,6 @@ export default function NavigationColumns({
             </div>
           );
         })}
-
       </div>
     </main>
   );

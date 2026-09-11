@@ -190,9 +190,7 @@ function TweetCard({ tweet, locale, contentStyle }: TweetCardProps) {
   const showAnnotated = !isAnimating && segmentsHasExplain && displayText === plainText;
 
   return (
-    <article
-      className={`${cardStyles.card}${tweet.pinned ? ` ${cardStyles.pinned}` : ''}`}
-    >
+    <article className={`${cardStyles.card}${tweet.pinned ? ` ${cardStyles.pinned}` : ''}`}>
       <div className={cardStyles.cardInner}>
         <div className={cardStyles.cardContent}>
           <div className={styles.tweetMetaRow}>
@@ -240,11 +238,15 @@ function TweetCard({ tweet, locale, contentStyle }: TweetCardProps) {
                   </span>
                 ))}
               </div>
-            ) : <span />}
+            ) : (
+              <span />
+            )}
 
             {tweet.lang ? (
               <span className={cardStyles.cardReadingTime}>{tweet.lang}</span>
-            ) : <span />}
+            ) : (
+              <span />
+            )}
           </div>
         </div>
       </div>
@@ -286,7 +288,7 @@ export default function TweetsSection({
         `/api/tweet-months?offset=${loadedGroups.length}&limit=${monthBatchSize}`,
         { cache: 'no-store' },
       );
-      const json = await response.json() as {
+      const json = (await response.json()) as {
         error?: string;
         monthGroups?: TweetMonthGroup[];
       };
@@ -299,9 +301,7 @@ export default function TweetsSection({
         setLoadedGroups((current) => [...current, ...(json.monthGroups ?? [])]);
       });
     } catch (error) {
-      setLoadMoreError(
-        error instanceof Error ? error.message : 'Failed to load more tweets.',
-      );
+      setLoadMoreError(error instanceof Error ? error.message : 'Failed to load more tweets.');
     } finally {
       setLoadingMore(false);
     }
@@ -321,7 +321,9 @@ export default function TweetsSection({
           <>
             <p className={styles.emptyState}>{t('unavailable')}</p>
             {process.env.NODE_ENV !== 'production' && sourceError ? (
-              <p className={styles.loadMoreError}>{t('unavailableHint', { reason: sourceError })}</p>
+              <p className={styles.loadMoreError}>
+                {t('unavailableHint', { reason: sourceError })}
+              </p>
             ) : null}
           </>
         ) : (
@@ -333,12 +335,8 @@ export default function TweetsSection({
             {loadedGroups.map((group) => (
               <section key={group.month} className={styles.monthGroup}>
                 <div className={styles.monthHeader}>
-                  <h3 className={styles.monthHeading}>
-                    {formatMonthLabel(group.month, locale)}
-                  </h3>
-                  <span className={styles.monthMeta}>
-                    {group.tweets.length}
-                  </span>
+                  <h3 className={styles.monthHeading}>{formatMonthLabel(group.month, locale)}</h3>
+                  <span className={styles.monthMeta}>{group.tweets.length}</span>
                 </div>
 
                 <div className={styles.tweetList}>
@@ -367,9 +365,7 @@ export default function TweetsSection({
               >
                 {loadingMore ? tCommon('loading') : t('loadMore')}
               </button>
-              {loadMoreError ? (
-                <p className={styles.loadMoreError}>{loadMoreError}</p>
-              ) : null}
+              {loadMoreError ? <p className={styles.loadMoreError}>{loadMoreError}</p> : null}
             </>
           ) : null}
         </>

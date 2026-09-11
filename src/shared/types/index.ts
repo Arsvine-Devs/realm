@@ -5,8 +5,6 @@
 import type { Locale } from '@/shared/contracts/locale';
 import type { ContentPostAccess } from '@/shared/lib/content/types';
 
-export type { ContentAccessMode, ContentPostAccess } from '@/shared/lib/content/types';
-
 /**
  * 单条内容相对当前请求 locale 的翻译状态：
  *   - 'source':     当前 locale === 内容原文 locale（无需提示）
@@ -34,7 +32,8 @@ export interface CatalogAssetReference {
   alt?: string;
 }
 
-export type AssetReference = string | ManagedAssetReference | ExternalAssetReference | CatalogAssetReference;
+export type AssetReference =
+  string | ManagedAssetReference | ExternalAssetReference | CatalogAssetReference;
 
 export interface GalleryImage {
   src: AssetReference;
@@ -106,13 +105,6 @@ export interface ExperienceItem {
   galleryImages: GalleryImage[];
 }
 
-export interface BlogPost {
-  id: string;
-  title: string;
-  excerpt: string;
-  articleContent?: string;
-}
-
 export interface BlogPostMeta {
   slug: string;
   title: string;
@@ -168,7 +160,7 @@ export interface SiteAssets {
   twitterImage: string;
 }
 
-export interface SiteFontPreconnect {
+interface SiteFontPreconnect {
   href: string;
   crossOrigin?: 'anonymous';
 }
@@ -226,8 +218,3 @@ export interface SitePages {
 // ============================================================
 // Component Props
 // ============================================================
-
-export interface NavLink {
-  label: string;
-  target: string;
-}

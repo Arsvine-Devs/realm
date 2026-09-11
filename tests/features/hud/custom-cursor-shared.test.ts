@@ -14,7 +14,9 @@ describe('custom cursor magnetic target lookup', () => {
     near.getBoundingClientRect = vi.fn(() => mockRect(10, 10, 30, 30));
     far.getBoundingClientRect = vi.fn(() => mockRect(1000, 1000, 30, 30));
     const getComputedStyle = vi.spyOn(window, 'getComputedStyle').mockReturnValue({
-      display: 'block', visibility: 'visible', opacity: '1',
+      display: 'block',
+      visibility: 'visible',
+      opacity: '1',
     } as CSSStyleDeclaration);
 
     const result = findClosestInteractiveElement([near, far], 20, 20);

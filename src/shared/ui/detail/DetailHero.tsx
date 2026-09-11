@@ -28,11 +28,7 @@ export default function DetailHero({
   const titleClassName = compact ? styles.compactTitle : styles.heroTitle;
 
   return (
-    <section
-      className={className}
-      ref={sectionRef}
-      data-nav-id="hero"
-    >
+    <section className={className} ref={sectionRef} data-nav-id="hero">
       {!compact && (
         <>
           <div

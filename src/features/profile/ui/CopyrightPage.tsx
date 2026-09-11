@@ -28,7 +28,10 @@ export default function CopyrightPage({ locale }: CopyrightPageProps) {
   // intro / contentLicense 的文案里有 {mitLink} / {ccLink} 占位符。
   // 我们要自己渲染成 <a>，所以用 t.raw() 拿原始模板字符串绕开 next-intl
   // 的 ICU 解析（直接 t() 会因为没传变量而 fallback 到 key 名）。
-  const renderWithLinks = (template: string, links: Record<string, { url: string; text: string }>) => {
+  const renderWithLinks = (
+    template: string,
+    links: Record<string, { url: string; text: string }>,
+  ) => {
     const parts: (string | React.ReactNode)[] = [];
     let remaining = template;
     let key = 0;
@@ -55,11 +58,12 @@ export default function CopyrightPage({ locale }: CopyrightPageProps) {
   const contentLicenseLinks = {
     ccLink: {
       url: CC_URL,
-      text: locale === 'en'
-        ? 'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0)'
-        : locale === 'zh-TW'
-          ? 'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License（CC BY-NC-ND 4.0，姓名標示—非商業性—禁止改作）'
-          : 'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License（CC BY-NC-ND 4.0，署名—非商业性使用—禁止演绎）',
+      text:
+        locale === 'en'
+          ? 'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0)'
+          : locale === 'zh-TW'
+            ? 'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License（CC BY-NC-ND 4.0，姓名標示—非商業性—禁止改作）'
+            : 'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License（CC BY-NC-ND 4.0，署名—非商业性使用—禁止演绎）',
     },
   };
 
@@ -72,43 +76,40 @@ export default function CopyrightPage({ locale }: CopyrightPageProps) {
 
   return (
     <SectionPageLayout>
-        <div
-          className={`${styles.friendLinkSection} ${styles.copyrightSection} ${entered ? styles.copyrightEntered : ''}`}
-        >
-          <h2>{t('heading')}</h2>
+      <div
+        className={`${styles.friendLinkSection} ${styles.copyrightSection} ${entered ? styles.copyrightEntered : ''}`}
+      >
+        <h2>{t('heading')}</h2>
 
-          <article className={styles.copyrightArticle} lang={langAttr}>
-            {locale !== 'zh-CN' && (
-              <>
-                <p className={styles.copyrightBindingNotice}>
-                  <strong>{t.raw('bindingNotice') as string}</strong>
-                </p>
-                <hr className={styles.copyrightBindingDivider} />
-              </>
-            )}
-            <p>{renderWithLinks(t.raw('intro') as string, introLinks)}</p>
-            <p>{renderWithLinks(t.raw('contentLicense') as string, contentLicenseLinks)}</p>
-            <p>{t('shareIntro')}</p>
-            <ol>
-              {shareItems.map((item, idx) => (
-                <li key={idx}>
-                  {item.replace('{author}', siteConfig.author)}
-                </li>
-              ))}
-            </ol>
-            <p>{t('prohibited')}</p>
-            <p>{t('quotation')}</p>
-            <p>{t('thirdParty')}</p>
-            <p>
-              {t('contactPrefix')}{' '}
-              <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>.
-            </p>
-          </article>
-
-          <p className={styles.copyrightStamp}>
-            © {yearRange} {siteConfig.author}
+        <article className={styles.copyrightArticle} lang={langAttr}>
+          {locale !== 'zh-CN' && (
+            <>
+              <p className={styles.copyrightBindingNotice}>
+                <strong>{t.raw('bindingNotice') as string}</strong>
+              </p>
+              <hr className={styles.copyrightBindingDivider} />
+            </>
+          )}
+          <p>{renderWithLinks(t.raw('intro') as string, introLinks)}</p>
+          <p>{renderWithLinks(t.raw('contentLicense') as string, contentLicenseLinks)}</p>
+          <p>{t('shareIntro')}</p>
+          <ol>
+            {shareItems.map((item, idx) => (
+              <li key={idx}>{item.replace('{author}', siteConfig.author)}</li>
+            ))}
+          </ol>
+          <p>{t('prohibited')}</p>
+          <p>{t('quotation')}</p>
+          <p>{t('thirdParty')}</p>
+          <p>
+            {t('contactPrefix')} <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>.
           </p>
-        </div>
+        </article>
+
+        <p className={styles.copyrightStamp}>
+          © {yearRange} {siteConfig.author}
+        </p>
+      </div>
     </SectionPageLayout>
   );
 }

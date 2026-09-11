@@ -17,7 +17,7 @@
     // HUD starts at 2200ms + 100ms = 2300ms
     // Left panel gets .animated at 200ms + 100ms = 300ms
     // Required delay = 2300ms - 300ms = 2000ms
-    transition-delay: 2.0s; // Original: 4.5s
+    transition-delay: 2s; // Original: 4.5s
     opacity: 0.7; // Fade in to a slightly transparent state
   }
 }
@@ -54,7 +54,9 @@
   height: 1px;
   border-bottom: 1px dashed var(--ark-border); // Dashed line using border
   position: relative; // Needed for pseudo-element positioning
-  transition: border-bottom-color 0.5s ease-in-out, background-color 0.5s ease-in-out; // ADDED transition
+  transition:
+    border-bottom-color 0.5s ease-in-out,
+    background-color 0.5s ease-in-out; // ADDED transition
 
   &::before {
     content: '';
@@ -80,15 +82,11 @@
   }
 }
 
-
-// --- New Keyframe for REVERSE Meteor Trail (Bottom->Top) --- 
-
+// --- New Keyframe for REVERSE Meteor Trail (Bottom->Top) ---
 
 // --- 添加分支动画样式 ---
 
-
 // --- 添加分支动画关键帧 ---
-
 
 // --- 新增: 环境参数容器样式 (修改后) ---
 .envParamsContainer {
@@ -105,12 +103,22 @@
   opacity: 0; // 初始隐藏
   transition: opacity 0.5s ease-out;
   // 与 fateTextContainer 使用相同的延迟
-  transition-delay: 2.0s;
+  transition-delay: 2s;
   pointer-events: none; // 避免遮挡
   min-height: calc(1.4em * 6);
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 82%, rgba(0, 0, 0, 0.18) 100%);
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 82%, rgba(0, 0, 0, 0.18) 100%);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 82%,
+    rgba(0, 0, 0, 0.18) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 82%,
+    rgba(0, 0, 0, 0.18) 100%
+  );
 
   // 移除 .animated 选择器，改为依赖 leftPanel.animated
   .leftPanel.animated & {
@@ -157,22 +165,23 @@
   }
 }
 
-
-
-// --- ADD: Left Dot Matrix --- 
+// --- ADD: Left Dot Matrix ---
 .leftDotMatrix {
   position: fixed;
   left: 0;
   top: 0;
   width: 6.5vw;
   height: 100vh;
-  background-image: radial-gradient(circle, rgba(var(--ark-primary-rgb), 0.2) 1px, transparent 1.1px); // Small, less opaque grey dots
+  background-image: radial-gradient(
+    circle,
+    rgba(var(--ark-primary-rgb), 0.2) 1px,
+    transparent 1.1px
+  ); // Small, less opaque grey dots
   background-size: 10px 10px; // Spacing of the dots
   z-index: 5; // Behind leftPanel (z-index 10), above gridBackground (z-index 1)
   pointer-events: none;
   opacity: 0.6; // Slightly transparent
 }
-
 
 // --- 新增: 盲文文本样式 ---
 .brailleText {
@@ -219,7 +228,9 @@
 
 .gradientSegment {
   height: 100%;
-  transition: flex 1.2s ease-in-out, background-color 1.2s ease-in-out;
+  transition:
+    flex 1.2s ease-in-out,
+    background-color 1.2s ease-in-out;
 }
 
 // --- 开往链接 ---
@@ -280,7 +291,11 @@
   padding: 0 clamp(14px, 1.2vw, 20px);
   border: 1px solid var(--ark-border);
   background:
-    linear-gradient(90deg, rgba(var(--ark-highlight-green-rgb), 0.06) 0%, rgba(var(--ark-highlight-green-rgb), 0) 24%),
+    linear-gradient(
+      90deg,
+      rgba(var(--ark-highlight-green-rgb), 0.06) 0%,
+      rgba(var(--ark-highlight-green-rgb), 0) 24%
+    ),
     rgba(var(--ark-dark-blue-rgb), 0.28);
   color: var(--ark-text-secondary);
   font-family: var(--font-hud);
@@ -307,7 +322,11 @@
     opacity: 1;
     border-color: rgba(var(--ark-highlight-green-rgb), 0.48);
     background:
-      linear-gradient(90deg, rgba(var(--ark-highlight-green-rgb), 0.1) 0%, rgba(var(--ark-highlight-green-rgb), 0.02) 28%),
+      linear-gradient(
+        90deg,
+        rgba(var(--ark-highlight-green-rgb), 0.1) 0%,
+        rgba(var(--ark-highlight-green-rgb), 0.02) 28%
+      ),
       rgba(var(--ark-dark-blue-rgb), 0.36);
     box-shadow: 0 0 14px rgba(var(--ark-highlight-green-rgb), 0.08);
 
@@ -331,7 +350,9 @@
   box-shadow:
     0 0 0 8px rgba(var(--ark-highlight-green-rgb), 0.08),
     0 0 10px rgba(var(--ark-highlight-green-rgb), 0.14);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .newsTickerViewport {
@@ -403,18 +424,13 @@
 
 // --- 新增: 倒置状态渐变 ---
 .gradientLineInverted {
-  background: linear-gradient(to right,
-      var(--ark-primary) 0% 2%,
-      /* Inverted Primary (Pink/Purple) block */
-      #888888 2% 38%,
-      /* Lighter Gray 1 */
-      #999999 38% 62%,
-      /* Lighter Gray 2 */
-      #aaaaaa 62% 82%,
-      /* Lighter Gray 3 */
-      #bbbbbb 82% 95%,
-      /* Lighter Gray 4 */
-      #cccccc 95% 100%
-      /* Lightest Gray */
-    );
+  background: linear-gradient(
+    to right,
+    var(--ark-primary) 0% 2%,
+    /* Inverted Primary (Pink/Purple) block */ #888888 2% 38%,
+    /* Lighter Gray 1 */ #999999 38% 62%,
+    /* Lighter Gray 2 */ #aaaaaa 62% 82%,
+    /* Lighter Gray 3 */ #bbbbbb 82% 95%,
+    /* Lighter Gray 4 */ #cccccc 95% 100% /* Lightest Gray */
+  );
 }

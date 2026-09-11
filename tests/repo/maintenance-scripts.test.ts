@@ -10,9 +10,11 @@ const execFileAsync = promisify(execFile);
 const temporaryDirectories: string[] = [];
 
 afterEach(async () => {
-  await Promise.all(temporaryDirectories.splice(0).map((directory) => (
-    rm(directory, { recursive: true, force: true })
-  )));
+  await Promise.all(
+    temporaryDirectories
+      .splice(0)
+      .map((directory) => rm(directory, { recursive: true, force: true })),
+  );
 });
 
 describe('maintenance scripts', () => {
@@ -32,20 +34,23 @@ describe('maintenance scripts', () => {
     temporaryDirectories.push(directory);
     const localPath = path.join(directory, '.env.local');
     const examplePath = path.join(directory, '.env.example');
-    await writeFile(localPath, [
-      'COS_PUBLIC_BUCKET=public-bucket',
-      'COS_PUBLIC_REGION=ap-hongkong',
-      'COS_PRIVATE_BUCKET=private-bucket',
-      'COS_PRIVATE_REGION=ap-hongkong',
-      'UNREGISTERED_KEY=remove-me',
-      '',
-    ].join('\n'));
+    await writeFile(
+      localPath,
+      [
+        'COS_PUBLIC_BUCKET=public-bucket',
+        'COS_PUBLIC_REGION=ap-hongkong',
+        'COS_PRIVATE_BUCKET=private-bucket',
+        'COS_PRIVATE_REGION=ap-hongkong',
+        'UNREGISTERED_KEY=remove-me',
+        '',
+      ].join('\n'),
+    );
 
-    await execFileAsync(process.execPath, [
-      'scripts/sync-env-files.mjs',
-      '--local', localPath,
-      '--example', examplePath,
-    ], { cwd: process.cwd() });
+    await execFileAsync(
+      process.execPath,
+      ['scripts/sync-env-files.mjs', '--local', localPath, '--example', examplePath],
+      { cwd: process.cwd() },
+    );
 
     const synchronized = await readFile(localPath, 'utf8');
     expect(synchronized).toContain('COS_PUBLIC_BUCKET=public-bucket');

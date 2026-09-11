@@ -44,7 +44,8 @@ export default function BlogDetailScaffold({
 
   const currentIndex = allPosts.findIndex((post) => post.slug === meta.slug);
   const prevPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
-  const nextPost = currentIndex >= 0 && currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+  const nextPost =
+    currentIndex >= 0 && currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
   const contentIndexHref = buildBlogIndexHref(locale);
   const prevPostHref = prevPost
     ? buildBlogPostHref(locale, prevPost.slug, defaultContentLocale)
@@ -64,33 +65,45 @@ export default function BlogDetailScaffold({
   const [activeNav, setActiveNav] = useState<BlogDetailSectionId>('header');
   const [isPastHeader, setIsPastHeader] = useState(false);
 
-  const setWrapperRef = useCallback((node: HTMLDivElement | null) => {
-    wrapperRef.current = node;
-    if (scrollRootRef) {
-      scrollRootRef.current = node;
-    }
-    if (!node) return;
+  const setWrapperRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      wrapperRef.current = node;
+      if (scrollRootRef) {
+        scrollRootRef.current = node;
+      }
+      if (!node) return;
 
-    const savedScrollTop = pageStateStore.read<number>('blog.scroll-top') ?? 0;
-    restoreScrollFrameRef.current = window.requestAnimationFrame(() => {
-      node.scrollTop = Math.min(savedScrollTop, Math.max(0, node.scrollHeight - node.clientHeight));
-      restoreScrollFrameRef.current = null;
-    });
-  }, [pageStateStore, scrollRootRef]);
+      const savedScrollTop = pageStateStore.read<number>('blog.scroll-top') ?? 0;
+      restoreScrollFrameRef.current = window.requestAnimationFrame(() => {
+        node.scrollTop = Math.min(
+          savedScrollTop,
+          Math.max(0, node.scrollHeight - node.clientHeight),
+        );
+        restoreScrollFrameRef.current = null;
+      });
+    },
+    [pageStateStore, scrollRootRef],
+  );
 
   const handleScroll = useCallback(() => {
     pageStateStore.write('blog.scroll-top', wrapperRef.current?.scrollTop ?? 0);
   }, [pageStateStore]);
 
-  useEffect(() => () => {
-    if (restoreScrollFrameRef.current !== null) {
-      window.cancelAnimationFrame(restoreScrollFrameRef.current);
-    }
-  }, []);
+  useEffect(
+    () => () => {
+      if (restoreScrollFrameRef.current !== null) {
+        window.cancelAnimationFrame(restoreScrollFrameRef.current);
+      }
+    },
+    [],
+  );
 
-  const setSectionRef = useCallback((id: BlogDetailSectionId) => (node: HTMLElement | null) => {
-    sectionRefs.current[id] = node;
-  }, []);
+  const setSectionRef = useCallback(
+    (id: BlogDetailSectionId) => (node: HTMLElement | null) => {
+      sectionRefs.current[id] = node;
+    },
+    [],
+  );
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
@@ -116,7 +129,7 @@ export default function BlogDetailScaffold({
           }
         });
       },
-      { threshold: 0.3, root: wrapper }
+      { threshold: 0.3, root: wrapper },
     );
 
     const headerObserver = new IntersectionObserver(
@@ -127,7 +140,7 @@ export default function BlogDetailScaffold({
           }
         });
       },
-      { threshold: 0.55, root: wrapper }
+      { threshold: 0.55, root: wrapper },
     );
 
     observedSections.forEach((section) => {
@@ -143,10 +156,13 @@ export default function BlogDetailScaffold({
     };
   }, [meta.slug]);
 
-  const handleBack = useCallback((event?: React.MouseEvent) => {
-    event?.preventDefault();
-    navigateTo(contentIndexHref);
-  }, [contentIndexHref, navigateTo]);
+  const handleBack = useCallback(
+    (event?: React.MouseEvent) => {
+      event?.preventDefault();
+      navigateTo(contentIndexHref);
+    },
+    [contentIndexHref, navigateTo],
+  );
 
   const scrollToSection = useCallback((id: BlogDetailSectionId) => {
     const target = sectionRefs.current[id];
@@ -178,11 +194,7 @@ export default function BlogDetailScaffold({
           {contentContent}
         </section>
 
-        <footer
-          className={styles.footer}
-          ref={setSectionRef('end')}
-          data-nav-id="end"
-        >
+        <footer className={styles.footer} ref={setSectionRef('end')} data-nav-id="end">
           <div className={styles.endMarker}>
             <span className={styles.endSignal}>{tCommon('endTransmission')}</span>
           </div>

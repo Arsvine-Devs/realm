@@ -5,7 +5,8 @@ import localLinkItems from '../../src/features/profile/contracts/friendLinks/sou
 import audioItems from '../../src/features/music/source-manifest.json' with { type: 'json' };
 
 function assertString(value, field) {
-  if (typeof value !== 'string' || !value.trim()) throw new Error(`Invalid source manifest field: ${field}`);
+  if (typeof value !== 'string' || !value.trim())
+    throw new Error(`Invalid source manifest field: ${field}`);
 }
 
 function assertUniqueIds(items, name) {
@@ -30,7 +31,9 @@ function validateAssetItems(items, name, { cover = true } = {}) {
     assertString(item.title, `${name}.${item.id}.title`);
     if (cover) assertLegacySource(item.cover, `${name}.${item.id}.cover`);
     if (!Array.isArray(item.gallery)) throw new Error(`Invalid ${name}.${item.id}.gallery`);
-    item.gallery.forEach((source, index) => assertLegacySource(source, `${name}.${item.id}.gallery[${index}]`));
+    item.gallery.forEach((source, index) =>
+      assertLegacySource(source, `${name}.${item.id}.gallery[${index}]`),
+    );
   }
 }
 
@@ -39,7 +42,9 @@ export function loadSourceManifests() {
   validateAssetItems(lifeItems, 'life');
   validateAssetItems(experienceItems, 'experience', { cover: false });
   assertUniqueIds(localLinkItems, 'friendLinks');
-  localLinkItems.forEach((item) => assertLegacySource(item.avatar, `friendLinks.${item.id}.avatar`));
+  localLinkItems.forEach((item) =>
+    assertLegacySource(item.avatar, `friendLinks.${item.id}.avatar`),
+  );
   assertUniqueIds(audioItems, 'audio');
   audioItems.forEach((item) => assertLegacySource(`music/${item.file}`, `audio.${item.id}.file`));
 

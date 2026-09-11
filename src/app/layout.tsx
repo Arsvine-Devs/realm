@@ -41,11 +41,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html
-      lang={htmlLangMap[defaultLocale]}
-      data-scroll-behavior="smooth"
-      suppressHydrationWarning
-    >
+    <html lang={htmlLangMap[defaultLocale]} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         {process.env.NODE_ENV === 'production' ? (
           <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />

@@ -1,0 +1,11 @@
+{
+  "path": ["../src", "../scripts", "../server.js", "../next.config.js"],
+  "pattern": "**/*.{ts,tsx,js,mjs}",
+  "ignore": ["**/contracts/data/**", "**/contracts/friendLinks/**", "**/contracts/skills/**"],
+  "minTokens": 80,
+  "minLines": 10,
+  "mode": "weak",
+  "reporters": ["console"],
+  "noColors": true,
+  "noTips": true
+}

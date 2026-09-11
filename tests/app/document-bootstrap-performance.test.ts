@@ -1,14 +1,17 @@
 import { describe, expect, it, vi } from 'vitest';
 import { buildDocumentBootstrapScript } from '@/shared/lib/document-bootstrap';
 
-function evaluateBootstrap(script: string, env: {
-  reduceMotion?: boolean;
-  saveData?: boolean;
-  effectiveType?: string;
-  deviceMemory?: number;
-  hardwareConcurrency?: number;
-  pathname?: string;
-} = {}) {
+function evaluateBootstrap(
+  script: string,
+  env: {
+    reduceMotion?: boolean;
+    saveData?: boolean;
+    effectiveType?: string;
+    deviceMemory?: number;
+    hardwareConcurrency?: number;
+    pathname?: string;
+  } = {},
+) {
   const attrs = new Map<string, string>();
   const html = {
     lang: '',
@@ -30,7 +33,14 @@ function evaluateBootstrap(script: string, env: {
     matches: env.reduceMotion ?? false,
   }));
 
-  const fn = new Function('document', 'matchMedia', 'navigator', 'sessionStorage', 'localStorage', script);
+  const fn = new Function(
+    'document',
+    'matchMedia',
+    'navigator',
+    'sessionStorage',
+    'localStorage',
+    script,
+  );
   fn(
     { documentElement: html, cookie: '', location: { pathname: env.pathname ?? '/zh-CN' } },
     matchMedia,
@@ -50,8 +60,12 @@ function evaluateBootstrap(script: string, env: {
 
 describe('buildDocumentBootstrapScript performance tier', () => {
   it('sets the document language from the locale-prefixed pathname before hydration', () => {
-    expect(evaluateBootstrap(buildDocumentBootstrapScript(), { pathname: '/en/copyright' }).html.lang).toBe('en-US');
-    expect(evaluateBootstrap(buildDocumentBootstrapScript(), { pathname: '/zh-TW/content' }).html.lang).toBe('zh-Hant-TW');
+    expect(
+      evaluateBootstrap(buildDocumentBootstrapScript(), { pathname: '/en/copyright' }).html.lang,
+    ).toBe('en-US');
+    expect(
+      evaluateBootstrap(buildDocumentBootstrapScript(), { pathname: '/zh-TW/content' }).html.lang,
+    ).toBe('zh-Hant-TW');
   });
 
   it('does not lower visual effects for the browser network estimate alone', () => {
@@ -64,8 +78,12 @@ describe('buildDocumentBootstrapScript performance tier', () => {
 
   it('does not lower visual effects for coarse hardware hints', () => {
     const script = buildDocumentBootstrapScript();
-    expect(evaluateBootstrap(script, { deviceMemory: 4 }).attrs.get('data-performance-tier')).toBe('full');
-    expect(evaluateBootstrap(script, { hardwareConcurrency: 4 }).attrs.get('data-performance-tier')).toBe('full');
+    expect(evaluateBootstrap(script, { deviceMemory: 4 }).attrs.get('data-performance-tier')).toBe(
+      'full',
+    );
+    expect(
+      evaluateBootstrap(script, { hardwareConcurrency: 4 }).attrs.get('data-performance-tier'),
+    ).toBe('full');
   });
 
   it('writes minimal tier for reduced motion', () => {

@@ -5,7 +5,8 @@ export const webProjects: Project[] = [
   {
     ...portfolioSourceFields('arsvine-realm'),
     title: 'Arsvine Realm',
-    description: 'A Next.js personal site built around portfolio work, writing, and a growing personal archive.',
+    description:
+      'A Next.js personal site built around portfolio work, writing, and a growing personal archive.',
     role: 'Design / Development / Content Architecture',
     year: '2026',
     status: 'shipped',
@@ -29,7 +30,8 @@ For me, Arsvine Realm is not merely about putting things online. It is closer to
   {
     ...portfolioSourceFields('endfield-planner'),
     title: 'Endfield Gacha Simulator & Planner',
-    description: 'A pull simulation and resource planning tool for Arknights: Endfield, designed to turn player intuition into computable strategy.',
+    description:
+      'A pull simulation and resource planning tool for Arknights: Endfield, designed to turn player intuition into computable strategy.',
     role: 'Full Stack Developer / System Designer',
     year: '2026',
     status: 'wip',
@@ -58,7 +60,8 @@ export const earlyProjects: Project[] = [
   {
     ...portfolioSourceFields('early-projects'),
     title: 'Early Projects',
-    description: 'Experiments, unfinished pieces, and remnants from the learning years. They are not all mature, but they form the earliest technical trail.',
+    description:
+      'Experiments, unfinished pieces, and remnants from the learning years. They are not all mature, but they form the earliest technical trail.',
     role: 'Student / Explorer',
     year: '201x',
     status: 'archived',
@@ -70,9 +73,6 @@ These projects touched HTML, CSS, JavaScript, Python, C++, C#, Scratch, and Unit
 I keep them archived here not to prove that the past was impressive, but to preserve a trail. Many preferences that now seem clear actually came from those messy early experiments.`,
   },
 ];
-
-export const learnProjects = earlyProjects;
-export const workProjects = [...webProjects, ...gameProjects];
 
 export const copyableTokens: CopyableToken[] = [
   { pattern: 'arsvine.com', label: 'Main site URL' },

@@ -4,7 +4,12 @@ import COS from 'cos-nodejs-sdk-v5';
 import { parseCatalogSection } from './catalog-validator';
 
 const PROJECT_NAMESPACE = 'realm';
-const DEFAULT_PRIVATE_ROOT = path.join(/* turbopackIgnore: true */ process.cwd(), 'dist', 'cos-upload', 'private-root');
+const DEFAULT_PRIVATE_ROOT = path.join(
+  /* turbopackIgnore: true */ process.cwd(),
+  'dist',
+  'cos-upload',
+  'private-root',
+);
 const DEFAULT_WORKS_PAGE_SIZE = 12;
 
 type CatalogSectionName = 'home' | 'works' | 'collections' | 'links' | 'audio' | 'static-assets';
@@ -151,7 +156,9 @@ function extractCurrentVersion(pointer: CatalogCurrentPointer | string) {
   if (typeof pointer === 'string') {
     return pointer.replace(/\/+$/, '').split('/').pop() || pointer;
   }
-  return pointer.version || pointer.current || pointer.path?.replace(/\/+$/, '').split('/').pop() || null;
+  return (
+    pointer.version || pointer.current || pointer.path?.replace(/\/+$/, '').split('/').pop() || null
+  );
 }
 
 function isCatalogVersion(value: string): boolean {
@@ -184,7 +191,10 @@ async function loadSection(section: CatalogSectionName) {
     const remote = await loadFrom(readRemote);
     if (remote != null) return remote;
   } catch (error) {
-    console.warn(`[catalog] remote ${section} is invalid; using local fallback:`, (error as Error).message);
+    console.warn(
+      `[catalog] remote ${section} is invalid; using local fallback:`,
+      (error as Error).message,
+    );
   }
 
   const local = await loadFrom(readLocal);
@@ -252,7 +262,11 @@ function normalizeImageSection(section: unknown) {
   if (Array.isArray(section)) {
     return section as CatalogImageRecord[];
   }
-  if (section && typeof section === 'object' && Array.isArray((section as { items?: unknown[] }).items)) {
+  if (
+    section &&
+    typeof section === 'object' &&
+    Array.isArray((section as { items?: unknown[] }).items)
+  ) {
     return (section as { items: CatalogImageRecord[] }).items;
   }
   return [];
@@ -277,7 +291,9 @@ export async function getHomeAssets() {
   return sortByOrderDate(toPublishedImageRecords(normalizeImageSection(section)));
 }
 
-export async function getWorksAssets(options: { page?: number; collection?: string; tag?: string } = {}) {
+export async function getWorksAssets(
+  options: { page?: number; collection?: string; tag?: string } = {},
+) {
   const section = await loadSection('works');
   let items = toPublishedImageRecords(normalizeImageSection(section));
 
@@ -302,10 +318,7 @@ export async function getCollectionAssets(slug: string, page = 1) {
     items = normalized.items.filter((item) => item.collection === slug);
   }
 
-  return paginate(
-    sortByOrderDate(toPublishedImageRecords(items)),
-    page,
-  );
+  return paginate(sortByOrderDate(toPublishedImageRecords(items)), page);
 }
 
 export async function getLinkAssets() {
@@ -321,7 +334,9 @@ export async function getAudioAssets() {
       ? (section as { items: CatalogAudioRecord[] }).items
       : [];
 
-  return sortByOrderDate(items.map(toPublicAudioRecord).filter((item): item is PublicCatalogAudioRecord => !!item));
+  return sortByOrderDate(
+    items.map(toPublicAudioRecord).filter((item): item is PublicCatalogAudioRecord => !!item),
+  );
 }
 
 export async function getStaticCatalogAssets(): Promise<Record<string, PublicCatalogStaticAsset>> {
@@ -329,12 +344,19 @@ export async function getStaticCatalogAssets(): Promise<Record<string, PublicCat
     return {};
   }
 
-  const section = await loadSection('static-assets') as { assets?: Record<string, CatalogImageRecord> };
+  const section = (await loadSection('static-assets')) as {
+    assets?: Record<string, CatalogImageRecord>;
+  };
   const assets: Record<string, PublicCatalogStaticAsset> = {};
 
   for (const [key, record] of Object.entries(section.assets || {})) {
     if (record.objectKey) {
-      assets[key] = { objectKey: record.objectKey, alt: record.alt, width: record.width, height: record.height };
+      assets[key] = {
+        objectKey: record.objectKey,
+        alt: record.alt,
+        width: record.width,
+        height: record.height,
+      };
     }
   }
   return assets;

@@ -6,13 +6,15 @@ import ActivationLever from '@/features/hud/ui/ActivationLever';
 describe('ActivationLever', () => {
   it('keeps native button semantics and its cursor label', () => {
     const onActivate = vi.fn();
-    render(<ActivationLever
-      onActivate={onActivate}
-      isActive={false}
-      iconType="discharge"
-      isAnimated
-      cursorLabel="START CHARGE"
-    />);
+    render(
+      <ActivationLever
+        onActivate={onActivate}
+        isActive={false}
+        iconType="discharge"
+        isAnimated
+        cursorLabel="START CHARGE"
+      />,
+    );
 
     const button = screen.getByRole('button', { name: 'START CHARGE' });
     expect(button.getAttribute('data-cursor-label')).toBe('START CHARGE');

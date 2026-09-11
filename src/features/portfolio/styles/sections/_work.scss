@@ -16,7 +16,12 @@
   font-family: var(--font-hud);
   font-size: var(--fs-base);
   cursor: none;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s, padding-left 0.3s ease-out, padding-right 0.3s ease-out;
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    border-color 0.3s,
+    padding-left 0.3s ease-out,
+    padding-right 0.3s ease-out;
   text-transform: uppercase;
   letter-spacing: 1px;
   opacity: 0.7;
@@ -52,7 +57,9 @@
   width: 100%;
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 0.18s ease, transform 0.18s ease;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }
 
 .activeWorkContent {
@@ -107,7 +114,10 @@
   padding: 8px 12px;
   letter-spacing: 1px;
   opacity: 0.6;
-  transition: opacity 0.3s, color 0.3s, border-color 0.3s;
+  transition:
+    opacity 0.3s,
+    color 0.3s,
+    border-color 0.3s;
   width: 100%;
   text-align: left;
 
@@ -142,7 +152,8 @@
   max-height: 0;
   overflow: hidden;
   opacity: 0;
-  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.4s ease,
     margin-top 0.4s ease;
   margin-top: 0;
@@ -199,7 +210,10 @@
   padding: 15px 20px;
   border-radius: 0;
   text-align: left;
-  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.3s ease;
   overflow: hidden;
   white-space: normal;
   cursor: default;
@@ -258,7 +272,9 @@
 .emptySegment {
   color: var(--ark-border);
   opacity: 0.6;
-  transition: color 0.2s ease, opacity 0.2s ease;
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
   background-image: radial-gradient(circle, rgba(var(--ark-border-rgb), 0.4) 1px, transparent 1px);
   background-size: 4px 4px;
   background-color: transparent;
@@ -267,7 +283,11 @@
   .skillCard:hover & {
     color: var(--ark-primary);
     opacity: 0.7;
-    background-image: radial-gradient(circle, rgba(var(--ark-primary-rgb), 0.5) 1px, transparent 1px);
+    background-image: radial-gradient(
+      circle,
+      rgba(var(--ark-primary-rgb), 0.5) 1px,
+      transparent 1px
+    );
   }
 }
 
@@ -312,7 +332,9 @@
   z-index: 10;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease-out 0.1s, transform 0.2s ease-out 0.1s;
+  transition:
+    opacity 0.2s ease-out 0.1s,
+    transform 0.2s ease-out 0.1s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
   .skillCard:hover & {
@@ -331,7 +353,6 @@
     border-color: rgba(var(--ark-dark-blue-rgb), 0.95) transparent transparent transparent;
   }
 }
-
 
 .inverted {
   .workTabButton {
@@ -387,7 +408,11 @@
   .emptySegment {
     color: var(--ark-border);
     opacity: 0.6;
-    background-image: radial-gradient(circle, rgba(var(--ark-border-rgb), 0.3) 1px, transparent 1px);
+    background-image: radial-gradient(
+      circle,
+      rgba(var(--ark-border-rgb), 0.3) 1px,
+      transparent 1px
+    );
 
     .skillCard:hover & {
       color: var(--ark-primary);

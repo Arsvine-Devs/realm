@@ -49,9 +49,12 @@ export function useDetailScrollReveal(
     return () => observer.disconnect();
   }, [ready, rootRef, depsKey]);
 
-  const setRef = useCallback((index: number) => (element: HTMLElement | null) => {
-    refs.current[index] = element;
-  }, []);
+  const setRef = useCallback(
+    (index: number) => (element: HTMLElement | null) => {
+      refs.current[index] = element;
+    },
+    [],
+  );
 
   return { visible, setRef };
 }

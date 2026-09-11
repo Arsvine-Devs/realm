@@ -11,7 +11,15 @@
     "title": "大学时光",
     "location": "江苏大学",
     "type": "education",
-    "gallery": ["gallery/university-gallery-1.jpg", "gallery/university-gallery-2.jpg", "gallery/photo-ujs-1.webp", "gallery/photo-ujs-2.webp", "gallery/photo-ujs-3.webp", "gallery/photo-ujs-4.webp", "gallery/photo-ujs-5.webp"]
+    "gallery": [
+      "gallery/university-gallery-1.jpg",
+      "gallery/university-gallery-2.jpg",
+      "gallery/photo-ujs-1.webp",
+      "gallery/photo-ujs-2.webp",
+      "gallery/photo-ujs-3.webp",
+      "gallery/photo-ujs-4.webp",
+      "gallery/photo-ujs-5.webp"
+    ]
   },
   {
     "id": "rhodes-island",

@@ -36,7 +36,10 @@ const GEO_OVERRIDE_PARAM = '_geo';
  *
  * 返回的 country 永远是大写两位码或空串。
  */
-function resolveCountry(request: NextRequest): { country: string; overrideAction: 'set' | 'clear' | 'none' } {
+function resolveCountry(request: NextRequest): {
+  country: string;
+  overrideAction: 'set' | 'clear' | 'none';
+} {
   const overrideRaw = request.nextUrl.searchParams.get(GEO_OVERRIDE_PARAM);
   if (overrideRaw !== null) {
     const trimmed = overrideRaw.trim().toUpperCase();
@@ -99,9 +102,10 @@ export function proxy(request: NextRequest) {
 
   // 若第一段长得像 locale 但不在受支持列表（如 /fr/web/1），剥掉它再前置目标 locale，
   // 避免拼出 /en/fr/web/1 这种 404 路径。
-  const rest = firstSegment && LOCALE_PATH_PATTERN.test(firstSegment)
-    ? '/' + segments.slice(1).join('/')
-    : pathname;
+  const rest =
+    firstSegment && LOCALE_PATH_PATTERN.test(firstSegment)
+      ? '/' + segments.slice(1).join('/')
+      : pathname;
 
   const url = request.nextUrl.clone();
   url.pathname = `/${targetLocale}${rest === '/' ? '' : rest}`;

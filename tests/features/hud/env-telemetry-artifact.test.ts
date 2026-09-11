@@ -35,11 +35,18 @@ describe('createTelemetrySnapshot', () => {
     const ids = new Set(
       Array.from({ length: 10 }, (_, index) => createTelemetrySnapshot(envData, index).id),
     );
-    const warningLines = Array.from({ length: 10 }, (_, index) => createTelemetrySnapshot(envData, index).lines[5]);
-    const primaryMetricLines = Array.from({ length: 10 }, (_, index) => createTelemetrySnapshot(envData, index).lines.slice(0, 3).join('\n'));
+    const warningLines = Array.from(
+      { length: 10 },
+      (_, index) => createTelemetrySnapshot(envData, index).lines[5],
+    );
+    const primaryMetricLines = Array.from({ length: 10 }, (_, index) =>
+      createTelemetrySnapshot(envData, index).lines.slice(0, 3).join('\n'),
+    );
 
     expect(ids.size).toBeGreaterThanOrEqual(6);
-    expect(warningLines.some((line) => /WATER|VIS|PRESSURE|CANOPY|BIOSPHERE|AIR/.test(line))).toBe(true);
+    expect(warningLines.some((line) => /WATER|VIS|PRESSURE|CANOPY|BIOSPHERE|AIR/.test(line))).toBe(
+      true,
+    );
     expect(warningLines.every((line) => line.length <= 30)).toBe(true);
     expect(primaryMetricLines.some((block) => /HUM|VIS|BAR|DEW/.test(block))).toBe(true);
     expect(primaryMetricLines.some((block) => /WIND|AQ|PH|H2O/.test(block))).toBe(true);
@@ -115,7 +122,9 @@ describe('buildTelemetryArtifactText', () => {
     expect(/POLLUTION|PPOOL|ACID|RAIN|OXYGEN|DEPLETION/.test(stageThree)).toBe(true);
     expect(/[°%/]/.test(stageThree)).toBe(true);
     expect(stageThree.split('\n')).toHaveLength(6);
-    expect(stageThree.split('\n').filter((line) => line.includes(':')).length).toBeGreaterThanOrEqual(5);
+    expect(
+      stageThree.split('\n').filter((line) => line.includes(':')).length,
+    ).toBeGreaterThanOrEqual(5);
     expect(stageThree.split('\n').every((line) => line.length <= 30)).toBe(true);
   });
 

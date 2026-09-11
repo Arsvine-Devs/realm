@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './ProjectCard.module.scss';
 import { resolveImageUrl } from '@/shared/lib/cdn';
 import type { KeyboardEvent, MouseEvent } from 'react';
-import type { AssetReference, LifeItem, Project } from '@/shared/types';
+import type { AssetReference } from '@/shared/types';
 
 interface ProjectCardItem {
   id: string | number;
@@ -31,7 +31,18 @@ function ProjectCard<T extends ProjectCardItem>({
   onNavigateIntent,
   isInverted,
 }: ProjectCardProps<T>) {
-  const { title, description, tech, link, imageUrl, invertedImageUrl, role, year, isConfidential, liveUrl } = project;
+  const {
+    title,
+    description,
+    tech,
+    link,
+    imageUrl,
+    invertedImageUrl,
+    role,
+    year,
+    isConfidential,
+    liveUrl,
+  } = project;
 
   const resolvedImageUrl = isInverted && invertedImageUrl ? invertedImageUrl : imageUrl;
   const backgroundImageUrl = resolveImageUrl(resolvedImageUrl, 'card');
@@ -48,25 +59,34 @@ function ProjectCard<T extends ProjectCardItem>({
   const isClickable = !!onClick || (link && link !== '#');
 
   return (
-    <div 
+    // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- the card contains nested external anchors and keeps its documented keyboard handler.
+    <div
       className={`${styles.projectCard} ${isClickable ? styles.clickable : ''} ${isConfidential ? styles.confidentialCard : ''}`}
       onClick={isClickable ? handleCardClick : undefined}
-      role={isClickable ? "button" : undefined}
+      role={isClickable ? 'button' : undefined}
       tabIndex={isClickable ? 0 : undefined}
       data-cursor-no-magnetic
-      onPointerDown={isClickable && onNavigateIntent ? (event) => {
-        if (event.button === 0) onNavigateIntent(project);
-      } : undefined}
-      onKeyDown={isClickable ? (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          onNavigateIntent?.(project);
-          handleCardClick(e);
-        }
-      } : undefined}
+      onPointerDown={
+        isClickable && onNavigateIntent
+          ? (event) => {
+              if (event.button === 0) onNavigateIntent(project);
+            }
+          : undefined
+      }
+      onKeyDown={
+        isClickable
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                onNavigateIntent?.(project);
+                handleCardClick(e);
+              }
+            }
+          : undefined
+      }
     >
       <div className={styles.cardBorderTopLeft}></div>
       <div className={styles.cardBorderBottomRight}></div>
-      
+
       <div className={styles.projectImageContainer}>
         {isConfidential && !resolvedImageUrl ? (
           <div className={`${styles.projectImagePlaceholder} ${styles.confidentialPlaceholder}`}>
@@ -79,7 +99,7 @@ function ProjectCard<T extends ProjectCardItem>({
           </div>
         )}
       </div>
-      
+
       <div className={styles.projectContent}>
         {(role || year) && (
           <div className={styles.projectMeta}>
@@ -88,20 +108,24 @@ function ProjectCard<T extends ProjectCardItem>({
           </div>
         )}
         <h3 className={styles.projectTitle}>
-          <span className={styles.titleBracket}>[</span>{title}<span className={styles.titleBracket}>]</span>
+          <span className={styles.titleBracket}>[</span>
+          {title}
+          <span className={styles.titleBracket}>]</span>
         </h3>
         <p className={styles.projectDescription}>{description}</p>
         <div className={styles.projectTech}>
           {tech.map((item: string, index: number) => (
-            <span key={index} className={styles.techTag}>{item}</span>
+            <span key={index} className={styles.techTag}>
+              {item}
+            </span>
           ))}
         </div>
       </div>
       {liveUrl && (
-        <a 
-          href={liveUrl} 
-          target="_blank" 
-          rel="noopener noreferrer" 
+        <a
+          href={liveUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           className={styles.projectLink}
           onClick={(e) => e.stopPropagation()}
           data-cursor-magnetic
@@ -110,10 +134,10 @@ function ProjectCard<T extends ProjectCardItem>({
         </a>
       )}
       {!liveUrl && !onClick && link && link !== '#' && (
-        <a 
-          href={link} 
-          target="_blank" 
-          rel="noopener noreferrer" 
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
           className={styles.projectLink}
           onClick={(e) => e.stopPropagation()}
           data-cursor-magnetic

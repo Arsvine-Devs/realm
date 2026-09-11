@@ -98,7 +98,10 @@ interface NavStrategyCtx {
   runAnimation: (animation: Animation, onFinished: () => void) => void;
   wapiSlideIn: () => void;
   wapiDiagExpand: () => void;
-  revealAfterContentHashAligned: (request: ContentHashNavigationRequest, onAligned: () => void) => void;
+  revealAfterContentHashAligned: (
+    request: ContentHashNavigationRequest,
+    onAligned: () => void,
+  ) => void;
   retractColumns: (cb: () => void) => void;
   expandColumns: (cb?: () => void) => void;
   processQueue: () => void;
@@ -107,32 +110,43 @@ interface NavStrategyCtx {
 
 // 每种 transition plan 的执行策略；选择逻辑在 resolveNavigationTransitionPlan，
 // 这里只负责"执行"。新增 plan 时加一条策略即可，不必改 navigateTo 本体。
-const NAVIGATION_STRATEGIES: Record<Exclude<NavigationTransitionPlan, 'samePageHash'>, (ctx: NavStrategyCtx) => void> = {
+const NAVIGATION_STRATEGIES: Record<
+  Exclude<NavigationTransitionPlan, 'samePageHash'>,
+  (ctx: NavStrategyCtx) => void
+> = {
   homeForwardMobile: (ctx) => {
     ctx.retractColumns(() => {});
     const anim = ctx.wrapper.animate(DIAG_COLLAPSE_KF, DIAG_COLLAPSE_OPTS);
     ctx.runAnimation(anim, () => {
       anim.cancel();
       ctx.wrapper.style.clipPath = 'inset(100%)';
-      ctx.pushThen(ctx.url, () => {
-        if (ctx.contentHashRequest) {
-          ctx.revealAfterContentHashAligned(ctx.contentHashRequest, ctx.wapiDiagExpand);
-          return;
-        }
-        ctx.wapiDiagExpand();
-      }, ctx.options);
+      ctx.pushThen(
+        ctx.url,
+        () => {
+          if (ctx.contentHashRequest) {
+            ctx.revealAfterContentHashAligned(ctx.contentHashRequest, ctx.wapiDiagExpand);
+            return;
+          }
+          ctx.wapiDiagExpand();
+        },
+        ctx.options,
+      );
     });
   },
   homeForwardDesktop: (ctx) => {
     ctx.retractColumns(() => {
       ctx.wrapper.style.opacity = '0';
-      ctx.pushThen(ctx.url, () => {
-        if (ctx.contentHashRequest) {
-          ctx.revealAfterContentHashAligned(ctx.contentHashRequest, ctx.wapiSlideIn);
-          return;
-        }
-        ctx.wapiSlideIn();
-      }, ctx.options);
+      ctx.pushThen(
+        ctx.url,
+        () => {
+          if (ctx.contentHashRequest) {
+            ctx.revealAfterContentHashAligned(ctx.contentHashRequest, ctx.wapiSlideIn);
+            return;
+          }
+          ctx.wapiSlideIn();
+        },
+        ctx.options,
+      );
     });
   },
   crossPageHash: (ctx) => {
@@ -140,13 +154,17 @@ const NAVIGATION_STRATEGIES: Record<Exclude<NavigationTransitionPlan, 'samePageH
     ctx.runAnimation(outAnim, () => {
       outAnim.cancel();
       ctx.wrapper.style.opacity = '0';
-      ctx.pushThen(ctx.url, () => {
-        if (ctx.contentHashRequest) {
-          ctx.revealAfterContentHashAligned(ctx.contentHashRequest, ctx.wapiSlideIn);
-          return;
-        }
-        ctx.wapiSlideIn();
-      }, ctx.options);
+      ctx.pushThen(
+        ctx.url,
+        () => {
+          if (ctx.contentHashRequest) {
+            ctx.revealAfterContentHashAligned(ctx.contentHashRequest, ctx.wapiSlideIn);
+            return;
+          }
+          ctx.wapiSlideIn();
+        },
+        ctx.options,
+      );
     });
   },
   returnHomeMobile: (ctx) => {
@@ -176,15 +194,19 @@ const NAVIGATION_STRATEGIES: Record<Exclude<NavigationTransitionPlan, 'samePageH
   blogDetailFade: (ctx) => {
     ctx.wrapper.style.transition = 'opacity 0.3s ease-out';
     ctx.wrapper.style.opacity = '0';
-    ctx.pushThen(ctx.url, () => {
-      ctx.wrapper.style.transition = 'opacity 0.4s ease-in';
-      ctx.wrapper.style.opacity = '1';
-      ctx.waitForTransition(ctx.wrapper, 500, () => {
-        ctx.wrapper.style.transition = '';
-        ctx.wrapper.style.opacity = '';
-        ctx.processQueue();
-      });
-    }, ctx.options);
+    ctx.pushThen(
+      ctx.url,
+      () => {
+        ctx.wrapper.style.transition = 'opacity 0.4s ease-in';
+        ctx.wrapper.style.opacity = '1';
+        ctx.waitForTransition(ctx.wrapper, 500, () => {
+          ctx.wrapper.style.transition = '';
+          ctx.wrapper.style.opacity = '';
+          ctx.processQueue();
+        });
+      },
+      ctx.options,
+    );
   },
   standardSlide: (ctx) => {
     const outAnim = ctx.wrapper.animate(SLIDE_OUT_KF, SLIDE_OUT_OPTS);
@@ -205,7 +227,9 @@ export function TransitionProvider({ children }: TransitionProviderProps) {
   const runControllerRef = useRef(new AnimationRunController());
   const transitionSurfaceRef = useRef<HTMLDivElement | null>(null);
   const backOverrideRef = useRef<(() => void) | null>(null);
-  const navigateToRef = useRef<((url: string, options?: { scroll?: boolean }) => void) | null>(null);
+  const navigateToRef = useRef<((url: string, options?: { scroll?: boolean }) => void) | null>(
+    null,
+  );
   const pendingCommitRef = useRef<(() => void) | null>(null);
   const [pendingUrl, setPendingUrl] = useState<string | null>(null);
 
@@ -223,154 +247,157 @@ export function TransitionProvider({ children }: TransitionProviderProps) {
     }
   };
 
-  const revealAfterContentHashAligned = useCallback((
-    request: ContentHashNavigationRequest,
-    onAligned: () => void,
-  ) => {
-    void alignContentHash(request)
-      .then((result) => {
-        if (result !== 'cancelled') onAligned();
-      })
-      .catch((error) => {
-        console.error('[navigation] content hash alignment failed:', error);
-        onAligned();
-      });
-  }, [alignContentHash]);
-
-  const navigateTo = useCallback((url: string, options?: { scroll?: boolean }) => {
-    const mobile = hookIsMobile;
-    const transitionPlan = resolveNavigationTransitionPlan({
-      sourcePathname: pathname,
-      targetUrl: url,
-      mobile,
-    });
-    if (transitionPlan === 'samePageHash') {
-      void push(url, { scroll: false, ...options }).catch((error) => {
-        console.error('[navigation] same-page navigation failed:', error);
-      });
-      return;
-    }
-
-    if (reducedMotion) {
-      pendingCommitRef.current?.();
-      runControllerRef.current.cancel();
-      const wrapper = transitionSurfaceRef.current;
-      if (wrapper) resetTransitionSurface(wrapper);
-      setPendingUrl(url);
-      void push(url, { scroll: false, ...options })
-        .catch((error) => {
-          console.error('[navigation] reduced-motion navigation failed:', error);
+  const revealAfterContentHashAligned = useCallback(
+    (request: ContentHashNavigationRequest, onAligned: () => void) => {
+      void alignContentHash(request)
+        .then((result) => {
+          if (result !== 'cancelled') onAligned();
         })
-        .finally(() => setPendingUrl(null));
-      return;
-    }
+        .catch((error) => {
+          console.error('[navigation] content hash alignment failed:', error);
+          onAligned();
+        });
+    },
+    [alignContentHash],
+  );
 
-    if (!runControllerRef.current.startOrQueue({ url, options })) {
-      return;
-    }
-
-    const wrapper = transitionSurfaceRef.current;
-    if (!wrapper) {
-      runControllerRef.current.cancel();
-      void push(url, { scroll: false, ...options }).catch((error) => {
-        console.error('[navigation] navigation without transition surface failed:', error);
+  const navigateTo = useCallback(
+    (url: string, options?: { scroll?: boolean }) => {
+      const mobile = hookIsMobile;
+      const transitionPlan = resolveNavigationTransitionPlan({
+        sourcePathname: pathname,
+        targetUrl: url,
+        mobile,
       });
-      return;
-    }
+      if (transitionPlan === 'samePageHash') {
+        void push(url, { scroll: false, ...options }).catch((error) => {
+          console.error('[navigation] same-page navigation failed:', error);
+        });
+        return;
+      }
 
-    const targetContentHash = getContentSectionHashFromUrl(url);
-    const contentHashRequest = targetContentHash
-      ? createContentHashNavigationRequest(targetContentHash)
-      : null;
+      if (reducedMotion) {
+        pendingCommitRef.current?.();
+        runControllerRef.current.cancel();
+        const wrapper = transitionSurfaceRef.current;
+        if (wrapper) resetTransitionSurface(wrapper);
+        setPendingUrl(url);
+        void push(url, { scroll: false, ...options })
+          .catch((error) => {
+            console.error('[navigation] reduced-motion navigation failed:', error);
+          })
+          .finally(() => setPendingUrl(null));
+        return;
+      }
 
-    const pushThen = (target: string, cb: () => void, pushOpts?: { scroll?: boolean }) => {
-      let removeCleanup = () => false;
-      let timeoutId = 0;
-      const cleanup = () => {
-        if (timeoutId) window.clearTimeout(timeoutId);
-        if (pendingCommitRef.current === onComplete) pendingCommitRef.current = null;
-        setPendingUrl(null);
-        removeCleanup();
-      };
-      const onComplete = () => {
-        cleanup();
-        cb();
-      };
-      pendingCommitRef.current?.();
-      pendingCommitRef.current = onComplete;
-      setPendingUrl(target);
-      removeCleanup = runControllerRef.current.addCleanup(cleanup);
-      timeoutId = window.setTimeout(() => {
-        if (pendingCommitRef.current === onComplete) {
+      if (!runControllerRef.current.startOrQueue({ url, options })) {
+        return;
+      }
+
+      const wrapper = transitionSurfaceRef.current;
+      if (!wrapper) {
+        runControllerRef.current.cancel();
+        void push(url, { scroll: false, ...options }).catch((error) => {
+          console.error('[navigation] navigation without transition surface failed:', error);
+        });
+        return;
+      }
+
+      const targetContentHash = getContentSectionHashFromUrl(url);
+      const contentHashRequest = targetContentHash
+        ? createContentHashNavigationRequest(targetContentHash)
+        : null;
+
+      const pushThen = (target: string, cb: () => void, pushOpts?: { scroll?: boolean }) => {
+        let removeCleanup = () => false;
+        let timeoutId = 0;
+        const cleanup = () => {
+          if (timeoutId) window.clearTimeout(timeoutId);
+          if (pendingCommitRef.current === onComplete) pendingCommitRef.current = null;
+          setPendingUrl(null);
+          removeCleanup();
+        };
+        const onComplete = () => {
+          cleanup();
+          cb();
+        };
+        pendingCommitRef.current?.();
+        pendingCommitRef.current = onComplete;
+        setPendingUrl(target);
+        removeCleanup = runControllerRef.current.addCleanup(cleanup);
+        timeoutId = window.setTimeout(() => {
+          if (pendingCommitRef.current === onComplete) {
+            resetTransitionSurface(wrapper);
+            cleanup();
+            runControllerRef.current.cancel();
+            processQueue();
+          }
+        }, NAVIGATION_COMMIT_TIMEOUT_MS);
+        void push(target, { scroll: false, ...pushOpts }).catch((error) => {
+          console.error('[navigation] route push failed:', error);
           resetTransitionSurface(wrapper);
           cleanup();
-          runControllerRef.current.cancel();
           processQueue();
-        }
-      }, NAVIGATION_COMMIT_TIMEOUT_MS);
-      void push(target, { scroll: false, ...pushOpts }).catch((error) => {
-        console.error('[navigation] route push failed:', error);
-        resetTransitionSurface(wrapper);
-        cleanup();
-        processQueue();
-      });
-    };
+        });
+      };
 
-    const runAnimation = (animation: Animation, onFinished: () => void) => {
-      runControllerRef.current.runAnimation(animation, onFinished, (error) => {
-        console.error('[navigation] transition animation failed:', error);
-        processQueue();
-      });
-    };
+      const runAnimation = (animation: Animation, onFinished: () => void) => {
+        runControllerRef.current.runAnimation(animation, onFinished, (error) => {
+          console.error('[navigation] transition animation failed:', error);
+          processQueue();
+        });
+      };
 
-    const wapiSlideIn = () => {
-      const anim = wrapper.animate(SLIDE_IN_KF, SLIDE_IN_OPTS);
-      runAnimation(anim, () => {
+      const wapiSlideIn = () => {
+        const anim = wrapper.animate(SLIDE_IN_KF, SLIDE_IN_OPTS);
+        runAnimation(anim, () => {
+          wrapper.style.opacity = '';
+          wrapper.style.transform = '';
+          anim.cancel();
+          processQueue();
+        });
+      };
+
+      const wapiDiagExpand = () => {
         wrapper.style.opacity = '';
-        wrapper.style.transform = '';
-        anim.cancel();
-        processQueue();
-      });
-    };
+        const anim = wrapper.animate(DIAG_EXPAND_KF, DIAG_EXPAND_OPTS);
+        runAnimation(anim, () => {
+          wrapper.style.clipPath = '';
+          wrapper.style.transform = '';
+          anim.cancel();
+          processQueue();
+        });
+      };
 
-    const wapiDiagExpand = () => {
-      wrapper.style.opacity = '';
-      const anim = wrapper.animate(DIAG_EXPAND_KF, DIAG_EXPAND_OPTS);
-      runAnimation(anim, () => {
-        wrapper.style.clipPath = '';
-        wrapper.style.transform = '';
-        anim.cancel();
-        processQueue();
-      });
-    };
+      const ctx: NavStrategyCtx = {
+        wrapper,
+        url,
+        options,
+        contentHashRequest,
+        pushThen,
+        runAnimation,
+        wapiSlideIn,
+        wapiDiagExpand,
+        revealAfterContentHashAligned,
+        retractColumns,
+        expandColumns,
+        processQueue,
+        waitForTransition: (el, ms, cb) => runControllerRef.current.waitForTransition(el, ms, cb),
+      };
 
-    const ctx: NavStrategyCtx = {
-      wrapper,
-      url,
-      options,
-      contentHashRequest,
-      pushThen,
-      runAnimation,
-      wapiSlideIn,
-      wapiDiagExpand,
-      revealAfterContentHashAligned,
+      // transitionPlan 已收窄为非 'samePageHash'（上方早 return）
+      NAVIGATION_STRATEGIES[transitionPlan](ctx);
+    },
+    [
+      pathname,
+      push,
       retractColumns,
       expandColumns,
-      processQueue,
-      waitForTransition: (el, ms, cb) => runControllerRef.current.waitForTransition(el, ms, cb),
-    };
-
-    // transitionPlan 已收窄为非 'samePageHash'（上方早 return）
-    NAVIGATION_STRATEGIES[transitionPlan](ctx);
-  }, [
-    pathname,
-    push,
-    retractColumns,
-    expandColumns,
-    hookIsMobile,
-    reducedMotion,
-    revealAfterContentHashAligned,
-  ]);
+      hookIsMobile,
+      reducedMotion,
+      revealAfterContentHashAligned,
+    ],
+  );
 
   // Keep navigateToRef updated
   useEffect(() => {
@@ -401,20 +428,23 @@ export function TransitionProvider({ children }: TransitionProviderProps) {
     backOverrideRef.current = handler;
   }, []);
 
-  const switchLocale = useCallback(async (url: string) => {
-    pendingCommitRef.current?.();
-    runControllerRef.current.cancel();
+  const switchLocale = useCallback(
+    async (url: string) => {
+      pendingCommitRef.current?.();
+      runControllerRef.current.cancel();
 
-    const wrapper = transitionSurfaceRef.current;
-    if (wrapper) {
-      wrapper.style.opacity = '';
-      wrapper.style.transform = '';
-      wrapper.style.clipPath = '';
-      wrapper.style.transition = '';
-    }
+      const wrapper = transitionSurfaceRef.current;
+      if (wrapper) {
+        wrapper.style.opacity = '';
+        wrapper.style.transform = '';
+        wrapper.style.clipPath = '';
+        wrapper.style.transition = '';
+      }
 
-    await push(url, { scroll: false });
-  }, [push]);
+      await push(url, { scroll: false });
+    },
+    [push],
+  );
 
   const handleBack = useCallback(() => {
     if (backOverrideRef.current) {
@@ -434,15 +464,17 @@ export function TransitionProvider({ children }: TransitionProviderProps) {
   }, []);
 
   return (
-    <TransitionContext.Provider value={{
-      navigateTo,
-      switchLocale,
-      setBackOverride,
-      handleBack,
-      isDetailOpen,
-      registerTransitionSurface,
-      pendingUrl,
-    }}>
+    <TransitionContext.Provider
+      value={{
+        navigateTo,
+        switchLocale,
+        setBackOverride,
+        handleBack,
+        isDetailOpen,
+        registerTransitionSurface,
+        pendingUrl,
+      }}
+    >
       {children}
     </TransitionContext.Provider>
   );

@@ -15,21 +15,48 @@ export function generateStaticParams() {
   return locales.flatMap((locale) => slugs.map((slug) => ({ locale, slug })));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: Locale; slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale; slug: string }>;
+}): Promise<Metadata> {
   const { locale, slug } = await params;
   const resolved = resolveLifeItem(slug, locale);
   return resolved
-    ? localizedMetadata(locale, `/life/${slug}`, { title: `${resolved.item.title.toUpperCase()} // LIFE`, description: resolved.item.title }, { type: 'article' })
+    ? localizedMetadata(
+        locale,
+        `/life/${slug}`,
+        { title: `${resolved.item.title.toUpperCase()} // LIFE`, description: resolved.item.title },
+        { type: 'article' },
+      )
     : {};
 }
 
-export default async function LifeDetail({ params }: { params: Promise<{ locale: Locale; slug: string }> }) {
+export default async function LifeDetail({
+  params,
+}: {
+  params: Promise<{ locale: Locale; slug: string }>;
+}) {
   const { locale, slug } = await params;
   const resolved = resolveLifeItem(slug, locale);
   if (!resolved) notFound();
-  const [messages, catalogAssets] = await Promise.all([loadMessages(locale), getStaticCatalogAssets()]);
+  const [messages, catalogAssets] = await Promise.all([
+    loadMessages(locale),
+    getStaticCatalogAssets(),
+  ]);
   const life = loadLife(locale);
-  return <LifeDetailPage locale={locale} messages={messages} item={hydrateCatalogAssets(resolved.item, catalogAssets)}
-    allItems={hydrateCatalogAssets([...life.gameData, ...life.travelData, ...life.otherData], catalogAssets)}
-    translationStatus={resolved.status} actualLocale={resolved.actualLocale} originLocale={resolved.originLocale} />;
+  return (
+    <LifeDetailPage
+      locale={locale}
+      messages={messages}
+      item={hydrateCatalogAssets(resolved.item, catalogAssets)}
+      allItems={hydrateCatalogAssets(
+        [...life.gameData, ...life.travelData, ...life.otherData],
+        catalogAssets,
+      )}
+      translationStatus={resolved.status}
+      actualLocale={resolved.actualLocale}
+      originLocale={resolved.originLocale}
+    />
+  );
 }

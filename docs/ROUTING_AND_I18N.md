@@ -17,19 +17,19 @@ export const defaultLocale = 'zh-CN';
 
 ## 公共路由
 
-| 路由 | 作用 |
-|---|---|
-| `/[locale]` | HUD 首页 |
-| `/[locale]/content` | 带 `#works`、`#experience`、`#blog`、`#life` 等 section 的聚合页 |
-| `/[locale]/{works,experience,life,friends,about,contact,tweets,copyright}` | section 或独立页 |
-| `/[locale]/blog/[slug]` | 博客详情，SSG + ISR |
-| `/[locale]/web/[id]` | 项目详情 |
-| `/[locale]/life/[slug]` | Life 详情 |
-| `/[locale]/access/[group]` | 独立 TOTP gate |
-| `/[locale]/rss.xml` | locale RSS |
-| `/rss.xml` | RSS 入口 |
-| `/sitemap.xml` | 动态 sitemap |
-| `/robots.txt` | 动态 robots |
+| 路由                                                                       | 作用                                                             |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `/[locale]`                                                                | HUD 首页                                                         |
+| `/[locale]/content`                                                        | 带 `#works`、`#experience`、`#blog`、`#life` 等 section 的聚合页 |
+| `/[locale]/{works,experience,life,friends,about,contact,tweets,copyright}` | section 或独立页                                                 |
+| `/[locale]/blog/[slug]`                                                    | 博客详情，SSG + ISR                                              |
+| `/[locale]/web/[id]`                                                       | 项目详情                                                         |
+| `/[locale]/life/[slug]`                                                    | Life 详情                                                        |
+| `/[locale]/access/[group]`                                                 | 独立 TOTP gate                                                   |
+| `/[locale]/rss.xml`                                                        | locale RSS                                                       |
+| `/rss.xml`                                                                 | RSS 入口                                                         |
+| `/sitemap.xml`                                                             | 动态 sitemap                                                     |
+| `/robots.txt`                                                              | 动态 robots                                                      |
 
 `/[locale]/game` 不是有效路由。游戏项目在 content hub 的详情模式中展示。
 
@@ -107,7 +107,7 @@ navigateTo('/zh-CN/content#blog');
 UI locale 切换使用：
 
 ```ts
-useTransition().switchLocale(nextLocale)
+useTransition().switchLocale(nextLocale);
 ```
 
 它只替换 URL 的 locale segment，不运行普通页面退出动画。`LocalePageState` 可以保留明确注册且不敏感的页面状态，但只在 locale-independent route 相同的情况下生效。

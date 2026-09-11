@@ -1,23 +1,23 @@
 version: 2
 
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "saturday"
-      time: "04:00"
+      interval: 'weekly'
+      day: 'saturday'
+      time: '04:00'
     open-pull-requests-limit: 5
     groups:
       npm-minor-and-patch:
         update-types:
-          - "minor"
-          - "patch"
+          - 'minor'
+          - 'patch'
 
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "saturday"
-      time: "04:30"
+      interval: 'weekly'
+      day: 'saturday'
+      time: '04:30'
     open-pull-requests-limit: 3

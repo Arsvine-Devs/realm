@@ -7,7 +7,7 @@ import experienceSource from '@/features/experience/contracts/source-manifest.js
 import friendLinkSource from '@/features/profile/contracts/friendLinks/source-manifest.json';
 import audioSource from '@/features/music/source-manifest.json';
 
-export interface AssetSourceManifestItem {
+interface AssetSourceManifestItem {
   id: string;
   title: string;
   gallery: string[];
@@ -22,7 +22,8 @@ interface ExperienceSourceManifestItem extends AssetSourceManifestItem {
 function assertUnique(items: Array<{ id: string }>, name: string) {
   const ids = new Set<string>();
   for (const item of items) {
-    if (!item.id || ids.has(item.id)) throw new Error(`Invalid or duplicate ${name} source id: ${item.id}`);
+    if (!item.id || ids.has(item.id))
+      throw new Error(`Invalid or duplicate ${name} source id: ${item.id}`);
     ids.add(item.id);
   }
 }

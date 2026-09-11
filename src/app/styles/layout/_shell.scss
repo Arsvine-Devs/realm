@@ -1,7 +1,6 @@
 @use '../../../shared/styles/breakpoints';
 // Shared shell layout styles composed by app/styles/Shell.module.scss
 
-
 // 主布局和内容包装器 — 共享基础定位
 .mainLayout {
   position: absolute;
@@ -40,8 +39,6 @@
   animation: slideUpOutSkew 0.5s ease-out forwards;
 }
 
-
-
 // 右侧面板
 .rightPanel {
   position: absolute;
@@ -78,8 +75,6 @@
   }
 }
 
-
-
 // HUD元素
 .hudElement {
   position: fixed;
@@ -93,14 +88,16 @@
   border: none;
   z-index: 50;
   opacity: 0;
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
 
-  >* {
+  > * {
     pointer-events: auto;
   }
 
@@ -217,4 +214,3 @@
     }
   }
 }
-

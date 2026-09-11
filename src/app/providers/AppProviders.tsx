@@ -18,9 +18,7 @@ export default function AppProviders({ children }: AppProvidersProps) {
       <HudProvider>
         <LocalePageStateProvider>
           <LayoutAnchorsProvider>
-            <TransitionProvider>
-              {children}
-            </TransitionProvider>
+            <TransitionProvider>{children}</TransitionProvider>
           </LayoutAnchorsProvider>
         </LocalePageStateProvider>
       </HudProvider>

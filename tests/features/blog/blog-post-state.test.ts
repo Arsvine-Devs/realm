@@ -93,9 +93,11 @@ describe('blogPostMachine', () => {
   it('returns to authRequired when the variant actor rejects with FORBIDDEN', async () => {
     const machine = blogPostMachine.provide({
       actors: {
-        loadVariant: fromPromise<BlogVariantPayload, { slug: string; locale: BlogContentLocale }>(async () => {
-          throw { code: 'FORBIDDEN', message: 'Access grant required.' };
-        }),
+        loadVariant: fromPromise<BlogVariantPayload, { slug: string; locale: BlogContentLocale }>(
+          async () => {
+            throw { code: 'FORBIDDEN', message: 'Access grant required.' };
+          },
+        ),
       },
     });
     const actor = createActor(machine, {
@@ -128,11 +130,13 @@ describe('blogPostMachine', () => {
     let attempt = 0;
     const machine = blogPostMachine.provide({
       actors: {
-        loadVariant: fromPromise<BlogVariantPayload, { slug: string; locale: BlogContentLocale }>(async () => {
-          attempt += 1;
-          if (attempt === 1) throw { code: 'INTERNAL_ERROR', message: 'Temporary failure' };
-          return variantPayload;
-        }),
+        loadVariant: fromPromise<BlogVariantPayload, { slug: string; locale: BlogContentLocale }>(
+          async () => {
+            attempt += 1;
+            if (attempt === 1) throw { code: 'INTERNAL_ERROR', message: 'Temporary failure' };
+            return variantPayload;
+          },
+        ),
       },
     });
     const actor = createActor(machine, {
@@ -151,8 +155,12 @@ describe('blogPostMachine', () => {
   it('continues a protected load after an explicit auth grant', async () => {
     const machine = blogPostMachine.provide({
       actors: {
-        checkGrant: fromPromise<{ granted: boolean }, { group: string }>(async () => ({ granted: false })),
-        loadVariant: fromPromise<BlogVariantPayload, { slug: string; locale: BlogContentLocale }>(async () => variantPayload),
+        checkGrant: fromPromise<{ granted: boolean }, { group: string }>(async () => ({
+          granted: false,
+        })),
+        loadVariant: fromPromise<BlogVariantPayload, { slug: string; locale: BlogContentLocale }>(
+          async () => variantPayload,
+        ),
       },
     });
     const actor = createActor(machine, {
@@ -170,10 +178,12 @@ describe('blogPostMachine', () => {
 
 describe('shouldSuppressFallbackBanner', () => {
   it('suppresses fallback banner during alternate content-locale display', () => {
-    expect(shouldSuppressFallbackBanner({
-      requestedContentLocale: 'ja',
-      displayedContentLocale: 'en',
-      actualContentLocale: 'zh-CN',
-    })).toBe(true);
+    expect(
+      shouldSuppressFallbackBanner({
+        requestedContentLocale: 'ja',
+        displayedContentLocale: 'en',
+        actualContentLocale: 'zh-CN',
+      }),
+    ).toBe(true);
   });
 });

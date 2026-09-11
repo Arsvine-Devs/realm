@@ -6,13 +6,13 @@
 
 ## 存储边界
 
-| 位置 | 内容 | 规则 |
-|---|---|---|
-| `public/` | avatar/logo、favicon、PWA icon/manifest、启动关键本地字体 | 小、稳定、首屏必要 |
-| public COS | 图片、音频、QR、装饰图、字体、public site manifest | public-read、immutable hash object |
-| private COS | versioned Catalog 和 `current.json` | server-only 读取 |
-| `cos-workspace/` | 本地 mirror、metadata、coscli | gitignored，不提交 |
-| `dist/cos-upload/` | 构建生成的上传树 | 可重建，不手工编辑 |
+| 位置               | 内容                                                      | 规则                               |
+| ------------------ | --------------------------------------------------------- | ---------------------------------- |
+| `public/`          | avatar/logo、favicon、PWA icon/manifest、启动关键本地字体 | 小、稳定、首屏必要                 |
+| public COS         | 图片、音频、QR、装饰图、字体、public site manifest        | public-read、immutable hash object |
+| private COS        | versioned Catalog 和 `current.json`                       | server-only 读取                   |
+| `cos-workspace/`   | 本地 mirror、metadata、coscli                             | gitignored，不提交                 |
+| `dist/cos-upload/` | 构建生成的上传树                                          | 可重建，不手工编辑                 |
 
 业务数据保存稳定 `catalogKey`，Catalog 在 SSG/ISR 时将它映射到带 hash 的 `objectKey`。不要把旧 COS prefix 或 hash 直接写入 TypeScript 数据。
 
@@ -209,10 +209,10 @@ pnpm maintenance:check
 
 上传 `public/_fonts-staging/` 到 `shared/fonts/`。metadata：
 
-| Object | Content-Type | Cache-Control |
-|---|---|---|
+| Object             | Content-Type              | Cache-Control                            |
+| ------------------ | ------------------------- | ---------------------------------------- |
 | `google-fonts.css` | `text/css; charset=utf-8` | `public, max-age=86400, must-revalidate` |
-| `*.woff2` | `font/woff2` | `public, max-age=31536000, immutable` |
+| `*.woff2`          | `font/woff2`              | `public, max-age=31536000, immutable`    |
 
 COS UI 的 Value 字段只填值，不要重复 `Cache-Control:` header name。
 

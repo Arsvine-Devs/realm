@@ -147,7 +147,9 @@
   font-size: var(--fs-caption);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  transition: color 0.2s ease, opacity 0.2s ease;
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
 
   &:hover {
     color: rgba(var(--not-found-accent-rgb), 0.9);

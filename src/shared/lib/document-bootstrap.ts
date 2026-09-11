@@ -1,8 +1,5 @@
 import { BILIBILI_FRIENDLY_COUNTRIES, HIDE_X_COUNTRIES } from './region-visibility';
-import {
-  PERFORMANCE_CAPABILITIES,
-  PERFORMANCE_CAPABILITY_ATTRIBUTES,
-} from './performance-tiers';
+import { PERFORMANCE_CAPABILITIES, PERFORMANCE_CAPABILITY_ATTRIBUTES } from './performance-tiers';
 import { resolveInitialPerformancePolicy } from './performance-policy';
 import { htmlLangMap } from '@/shared/contracts/locale';
 

@@ -70,7 +70,11 @@ function IndustrialHud({ ref }: { ref?: React.Ref<IndustrialHudRef> }) {
             <div ref={scaleLeftRef} className={styles.scale_animation_content}>
               <div className={styles.scale_connecting_line}></div>
               {[...Array(20)].map((_, i) => (
-                <div key={`scale-l-${i}`} className={styles.scale_marker} style={{ top: `${5 + i * 10}%` }}></div>
+                <div
+                  key={`scale-l-${i}`}
+                  className={styles.scale_marker}
+                  style={{ top: `${5 + i * 10}%` }}
+                ></div>
               ))}
             </div>
           </div>
@@ -82,7 +86,11 @@ function IndustrialHud({ ref }: { ref?: React.Ref<IndustrialHudRef> }) {
             <div ref={scaleRightRef} className={styles.scale_animation_content}>
               <div className={styles.scale_connecting_line}></div>
               {[...Array(20)].map((_, i) => (
-                <div key={`scale-r-${i}`} className={styles.scale_marker} style={{ top: `${5 + i * 10}%` }}></div>
+                <div
+                  key={`scale-r-${i}`}
+                  className={styles.scale_marker}
+                  style={{ top: `${5 + i * 10}%` }}
+                ></div>
               ))}
             </div>
           </div>
@@ -102,7 +110,10 @@ function IndustrialHud({ ref }: { ref?: React.Ref<IndustrialHudRef> }) {
             <div className={styles.hud_text}>BIO-SIGNAL DETECTED</div>
             <div className={styles.signal_ekg}>
               <svg viewBox="0 0 100 30" preserveAspectRatio="none">
-                <polyline points="0,15 20,15 25,5 30,25 35,15 50,15 55,5 65,28 75,15 100,15" className={styles.ekg_line} />
+                <polyline
+                  points="0,15 20,15 25,5 30,25 35,15 50,15 55,5 65,28 75,15 100,15"
+                  className={styles.ekg_line}
+                />
               </svg>
             </div>
           </div>
@@ -113,7 +124,9 @@ function IndustrialHud({ ref }: { ref?: React.Ref<IndustrialHudRef> }) {
         </div>
         <div className={`${styles.hud_element} ${styles.bottom_right}`}>
           <div className={styles.hud_line}></div>
-          <div className={styles.hud_text} ref={clockTextRef}>--:--:--</div>
+          <div className={styles.hud_text} ref={clockTextRef}>
+            --:--:--
+          </div>
         </div>
       </div>
     </>

@@ -1,7 +1,6 @@
 @use '../../../shared/styles/breakpoints';
-// --- 新增: 倒置状态下的心电图波形为粉色 --- 
+// --- 新增: 倒置状态下的心电图波形为粉色 ---
 .inverted {
-
   .logoContainer {
     --logo-base-opacity: 0.8;
     --logo-base-color: #444444;
@@ -18,9 +17,7 @@
       color: #ffffff;
     }
   }
-
 }
-
 
 // 倒置模式下的底部功能栏
 .inverted {
@@ -28,14 +25,16 @@
     background: rgba(240, 240, 240, 0.95);
 
     &::after {
-      background: linear-gradient(90deg,
-          transparent 0%,
-          rgba(var(--ark-highlight-green-rgb), 0.02) 15%,
-          rgba(var(--ark-highlight-green-rgb), 0.06) 35%,
-          rgba(var(--ark-highlight-green-rgb), 0.15) 55%,
-          rgba(var(--ark-highlight-green-rgb), 0.4) 78%,
-          var(--ark-highlight-green) 95%,
-          rgba(var(--ark-highlight-green-rgb), 0.6) 100%);
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(var(--ark-highlight-green-rgb), 0.02) 15%,
+        rgba(var(--ark-highlight-green-rgb), 0.06) 35%,
+        rgba(var(--ark-highlight-green-rgb), 0.15) 55%,
+        rgba(var(--ark-highlight-green-rgb), 0.4) 78%,
+        var(--ark-highlight-green) 95%,
+        rgba(var(--ark-highlight-green-rgb), 0.6) 100%
+      );
       filter: drop-shadow(0 0 3px var(--ark-highlight-green));
     }
   }
@@ -81,4 +80,3 @@
     }
   }
 }
-

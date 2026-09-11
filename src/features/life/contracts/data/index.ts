@@ -1,6 +1,11 @@
 import type { LifeItem } from '@/shared/types';
 import type { Locale } from '@/shared/contracts/locale';
-import { findSourceItem, galleryReferences, legacyAssetReference, sourceManifests } from '@/features/assets/contracts/source-manifest';
+import {
+  findSourceItem,
+  galleryReferences,
+  legacyAssetReference,
+  sourceManifests,
+} from '@/features/assets/contracts/source-manifest';
 
 const arknightsSource = findSourceItem(sourceManifests.life, 'arknights');
 const endfieldSource = findSourceItem(sourceManifests.life, 'arknights-endfield');
@@ -15,7 +20,8 @@ export const gameData: LifeItem[] = [
   {
     id: arknightsSource.id,
     title: arknightsSource.title,
-    description: '不只是策略塔防，而是一套关于秩序、灾难、理想与系统设计的长期样本。泰拉像一份冷峻的档案，也像一个仍在运转的文明切片。',
+    description:
+      '不只是策略塔防，而是一套关于秩序、灾难、理想与系统设计的长期样本。泰拉像一份冷峻的档案，也像一个仍在运转的文明切片。',
     tech: arknightsSource.tech,
     link: '#',
     imageUrl: legacyAssetReference(arknightsSource.cover),
@@ -37,7 +43,8 @@ export const gameData: LifeItem[] = [
   {
     id: endfieldSource.id,
     title: endfieldSource.title,
-    description: '我期待的不是简单的“明日方舟 3D 化”，而是一个世界观如何从战术地图走向开拓现场：在荒原上布线、生产、战斗，并重新建立秩序。',
+    description:
+      '我期待的不是简单的“明日方舟 3D 化”，而是一个世界观如何从战术地图走向开拓现场：在荒原上布线、生产、战斗，并重新建立秩序。',
     tech: endfieldSource.tech,
     link: '#',
     imageUrl: legacyAssetReference(endfieldSource.cover),
@@ -59,7 +66,8 @@ export const gameData: LifeItem[] = [
   {
     id: deathStrandingSource.id,
     title: deathStrandingSource.title,
-    description: '它把行走、负重、孤独和连接做成了可被体验的东西。不是拯救世界的豪言壮语，而是在破碎世界里替后来者铺一小段路。',
+    description:
+      '它把行走、负重、孤独和连接做成了可被体验的东西。不是拯救世界的豪言壮语，而是在破碎世界里替后来者铺一小段路。',
     tech: deathStrandingSource.tech,
     link: '#',
     imageUrl: legacyAssetReference(deathStrandingSource.cover),
@@ -83,7 +91,8 @@ export const travelData: LifeItem[] = [
   {
     id: zhenjiangSource.id,
     title: zhenjiangSource.title,
-    description: '不算远行，更像暂居后的慢慢识别：一座没有强行证明自己的江南老城，安静、松弛，也有自己的褶皱。',
+    description:
+      '不算远行，更像暂居后的慢慢识别：一座没有强行证明自己的江南老城，安静、松弛，也有自己的褶皱。',
     tech: zhenjiangSource.tech,
     link: '#',
     imageUrl: legacyAssetReference(zhenjiangSource.cover),
@@ -107,7 +116,8 @@ export const otherData: LifeItem[] = [
   {
     id: gameDevSource.id,
     title: gameDevSource.title,
-    description: '创造自己脑海中的世界，也研究世界如何被系统、界面、规则和叙事共同支撑起来。还在路上，但这条路本身已经足够有趣。',
+    description:
+      '创造自己脑海中的世界，也研究世界如何被系统、界面、规则和叙事共同支撑起来。还在路上，但这条路本身已经足够有趣。',
     imageUrl: legacyAssetReference(gameDevSource.cover),
     tech: gameDevSource.tech,
     articleContent: `我的游戏开发之路，最开始并不是从“我要做出一款完整的游戏”开始的，而是从一个个脑海里的世界、角色、机制和场景开始的。我一直很喜欢那种能够把想象变成可交互体验的创作方式：不是只写下一段设定，也不是只画出一张画面，而是让玩家真正走进那个世界，感受到它的规则、氛围和情绪。
