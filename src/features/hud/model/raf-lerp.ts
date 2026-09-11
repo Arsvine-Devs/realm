@@ -34,10 +34,6 @@ export function lowPass(prev: number, next: number, alpha: number): number {
  * 判断"rAF loop 是否还该继续"——典型用法是 idle 时停帧省 CPU：
  *   if (isAtRest(current, target, threshold)) { stop; }
  */
-export function isAtRest(
-  current: number,
-  target: number,
-  epsilon = 0.05,
-): boolean {
+export function isAtRest(current: number, target: number, epsilon = 0.05): boolean {
   return Math.abs(current - target) < epsilon;
 }

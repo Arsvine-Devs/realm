@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { FateTypingState } from '@/features/hud/contracts/state';
-import {
-  formatFateTextForWrap,
-  getTypingDelays,
-} from '@/features/hud/model/typing-effect';
+import { formatFateTextForWrap, getTypingDelays } from '@/features/hud/model/typing-effect';
 
 /**
  * Fate text typing effect — 节奏：
@@ -65,7 +62,7 @@ export function useFateTypingEffect(textVisible: boolean): FateTypingState {
     const typeString = (str: string, index: number, delay: number, callback?: () => void) => {
       if (cancelled) return;
       if (index < str.length) {
-        setDisplayedFateText(prev => prev + str[index]);
+        setDisplayedFateText((prev) => prev + str[index]);
         schedule(() => typeString(str, index + 1, delay, callback), delay);
       } else if (callback) {
         schedule(callback, 0);
@@ -75,7 +72,7 @@ export function useFateTypingEffect(textVisible: boolean): FateTypingState {
     const deleteString = (currentStr: string, delay: number, callback?: () => void) => {
       if (cancelled) return;
       if (currentStr.length > 0) {
-        setDisplayedFateText(prev => prev.slice(0, -1));
+        setDisplayedFateText((prev) => prev.slice(0, -1));
         schedule(() => deleteString(currentStr.slice(0, -1), delay, callback), delay);
       } else if (callback) {
         schedule(callback, 0);
@@ -132,7 +129,10 @@ export function useFateTypingEffect(textVisible: boolean): FateTypingState {
           if (cancelled) return;
           // AbortError 是组件卸载时的正常清理，不算失败
           if ((err as Error)?.name === 'AbortError') return;
-          console.warn('[useFateTypingEffect] hitokoto fetch failed, fallback to preset:', (err as Error).message);
+          console.warn(
+            '[useFateTypingEffect] hitokoto fetch failed, fallback to preset:',
+            (err as Error).message,
+          );
           onFail();
         });
     };

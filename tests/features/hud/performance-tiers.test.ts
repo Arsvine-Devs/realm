@@ -34,8 +34,12 @@ describe('performance tier capabilities', () => {
     for (let index = 1; index < PERFORMANCE_TIERS.length; index += 1) {
       const previous = PERFORMANCE_CAPABILITIES[PERFORMANCE_TIERS[index - 1]];
       const current = PERFORMANCE_CAPABILITIES[PERFORMANCE_TIERS[index]];
-      const disabled = CAPABILITIES.filter((capability) => previous[capability] && !current[capability]);
-      const reenabled = CAPABILITIES.filter((capability) => !previous[capability] && current[capability]);
+      const disabled = CAPABILITIES.filter(
+        (capability) => previous[capability] && !current[capability],
+      );
+      const reenabled = CAPABILITIES.filter(
+        (capability) => !previous[capability] && current[capability],
+      );
 
       expect(disabled).toHaveLength(1);
       expect(reenabled).toHaveLength(0);
@@ -54,14 +58,20 @@ describe('performance tier capabilities', () => {
     for (const tier of PERFORMANCE_TIERS) {
       const attributes = new Map<string, string>();
       applyPerformanceAttributes(
-        { setAttribute: (name, value) => { attributes.set(name, value); } },
+        {
+          setAttribute: (name, value) => {
+            attributes.set(name, value);
+          },
+        },
         buildPerformanceState(tier, null),
       );
 
       expect(attributes.get('data-performance-tier')).toBe(tier);
       for (const [capability, attribute] of Object.entries(PERFORMANCE_CAPABILITY_ATTRIBUTES)) {
         expect(attributes.get(attribute)).toBe(
-          PERFORMANCE_CAPABILITIES[tier][capability as keyof typeof PERFORMANCE_CAPABILITY_ATTRIBUTES]
+          PERFORMANCE_CAPABILITIES[tier][
+            capability as keyof typeof PERFORMANCE_CAPABILITY_ATTRIBUTES
+          ]
             ? 'on'
             : 'off',
         );

@@ -6,16 +6,16 @@ ARSVINE REALM 是一个以末日废土 HUD 为视觉语言的个人作品集与�
 
 ## 项目状态
 
-| 项目 | 当前设置 |
-|---|---|
-| 类型 | 个人站点，不是通用模板 |
-| 生产平台 | Vercel |
-| Runtime | Node.js `24.x` |
-| Package manager | pnpm `11.7.0` |
-| UI locale | `zh-CN`、`zh-TW`、`en` |
-| 公共路由 | `/<locale>/...` |
-| 内容源 | 仓库内 typed data + 私有 GitHub 内容仓库 |
-| 媒体 | Tencent COS + versioned Catalog |
+| 项目            | 当前设置                                   |
+| --------------- | ------------------------------------------ |
+| 类型            | 个人站点，不是通用模板                     |
+| 生产平台        | Vercel                                     |
+| Runtime         | Node.js `24.x`                             |
+| Package manager | pnpm，版本见 `package.json#packageManager` |
+| UI locale       | `zh-CN`、`zh-TW`、`en`                     |
+| 公共路由        | `/<locale>/...`                            |
+| 内容源          | 仓库内 typed data + 私有 GitHub 内容仓库   |
+| 媒体            | Tencent COS + versioned Catalog            |
 
 ## 主要能力
 
@@ -68,10 +68,12 @@ Copy-Item .env.example .env.local
 pnpm dev           # node server.js
 pnpm build         # next build
 pnpm start         # 自托管 production server
-pnpm lint          # ESLint
+pnpm lint          # Oxlint + ESLint 兼容规则
 pnpm typecheck     # TypeScript
 pnpm test          # Vitest
-pnpm check         # 字体配置 + lint + typecheck + test + build
+pnpm format        # Prettier 自动格式化
+pnpm quality       # Knip + JSCPD 维护扫描
+pnpm check         # 格式 + 字体配置 + lint + typecheck + Knip + JSCPD + test + build
 ```
 
 资产维护：
@@ -88,21 +90,21 @@ pnpm assets:publish -- --dry-run
 
 完整入口：[`docs/README.md`](./docs/README.md)
 
-| 任务 | 文档 |
-|---|---|
-| 首次安装 | [`GETTING_STARTED.md`](./docs/GETTING_STARTED.md) |
-| 日常开发 | [`DEVELOPMENT.md`](./docs/DEVELOPMENT.md) |
-| 系统架构 | [`ARCHITECTURE.md`](./docs/ARCHITECTURE.md) |
-| 路由与国际化 | [`ROUTING_AND_I18N.md`](./docs/ROUTING_AND_I18N.md) |
-| 内容与 MDX | [`CONTENT_AND_MDX.md`](./docs/CONTENT_AND_MDX.md) |
-| 安全 | [`SECURITY.md`](./docs/SECURITY.md) |
-| 资产与 CDN | [`ASSETS.md`](./docs/ASSETS.md) |
-| 性能 | [`PERFORMANCE.md`](./docs/PERFORMANCE.md) |
-| 测试 | [`TESTING_AND_QUALITY.md`](./docs/TESTING_AND_QUALITY.md) |
-| 部署运维 | [`OPERATIONS.md`](./docs/OPERATIONS.md) |
-| 配置参考 | [`CONFIGURATION.md`](./docs/CONFIGURATION.md) |
-| 故障排查 | [`TROUBLESHOOTING.md`](./docs/TROUBLESHOOTING.md) |
-| 历史回归 | [`GOTCHAS.md`](./docs/GOTCHAS.md) |
+| 任务         | 文档                                                      |
+| ------------ | --------------------------------------------------------- |
+| 首次安装     | [`GETTING_STARTED.md`](./docs/GETTING_STARTED.md)         |
+| 日常开发     | [`DEVELOPMENT.md`](./docs/DEVELOPMENT.md)                 |
+| 系统架构     | [`ARCHITECTURE.md`](./docs/ARCHITECTURE.md)               |
+| 路由与国际化 | [`ROUTING_AND_I18N.md`](./docs/ROUTING_AND_I18N.md)       |
+| 内容与 MDX   | [`CONTENT_AND_MDX.md`](./docs/CONTENT_AND_MDX.md)         |
+| 安全         | [`SECURITY.md`](./docs/SECURITY.md)                       |
+| 资产与 CDN   | [`ASSETS.md`](./docs/ASSETS.md)                           |
+| 性能         | [`PERFORMANCE.md`](./docs/PERFORMANCE.md)                 |
+| 测试         | [`TESTING_AND_QUALITY.md`](./docs/TESTING_AND_QUALITY.md) |
+| 部署运维     | [`OPERATIONS.md`](./docs/OPERATIONS.md)                   |
+| 配置参考     | [`CONFIGURATION.md`](./docs/CONFIGURATION.md)             |
+| 故障排查     | [`TROUBLESHOOTING.md`](./docs/TROUBLESHOOTING.md)         |
+| 历史回归     | [`GOTCHAS.md`](./docs/GOTCHAS.md)                         |
 
 ## 项目结构
 

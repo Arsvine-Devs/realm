@@ -29,7 +29,7 @@
   flex-grow: 1; // 占据多余空间
   text-align: left;
   white-space: nowrap; // 防止文本换行
-  overflow: hidden;    // 超出部分隐藏
+  overflow: hidden; // 超出部分隐藏
   text-overflow: ellipsis; // 超出部分显示省略号
   margin-right: 10px; // 与右侧按钮的间距
 }
@@ -97,7 +97,7 @@
 
 // 播放列表切换按钮悬停效果 (低电量)
 .playlistToggleButton.toggleButtonLowPower:hover {
-   background-color: rgba(var(--ark-highlight-green-rgb), 0.1);
+  background-color: rgba(var(--ark-highlight-green-rgb), 0.1);
 }
 
 // 播放列表切换按钮内的横线
@@ -106,14 +106,16 @@
   height: 1px;
   background-color: var(--ark-text-secondary); // 默认颜色
   margin: 1.5px 0;
-  transition: opacity 0.2s, background-color 0.2s;
+  transition:
+    opacity 0.2s,
+    background-color 0.2s;
   opacity: 0.7;
 }
 
 // 播放列表切换按钮悬停时横线效果 (正常电量)
 .playlistToggleButton:not(.toggleButtonLowPower):hover .toggleButtonLine {
-    opacity: 1;
-    background-color: var(--ark-primary); // 变为主题色
+  opacity: 1;
+  background-color: var(--ark-primary); // 变为主题色
 }
 
 // 播放列表切换按钮内横线 (低电量状态)
@@ -123,7 +125,7 @@
 
 // 播放列表切换按钮悬停时横线效果 (低电量)
 .playlistToggleButton.toggleButtonLowPower:hover .toggleButtonLine {
-    opacity: 1; // 仅增加透明度，颜色不变或略微变亮
+  opacity: 1; // 仅增加透明度，颜色不变或略微变亮
 }
 
 // .controls { /* 旧的播放控制按钮容器 (已移除) */ }
@@ -153,10 +155,12 @@
 .playlistContainer {
   width: 100%;
   max-height: 0; // 默认收起 (高度为0)
-  opacity: 0;    // 默认透明
-  overflow-y: auto;  // 内容超出时垂直滚动
+  opacity: 0; // 默认透明
+  overflow-y: auto; // 内容超出时垂直滚动
   overflow-x: hidden; // 水平方向不滚动
-  transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out; // 展开/收起动画
+  transition:
+    max-height 0.4s ease-in-out,
+    opacity 0.3s ease-in-out; // 展开/收起动画
   border-top: 1px solid rgba(128, 128, 128, 0.3); // 顶部边框线
   background-color: rgba(var(--ark-dark-blue-rgb), 0.1); // 轻微背景色
 }
@@ -169,9 +173,15 @@
 
 // 单个播放列表项
 .playlistItem {
+  width: 100%;
   padding: 8px 15px;
   cursor: none;
+  border: 0;
   border-bottom: 1px solid rgba(128, 128, 128, 0.3); // 底部边框线
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   display: flex;
   flex-direction: column;
   transition: background-color 0.2s ease; // 悬停背景色动画
@@ -179,8 +189,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
 
-  &:last-child { border-bottom: none; } // 最后一项无底边框
-  &:hover { background-color: rgba(var(--ark-primary-rgb), 0.1); } // 悬停效果
+  &:last-child {
+    border-bottom: none;
+  } // 最后一项无底边框
+  &:hover {
+    background-color: rgba(var(--ark-primary-rgb), 0.1);
+  } // 悬停效果
 }
 
 // 播放列表项标题
@@ -206,10 +220,9 @@
     color: var(--ark-highlight-green);
     font-weight: bold;
   }
-   .playlistItemArtist {
-     opacity: 0.8;
-   }
+  .playlistItemArtist {
+    opacity: 0.8;
+  }
 }
-
 
 // ===== 响应式: 移动端播放器适配 =====

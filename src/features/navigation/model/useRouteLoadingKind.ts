@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { getRouteTemplate } from './NavigationRuntime';
 
-export type RouteLoadingKind = null | 'tweets' | 'blog';
-export type RouteLoadingPresentation = 'default' | 'standalone';
+type RouteLoadingKind = null | 'tweets' | 'blog';
+type RouteLoadingPresentation = 'default' | 'standalone';
 
 interface RouteLoadingState {
   kind: RouteLoadingKind;
@@ -18,17 +18,22 @@ const BLOG_DETAIL_ROUTE_RE = /^\/[A-Za-z-]+\/blog\/[^/]+\/?$/;
 function isStandalonePathname(pathname: string): boolean {
   const routeTemplate = getRouteTemplate(pathname);
   return (
-    routeTemplate.startsWith('/[locale]/web/')
-    || routeTemplate.startsWith('/[locale]/life/')
-    || routeTemplate.startsWith('/[locale]/blog/')
+    routeTemplate.startsWith('/[locale]/web/') ||
+    routeTemplate.startsWith('/[locale]/life/') ||
+    routeTemplate.startsWith('/[locale]/blog/')
   );
 }
 
-export default function useRouteLoadingKind(pathname: string, targetUrl: string | null = null): RouteLoadingState {
+export default function useRouteLoadingKind(
+  pathname: string,
+  targetUrl: string | null = null,
+): RouteLoadingState {
   return useMemo(() => {
     if (!targetUrl) return { kind: null, presentation: 'default' };
     const path = targetUrl.split('?')[0]?.split('#')[0] ?? targetUrl;
-    const presentation: RouteLoadingPresentation = isStandalonePathname(pathname) ? 'standalone' : 'default';
+    const presentation: RouteLoadingPresentation = isStandalonePathname(pathname)
+      ? 'standalone'
+      : 'default';
     if (TWEETS_ROUTE_RE.test(path)) return { kind: 'tweets', presentation };
     if (BLOG_DETAIL_ROUTE_RE.test(path)) return { kind: 'blog', presentation };
     return { kind: null, presentation: 'default' };

@@ -41,9 +41,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom,
-      transparent 50%,
-      rgba(0, 0, 0, 0.15) 50%);
+  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.15) 50%);
   background-size: 100% 4px;
   opacity: 0.2;
   pointer-events: none;
@@ -81,7 +79,6 @@
   }
 }
 
-
 .articleImageFigure {
   margin: 25px 0;
   text-align: center;
@@ -89,7 +86,9 @@
 
 .clickableFigure {
   cursor: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     transform: scale(1.02);
@@ -255,7 +254,9 @@
   color: var(--ark-primary);
   text-decoration: none;
   border-bottom: 1px dotted var(--ark-primary);
-  transition: color 0.2s, border-color 0.2s;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
 
   &:hover {
     color: var(--ark-text);
@@ -263,7 +264,6 @@
     border-bottom-style: solid;
   }
 }
-
 
 .articleLinkList {
   margin-top: 20px;

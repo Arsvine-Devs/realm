@@ -18,11 +18,7 @@ export default function DetailGallerySection({
   children,
 }: DetailGallerySectionProps) {
   return (
-    <section
-      className={className}
-      ref={sectionRef}
-      data-nav-id="archive"
-    >
+    <section className={className} ref={sectionRef} data-nav-id="archive">
       {title && <h2 className={styles.sectionHeader}>{title}</h2>}
       {contentClassName ? <div className={contentClassName}>{children}</div> : children}
     </section>

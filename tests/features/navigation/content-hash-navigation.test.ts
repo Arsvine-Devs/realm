@@ -45,16 +45,24 @@ describe('resolveContentHashTransitionMode', () => {
   });
 
   it('treats auxiliary pages to content hash as cross-page', () => {
-    expect(resolveContentHashTransitionMode('/[locale]/friends', '/en/content#about')).toBe('cross-page');
-    expect(resolveContentHashTransitionMode('/[locale]/friends', '/en/content#blog')).toBe('cross-page');
+    expect(resolveContentHashTransitionMode('/[locale]/friends', '/en/content#about')).toBe(
+      'cross-page',
+    );
+    expect(resolveContentHashTransitionMode('/[locale]/friends', '/en/content#blog')).toBe(
+      'cross-page',
+    );
   });
 
   it('treats content to content hash as same-page', () => {
-    expect(resolveContentHashTransitionMode('/[locale]/content', '/en/content#life')).toBe('same-page');
+    expect(resolveContentHashTransitionMode('/[locale]/content', '/en/content#life')).toBe(
+      'same-page',
+    );
   });
 
   it('ignores non-content-hash targets', () => {
-    expect(resolveContentHashTransitionMode('/[locale]/friends', '/en/blog/init')).toBe('not-content-hash');
+    expect(resolveContentHashTransitionMode('/[locale]/friends', '/en/blog/init')).toBe(
+      'not-content-hash',
+    );
   });
 });
 

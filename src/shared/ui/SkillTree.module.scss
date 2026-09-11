@@ -156,7 +156,9 @@ $connector-w: 14px;
   gap: 12px;
   padding: 5px 10px;
   border: 1px solid transparent;
-  transition: border-color 0.25s ease, background-color 0.25s ease;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease;
 
   .hovered & {
     border-color: var(--ark-border);
@@ -187,7 +189,9 @@ $connector-w: 14px;
   display: block;
   width: 6px;
   height: 10px;
-  transition: background-color 0.2s ease, opacity 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .filled {

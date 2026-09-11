@@ -19,64 +19,65 @@ export const PERFORMANCE_TIERS: readonly PerformanceTier[] = [
   'minimal',
 ];
 
-export const PERFORMANCE_CAPABILITIES: Readonly<Record<PerformanceTier, PerformanceCapabilities>> = {
-  full: {
-    allowLogoEffects: true,
-    allowAmbientWebGL: true,
-    allowHeavyCssEffects: true,
-    allowDecorativeMotion: true,
-    allowInteractiveWebGL: true,
-    allowCustomCursor: true,
-  },
-  'logo-reduced': {
-    allowLogoEffects: false,
-    allowAmbientWebGL: true,
-    allowHeavyCssEffects: true,
-    allowDecorativeMotion: true,
-    allowInteractiveWebGL: true,
-    allowCustomCursor: true,
-  },
-  'ambient-reduced': {
-    allowLogoEffects: false,
-    allowAmbientWebGL: false,
-    allowHeavyCssEffects: true,
-    allowDecorativeMotion: true,
-    allowInteractiveWebGL: true,
-    allowCustomCursor: true,
-  },
-  'css-reduced': {
-    allowLogoEffects: false,
-    allowAmbientWebGL: false,
-    allowHeavyCssEffects: false,
-    allowDecorativeMotion: true,
-    allowInteractiveWebGL: true,
-    allowCustomCursor: true,
-  },
-  'motion-reduced': {
-    allowLogoEffects: false,
-    allowAmbientWebGL: false,
-    allowHeavyCssEffects: false,
-    allowDecorativeMotion: false,
-    allowInteractiveWebGL: true,
-    allowCustomCursor: true,
-  },
-  'webgl-reduced': {
-    allowLogoEffects: false,
-    allowAmbientWebGL: false,
-    allowHeavyCssEffects: false,
-    allowDecorativeMotion: false,
-    allowInteractiveWebGL: false,
-    allowCustomCursor: true,
-  },
-  minimal: {
-    allowLogoEffects: false,
-    allowAmbientWebGL: false,
-    allowHeavyCssEffects: false,
-    allowDecorativeMotion: false,
-    allowInteractiveWebGL: false,
-    allowCustomCursor: false,
-  },
-};
+export const PERFORMANCE_CAPABILITIES: Readonly<Record<PerformanceTier, PerformanceCapabilities>> =
+  {
+    full: {
+      allowLogoEffects: true,
+      allowAmbientWebGL: true,
+      allowHeavyCssEffects: true,
+      allowDecorativeMotion: true,
+      allowInteractiveWebGL: true,
+      allowCustomCursor: true,
+    },
+    'logo-reduced': {
+      allowLogoEffects: false,
+      allowAmbientWebGL: true,
+      allowHeavyCssEffects: true,
+      allowDecorativeMotion: true,
+      allowInteractiveWebGL: true,
+      allowCustomCursor: true,
+    },
+    'ambient-reduced': {
+      allowLogoEffects: false,
+      allowAmbientWebGL: false,
+      allowHeavyCssEffects: true,
+      allowDecorativeMotion: true,
+      allowInteractiveWebGL: true,
+      allowCustomCursor: true,
+    },
+    'css-reduced': {
+      allowLogoEffects: false,
+      allowAmbientWebGL: false,
+      allowHeavyCssEffects: false,
+      allowDecorativeMotion: true,
+      allowInteractiveWebGL: true,
+      allowCustomCursor: true,
+    },
+    'motion-reduced': {
+      allowLogoEffects: false,
+      allowAmbientWebGL: false,
+      allowHeavyCssEffects: false,
+      allowDecorativeMotion: false,
+      allowInteractiveWebGL: true,
+      allowCustomCursor: true,
+    },
+    'webgl-reduced': {
+      allowLogoEffects: false,
+      allowAmbientWebGL: false,
+      allowHeavyCssEffects: false,
+      allowDecorativeMotion: false,
+      allowInteractiveWebGL: false,
+      allowCustomCursor: true,
+    },
+    minimal: {
+      allowLogoEffects: false,
+      allowAmbientWebGL: false,
+      allowHeavyCssEffects: false,
+      allowDecorativeMotion: false,
+      allowInteractiveWebGL: false,
+      allowCustomCursor: false,
+    },
+  };
 
 export const PERFORMANCE_CAPABILITY_ATTRIBUTES = {
   allowLogoEffects: 'data-logo-effects',
@@ -109,9 +110,6 @@ export function applyPerformanceAttributes(
   root.setAttribute('data-performance-tier', state.performanceTier);
   root.setAttribute('data-performance-reason', state.performanceReason ?? 'none');
   for (const [capability, attribute] of Object.entries(PERFORMANCE_CAPABILITY_ATTRIBUTES)) {
-    root.setAttribute(
-      attribute,
-      state[capability as keyof PerformanceCapabilities] ? 'on' : 'off',
-    );
+    root.setAttribute(attribute, state[capability as keyof PerformanceCapabilities] ? 'on' : 'off');
   }
 }

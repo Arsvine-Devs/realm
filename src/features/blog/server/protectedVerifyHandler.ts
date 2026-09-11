@@ -12,38 +12,50 @@ export default async function handler(request: Request) {
   const headers = { 'Cache-Control': 'private, no-store' };
 
   if (!group || !token) {
-    return jsonResponse({
-      ok: false,
-      error: { code: 'VALIDATION_FAILED', message: 'Missing group or token.' },
-    }, { status: 400, headers });
+    return jsonResponse(
+      {
+        ok: false,
+        error: { code: 'VALIDATION_FAILED', message: 'Missing group or token.' },
+      },
+      { status: 400, headers },
+    );
   }
 
   const limiter = await enforceRateLimit(`totp:${getClientAddress(request)}:${group}`, 5, 60_000);
   if (!limiter.ok) {
-    return jsonResponse({
-      ok: false,
-      error: { code: 'RATE_LIMITED', message: 'Too many attempts. Please try again later.' },
-    }, {
-      status: 429,
-      headers: { ...headers, 'Retry-After': String(Math.ceil(limiter.retryAfterMs / 1000)) },
-    });
+    return jsonResponse(
+      {
+        ok: false,
+        error: { code: 'RATE_LIMITED', message: 'Too many attempts. Please try again later.' },
+      },
+      {
+        status: 429,
+        headers: { ...headers, 'Retry-After': String(Math.ceil(limiter.retryAfterMs / 1000)) },
+      },
+    );
   }
 
   const result = verifyTotpGroupToken(group, token);
   if (!result.ok) {
-    return jsonResponse({
-      ok: false,
-      error: {
-        code: result.reason === 'group_not_found' ? 'GROUP_NOT_FOUND' : 'TOTP_INVALID',
-        message:
-          result.reason === 'group_not_found'
-            ? 'Access group not found.'
-            : 'Token is invalid or expired.',
+    return jsonResponse(
+      {
+        ok: false,
+        error: {
+          code: result.reason === 'group_not_found' ? 'GROUP_NOT_FOUND' : 'TOTP_INVALID',
+          message:
+            result.reason === 'group_not_found'
+              ? 'Access group not found.'
+              : 'Token is invalid or expired.',
+        },
       },
-    }, { status: result.reason === 'group_not_found' ? 404 : 401, headers });
+      { status: result.reason === 'group_not_found' ? 404 : 401, headers },
+    );
   }
 
-  return jsonResponse({ ok: true, redirectTo: next }, {
-    headers: { ...headers, 'Set-Cookie': createAccessGrantCookie(group) },
-  });
+  return jsonResponse(
+    { ok: true, redirectTo: next },
+    {
+      headers: { ...headers, 'Set-Cookie': createAccessGrantCookie(group) },
+    },
+  );
 }

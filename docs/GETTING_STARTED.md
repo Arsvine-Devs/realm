@@ -6,12 +6,12 @@
 
 ## 前置条件
 
-| 工具 | 要求 | 说明 |
-|---|---|---|
-| Node.js | `24.x` | 与生产和 `package.json#engines` 一致 |
-| pnpm | `11.7.0` | 版本来自 `packageManager` |
-| Git | 当前稳定版 | 用于获取代码和检查工作区 |
-| Windows PowerShell | 可选 | `dev.arsvine.com` 本地 COS 流程需要 |
+| 工具               | 要求                             | 说明                                 |
+| ------------------ | -------------------------------- | ------------------------------------ |
+| Node.js            | `24.x`                           | 与生产和 `package.json#engines` 一致 |
+| pnpm               | 见 `package.json#packageManager` | 安装与 CI 使用同一版本               |
+| Git                | 当前稳定版                       | 用于获取代码和检查工作区             |
+| Windows PowerShell | 可选                             | `dev.arsvine.com` 本地 COS 流程需要  |
 
 确认版本：
 
@@ -28,7 +28,7 @@ pnpm install --frozen-lockfile
 
 日常开发通常也可以使用 `pnpm install`。CI 和可重复环境应使用 `--frozen-lockfile`，避免安装过程改写 `pnpm-lock.yaml`。
 
-仓库通过 `pnpm-workspace.yaml` 固定构建许可、依赖最小发布时间、`postcss` override，以及 `@react-three/fiber@9.6.1` 补丁。不要改用 npm 或 yarn 重新生成锁文件。
+仓库通过 `pnpm-workspace.yaml` 固定构建许可、依赖最小发布时间、`postcss` override，以及 `@react-three/fiber@9.7.0` 补丁。不要改用 npm 或 yarn 重新生成锁文件。
 
 ## 创建本地环境文件
 
@@ -95,7 +95,7 @@ pnpm test
 pnpm check
 ```
 
-`pnpm check` 依次执行字体配置检查、ESLint、TypeScript、Vitest 和生产构建。
+`pnpm check` 执行格式、字体配置、Oxlint/ESLint、TypeScript、Knip、Vitest 和生产构建。命令与配置见 [`TESTING_AND_QUALITY.md`](./TESTING_AND_QUALITY.md)。
 
 ## 使用真实 COS 资产进行本地调试
 

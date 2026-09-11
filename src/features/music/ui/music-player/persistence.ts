@@ -1,4 +1,4 @@
-export interface PersistedPlayerState {
+interface PersistedPlayerState {
   currentTrackIndex: number;
   currentTime: number;
   trackId?: string;

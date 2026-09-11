@@ -21,9 +21,11 @@ describe('content hash URL synchronization', () => {
       ['section-blog', createSection(140)],
     ]);
 
-    expect(getActiveContentSectionHash(container, {
-      getElementById: (id) => sections.get(id) ?? null,
-    })).toBe('experience');
+    expect(
+      getActiveContentSectionHash(container, {
+        getElementById: (id) => sections.get(id) ?? null,
+      }),
+    ).toBe('experience');
   });
 
   it('uses replaceState for a changed content hash and does not add history entries', () => {
@@ -33,17 +35,13 @@ describe('content hash URL synchronization', () => {
     const section = createSection(-10);
 
     const hash = syncContentHashFromScroll(container, {
-      documentRef: { getElementById: (id) => id === 'section-blog' ? section : null },
+      documentRef: { getElementById: (id) => (id === 'section-blog' ? section : null) },
       historyRef: { state: { from: 'test' }, replaceState },
       locationRef: { pathname: '/zh-CN/content', search: '?view=all', hash: '#works' },
     });
 
     expect(hash).toBe('blog');
-    expect(replaceState).toHaveBeenCalledWith(
-      { from: 'test' },
-      '',
-      '/zh-CN/content?view=all#blog',
-    );
+    expect(replaceState).toHaveBeenCalledWith({ from: 'test' }, '', '/zh-CN/content?view=all#blog');
   });
 
   it('does not rewrite an already-current hash or a non-content URL', () => {
@@ -51,7 +49,9 @@ describe('content hash URL synchronization', () => {
     container.getBoundingClientRect = () => new DOMRect(0, 0, 100, 400);
     const replaceState = vi.fn();
     const section = createSection(-10);
-    const documentRef = { getElementById: (id: string) => id === 'section-life' ? section : null };
+    const documentRef = {
+      getElementById: (id: string) => (id === 'section-life' ? section : null),
+    };
     const historyRef = { state: null, replaceState };
 
     syncContentHashFromScroll(container, {

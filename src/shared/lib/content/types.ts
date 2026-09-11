@@ -1,11 +1,11 @@
-export type ContentAccessMode = 'public' | 'totp';
+type ContentAccessMode = 'public' | 'totp';
 
 export interface ContentPostAccess {
   mode: ContentAccessMode;
   group?: string;
 }
 
-export interface ContentBlogIndexVariant {
+interface ContentBlogIndexVariant {
   title: string;
   excerpt: string;
   tags?: string[];
@@ -30,7 +30,7 @@ export interface ContentBlogIndex {
   posts: ContentBlogIndexItem[];
 }
 
-export interface TotpSecretSet {
+interface TotpSecretSet {
   current: string;
   previous?: string[];
 }

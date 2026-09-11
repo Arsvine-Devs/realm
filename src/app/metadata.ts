@@ -5,15 +5,22 @@ import { getSiteUrl, siteConfig } from '@/shared/config/site';
 
 type PageCopy = { title?: string; description?: string };
 
-export function localizedMetadata(locale: Locale, path: string, copy: PageCopy, options: {
-  type?: 'article' | 'website';
-  robots?: Metadata['robots'];
-} = {}): Metadata {
+export function localizedMetadata(
+  locale: Locale,
+  path: string,
+  copy: PageCopy,
+  options: {
+    type?: 'article' | 'website';
+    robots?: Metadata['robots'];
+  } = {},
+): Metadata {
   const normalizedPath = path === '/' ? '' : path;
   const url = `${getSiteUrl()}/${locale}${normalizedPath}`;
   const title = copy.title || siteConfig.metaTitle;
   const description = copy.description || siteConfig.metaDescription;
-  const languages = Object.fromEntries(locales.map((candidate) => [candidate, `/${candidate}${normalizedPath || '/'}`]));
+  const languages = Object.fromEntries(
+    locales.map((candidate) => [candidate, `/${candidate}${normalizedPath || '/'}`]),
+  );
 
   return {
     title,

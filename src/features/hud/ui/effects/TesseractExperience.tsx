@@ -37,10 +37,7 @@ function Plane(props: { position: [number, number, number] }) {
 function WebglContextLossListener({ onContextLost }: { onContextLost: () => void }) {
   const gl = useThree((state) => state.gl);
 
-  useEffect(
-    () => listenForWebglContextLoss(gl.domElement, onContextLost),
-    [gl, onContextLost],
-  );
+  useEffect(() => listenForWebglContextLoss(gl.domElement, onContextLost), [gl, onContextLost]);
 
   return null;
 }
@@ -78,7 +75,11 @@ function SceneLogic({
       if (physicsMesh) {
         const tesseractWorldPos = tesseractWorldPosRef.current;
         physicsMesh.getWorldPosition(tesseractWorldPos);
-        const batteryWorldPos = resolveBatteryWorldPosition(batteryPosition3D, camera, batteryWorldPosRef.current);
+        const batteryWorldPos = resolveBatteryWorldPosition(
+          batteryPosition3D,
+          camera,
+          batteryWorldPosRef.current,
+        );
 
         tesseractWorldPos.clampLength(0, 50);
         batteryWorldPos.clampLength(0, 50);
@@ -122,10 +123,10 @@ function SceneLogic({
     currentOffset.y += (targetY - currentOffset.y) * 0.18;
 
     if (
-      Math.abs(currentOffset.x) < 0.05
-      && Math.abs(currentOffset.y) < 0.05
-      && targetX === 0
-      && targetY === 0
+      Math.abs(currentOffset.x) < 0.05 &&
+      Math.abs(currentOffset.y) < 0.05 &&
+      targetX === 0 &&
+      targetY === 0
     ) {
       currentOffset.x = 0;
       currentOffset.y = 0;
@@ -203,10 +204,7 @@ const TesseractExperience = ({
       canvasRectRef.current = canvasRect;
       batteryIconRectRef.current = iconRect;
 
-      const nextPosition = resolveBatteryAnchorPosition(
-        canvasRect,
-        iconRect,
-      );
+      const nextPosition = resolveBatteryAnchorPosition(canvasRect, iconRect);
       startTransition(() => {
         setBatteryPosition3D(nextPosition);
       });

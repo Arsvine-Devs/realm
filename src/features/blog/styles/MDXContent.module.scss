@@ -92,7 +92,9 @@
   color: var(--ark-text);
   text-decoration: none;
   border-bottom: 1px solid rgba(var(--ark-border-rgb), 0.3);
-  transition: border-color 0.3s ease, color 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    color 0.3s ease;
 
   &:hover {
     color: var(--ark-primary);
@@ -152,7 +154,10 @@
 .strongShort {
   padding: 1px 4px;
   margin: 0 1px;
-  transition: background 0.25s ease, color 0.25s ease, text-decoration-color 0.25s ease;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    text-decoration-color 0.25s ease;
 
   &:hover {
     background: rgba(var(--ark-text-rgb), 0.88);
@@ -335,7 +340,9 @@
     color: var(--ark-text);
     opacity: 0.8;
     border-bottom: 1px solid rgba(var(--ark-text-rgb), 0.15);
-    transition: opacity 0.2s ease, border-color 0.2s ease;
+    transition:
+      opacity 0.2s ease,
+      border-color 0.2s ease;
 
     &:hover {
       opacity: 1;

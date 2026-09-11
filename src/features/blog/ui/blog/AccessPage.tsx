@@ -25,61 +25,68 @@ export default function AccessPage({ locale, group, nextPath }: AccessPageProps)
   const [submitting, setSubmitting] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
-  const submitToken = useCallback(async (nextToken: string) => {
-    if (submitting || nextToken.length !== 6 || lastSubmittedTokenRef.current === nextToken) {
-      return;
-    }
-
-    lastSubmittedTokenRef.current = nextToken;
-    setSubmitting(true);
-    setError('');
-
-    try {
-      const response = await fetch('/api/protected-verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          group,
-          token: nextToken,
-          next: nextPath,
-        }),
-      });
-
-      const json = (await response.json()) as ProtectedVerifyResponse;
-
-      if (!response.ok || !json.ok || !json.redirectTo) {
-        if ('error' in json) {
-          throw new Error(json.error.message || t('invalidToken'));
-        }
-        throw new Error(t('invalidToken'));
+  const submitToken = useCallback(
+    async (nextToken: string) => {
+      if (submitting || nextToken.length !== 6 || lastSubmittedTokenRef.current === nextToken) {
+        return;
       }
 
-      navigateTo(json.redirectTo);
-    } catch (submissionError) {
-      setError(
-        submissionError instanceof Error ? submissionError.message : t('invalidToken'),
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  }, [group, navigateTo, nextPath, submitting, t]);
+      lastSubmittedTokenRef.current = nextToken;
+      setSubmitting(true);
+      setError('');
 
-  const handleSubmit = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    await submitToken(token);
-  }, [submitToken, token]);
+      try {
+        const response = await fetch('/api/protected-verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            group,
+            token: nextToken,
+            next: nextPath,
+          }),
+        });
 
-  const handleTokenChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const nextToken = event.target.value.replace(/\D+/g, '').slice(0, 6);
-    lastSubmittedTokenRef.current = nextToken.length === 6 ? lastSubmittedTokenRef.current : null;
-    setError('');
-    setToken(nextToken);
-    if (nextToken.length === 6) {
-      void submitToken(nextToken);
-    }
-  }, [submitToken]);
+        const json = (await response.json()) as ProtectedVerifyResponse;
+
+        if (!response.ok || !json.ok || !json.redirectTo) {
+          if ('error' in json) {
+            throw new Error(json.error.message || t('invalidToken'));
+          }
+          throw new Error(t('invalidToken'));
+        }
+
+        navigateTo(json.redirectTo);
+      } catch (submissionError) {
+        setError(submissionError instanceof Error ? submissionError.message : t('invalidToken'));
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [group, navigateTo, nextPath, submitting, t],
+  );
+
+  const handleSubmit = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      await submitToken(token);
+    },
+    [submitToken, token],
+  );
+
+  const handleTokenChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const nextToken = event.target.value.replace(/\D+/g, '').slice(0, 6);
+      lastSubmittedTokenRef.current = nextToken.length === 6 ? lastSubmittedTokenRef.current : null;
+      setError('');
+      setToken(nextToken);
+      if (nextToken.length === 6) {
+        void submitToken(nextToken);
+      }
+    },
+    [submitToken],
+  );
 
   const handleFieldClick = useCallback(() => {
     inputRef.current?.focus();
@@ -98,11 +105,7 @@ export default function AccessPage({ locale, group, nextPath }: AccessPageProps)
             <label className={styles.label} htmlFor="totp-token">
               {t('tokenLabel')}
             </label>
-            <div
-              className={styles.codeField}
-              onClick={handleFieldClick}
-              role="presentation"
-            >
+            <div className={styles.codeField} onClick={handleFieldClick} role="presentation">
               <input
                 ref={inputRef}
                 id="totp-token"
@@ -111,6 +114,7 @@ export default function AccessPage({ locale, group, nextPath }: AccessPageProps)
                 autoComplete="one-time-code"
                 pattern="[0-9]*"
                 maxLength={6}
+                /* oxlint-disable-next-line jsx-a11y/no-autofocus -- the gate has one visible field represented by this focused input. */
                 autoFocus
                 value={token}
                 disabled={submitting}
@@ -121,7 +125,8 @@ export default function AccessPage({ locale, group, nextPath }: AccessPageProps)
               <div className={styles.slotGrid} aria-hidden="true">
                 {Array.from({ length: 6 }, (_, index) => {
                   const char = token[index] ?? '';
-                  const isActive = isFocused && index === Math.min(token.length, 5) && token.length < 6;
+                  const isActive =
+                    isFocused && index === Math.min(token.length, 5) && token.length < 6;
                   const isFilled = char !== '';
 
                   return (
@@ -140,7 +145,12 @@ export default function AccessPage({ locale, group, nextPath }: AccessPageProps)
               {submitting ? t('verifying') : '\u00A0'}
             </p>
             {error ? <p className={styles.error}>{error}</p> : null}
-            <button className={styles.hiddenSubmit} type="submit" tabIndex={-1} aria-hidden="true" />
+            <button
+              className={styles.hiddenSubmit}
+              type="submit"
+              tabIndex={-1}
+              aria-hidden="true"
+            />
           </form>
         </section>
       </SectionPageLayout>

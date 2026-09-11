@@ -121,7 +121,9 @@ describe('LeftPanel adaptive performance', () => {
     expect(links[0].getAttribute('target')).toBe('_blank');
     expect(links[0].getAttribute('rel')).toBe('noopener noreferrer');
     expect(links[0].querySelector('img')?.getAttribute('alt')).toBe('');
-    expect(links[0].querySelector('[class*="travellingMobileBadge"]')?.textContent).toBe('travellingLabel');
+    expect(links[0].querySelector('[class*="travellingMobileBadge"]')?.textContent).toBe(
+      'travellingLabel',
+    );
     expect(links[0].querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
   });
 });

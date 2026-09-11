@@ -16,10 +16,7 @@ interface AboutSectionProps {
   aboutContentRef: RefObject<HTMLDivElement | null>;
 }
 
-export default function AboutSection({
-  aboutSectionRef,
-  aboutContentRef,
-}: AboutSectionProps) {
+export default function AboutSection({ aboutSectionRef, aboutContentRef }: AboutSectionProps) {
   const t = useTranslations('sections.about');
   const { query } = useNavigationRuntime();
   const { navigateTo } = useTransition();
@@ -35,14 +32,26 @@ export default function AboutSection({
       ? `${siteConfig.copyrightYearStart}-${currentYear}`
       : `${siteConfig.copyrightYearStart}`;
   return (
-    <div id="about-section" ref={aboutSectionRef} className={`${styles.contentSection} ${styles.aboutSection}`}>
+    <div
+      id="about-section"
+      ref={aboutSectionRef}
+      className={`${styles.contentSection} ${styles.aboutSection}`}
+    >
       {allowDecorativeMotion ? <Noise /> : null}
       <div ref={aboutContentRef} className={styles.aboutContentInner}>
         <h2>ABOUT</h2>
         <div className={styles.siteStatsContainer}>
-          <p>{t('systemUptime')}: <span className={styles.statValue}>{runtime}</span></p>
-          <p>{t('currentVisitDuration')}: <span className={styles.statValue}>{currentVisitDuration}</span></p>
-          <p>{t('visitorLanguage')}: <span className={styles.statValue}>{visitorLanguageCode ?? '--'}</span></p>
+          <p>
+            {t('systemUptime')}: <span className={styles.statValue}>{runtime}</span>
+          </p>
+          <p>
+            {t('currentVisitDuration')}:{' '}
+            <span className={styles.statValue}>{currentVisitDuration}</span>
+          </p>
+          <p>
+            {t('visitorLanguage')}:{' '}
+            <span className={styles.statValue}>{visitorLanguageCode ?? '--'}</span>
+          </p>
         </div>
         <div className={styles.footerInfo}>
           <p>{t('codeLicense')}</p>
@@ -58,7 +67,9 @@ export default function AboutSection({
               {t('details')}
             </a>
           </p>
-          <p>© {yearRange} {siteConfig.author}.</p>
+          <p>
+            © {yearRange} {siteConfig.author}.
+          </p>
         </div>
         <div className={styles.aboutImageContainer}>
           <img

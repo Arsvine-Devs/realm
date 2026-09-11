@@ -24,11 +24,16 @@ const FALLBACK_AUTO_DISMISS_MS = 30000;
 const TRANSLATED_AUTO_DISMISS_MS = 5000;
 const EXIT_ANIMATION_MS = 240;
 
-export default function LocaleFallbackBanner({ requestedLocale, actualLocale, originLocale, status }: Props) {
+export default function LocaleFallbackBanner({
+  requestedLocale,
+  actualLocale,
+  originLocale,
+  status,
+}: Props) {
   // 显式 status 优先；缺省时按旧逻辑兼容（防止旧调用方一次性全断）。
   // 兼容路径里不区分 translated，只表达 fallback。
-  const effectiveStatus: TranslationStatus = status
-    ?? (requestedLocale !== actualLocale ? 'fallback' : 'source');
+  const effectiveStatus: TranslationStatus =
+    status ?? (requestedLocale !== actualLocale ? 'fallback' : 'source');
 
   if (effectiveStatus === 'source') return null;
 
@@ -50,7 +55,12 @@ interface ContentProps {
   status: Exclude<TranslationStatus, 'source'>;
 }
 
-function LocaleFallbackBannerContent({ requestedLocale, actualLocale, originLocale, status }: ContentProps) {
+function LocaleFallbackBannerContent({
+  requestedLocale,
+  actualLocale,
+  originLocale,
+  status,
+}: ContentProps) {
   const t = useTranslations('fallbackBanner');
   const [isVisible, setIsVisible] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
@@ -74,12 +84,13 @@ function LocaleFallbackBannerContent({ requestedLocale, actualLocale, originLoca
 
   if (!isVisible) return null;
 
-  const text = status === 'fallback'
-    ? t('fallback', {
-        requested: localeNativeName[requestedLocale],
-        actual: localeNativeName[actualLocale],
-      })
-    : t('translated', { origin: localeNativeName[originLocale] });
+  const text =
+    status === 'fallback'
+      ? t('fallback', {
+          requested: localeNativeName[requestedLocale],
+          actual: localeNativeName[actualLocale],
+        })
+      : t('translated', { origin: localeNativeName[originLocale] });
 
   const variantClass = status === 'fallback' ? styles.fallback : styles.translated;
   const icon = status === 'fallback' ? '⚠' : 'ℹ';
@@ -87,7 +98,13 @@ function LocaleFallbackBannerContent({ requestedLocale, actualLocale, originLoca
   return (
     <div className={`${styles.banner} ${variantClass} ${isClosing ? styles.closing : ''}`}>
       <span className={styles.bannerIcon}>{icon}</span>
-      <span className={styles.bannerText} role="status" aria-live="polite">
+      {/* A live status region is intentionally a span because it is inline banner content. */}
+      <span
+        className={styles.bannerText}
+        /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- output would misrepresent this translated status message. */
+        role="status"
+        aria-live="polite"
+      >
         {text}
       </span>
       <button

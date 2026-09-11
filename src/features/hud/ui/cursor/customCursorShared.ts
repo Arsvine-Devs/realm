@@ -2,8 +2,8 @@ import { lerp, clamp } from '@/features/hud/model/raf-lerp';
 
 export const MAGNETIC_DISTANCE = 120;
 export const MAGNETIC_STRENGTH = 0.4;
-export const GENERIC_CURSOR_INTERACTIVE_SELECTOR = 'a, button, .btn, [role="button"]';
-export const CURSOR_INTERACTIVE_SELECTOR = `${GENERIC_CURSOR_INTERACTIVE_SELECTOR}, [data-cursor-magnetic]`;
+const GENERIC_CURSOR_INTERACTIVE_SELECTOR = 'a, button, .btn, [role="button"]';
+const CURSOR_INTERACTIVE_SELECTOR = `${GENERIC_CURSOR_INTERACTIVE_SELECTOR}, [data-cursor-magnetic]`;
 
 export interface CursorTargetBounds {
   x: number;
@@ -46,7 +46,10 @@ export function getInteractiveCursorTarget(target: EventTarget | null): HTMLElem
 
   const candidate = target.closest(GENERIC_CURSOR_INTERACTIVE_SELECTOR);
   if (!(candidate instanceof HTMLElement)) return null;
-  if (candidate.closest('[data-cursor-no-magnetic]') && !candidate.hasAttribute('data-cursor-magnetic')) {
+  if (
+    candidate.closest('[data-cursor-no-magnetic]') &&
+    !candidate.hasAttribute('data-cursor-magnetic')
+  ) {
     return null;
   }
 
@@ -56,17 +59,27 @@ export function getInteractiveCursorTarget(target: EventTarget | null): HTMLElem
 export function collectInteractiveElements() {
   return Array.from(document.querySelectorAll(CURSOR_INTERACTIVE_SELECTOR)).filter((el) => {
     const htmlEl = el as HTMLElement;
-    if (htmlEl.closest('[data-cursor-no-magnetic]') && !htmlEl.hasAttribute('data-cursor-magnetic')) {
+    if (
+      htmlEl.closest('[data-cursor-no-magnetic]') &&
+      !htmlEl.hasAttribute('data-cursor-magnetic')
+    ) {
       return false;
     }
-    if (!htmlEl.hasAttribute('data-cursor-magnetic') && htmlEl.parentElement?.closest('[data-cursor-magnetic]')) {
+    if (
+      !htmlEl.hasAttribute('data-cursor-magnetic') &&
+      htmlEl.parentElement?.closest('[data-cursor-magnetic]')
+    ) {
       return false;
     }
     return true;
   }) as HTMLElement[];
 }
 
-export function getCursorTargetBounds(el: HTMLElement, padding = 0, rect?: DOMRect): CursorTargetBounds {
+export function getCursorTargetBounds(
+  el: HTMLElement,
+  padding = 0,
+  rect?: DOMRect,
+): CursorTargetBounds {
   const targetRect = rect ?? el.getBoundingClientRect();
   const customPadding = Number(el.getAttribute('data-cursor-padding'));
   const resolvedPadding = Number.isFinite(customPadding) ? customPadding : padding;
@@ -100,7 +113,11 @@ export function findClosestInteractiveElement(
     const dy = Math.max(Math.abs(pointerY - bounds.y) - bounds.h / 2, 0);
     const distance = Math.hypot(dx, dy);
 
-    if (distance < MAGNETIC_DISTANCE && distance < closestDistance && isCursorInteractive(el, rect)) {
+    if (
+      distance < MAGNETIC_DISTANCE &&
+      distance < closestDistance &&
+      isCursorInteractive(el, rect)
+    ) {
       closestDistance = distance;
       closestElement = el;
       closestRect = rect;

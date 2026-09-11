@@ -9,18 +9,16 @@ export type AccessApiErrorCode =
   | 'INTERNAL_ERROR'
   | 'UPSTREAM_FAILED';
 
-export interface AccessApiError {
+interface AccessApiError {
   code: AccessApiErrorCode;
   message: string;
 }
 
 export type GrantCheckResponse =
-  | { ok: true; granted: boolean }
-  | { ok: false; error: AccessApiError };
+  { ok: true; granted: boolean } | { ok: false; error: AccessApiError };
 
 export type ProtectedVerifyResponse =
-  | { ok: true; redirectTo: string }
-  | { ok: false; error: AccessApiError };
+  { ok: true; redirectTo: string } | { ok: false; error: AccessApiError };
 
 export function normalizeNextPath(value: unknown) {
   if (typeof value !== 'string') {

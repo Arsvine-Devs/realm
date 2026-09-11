@@ -21,7 +21,12 @@ describe('parseWebDetailParagraph', () => {
       { type: 'text', text: ' ' },
       { type: 'link', text: 'repo', href: 'https://github.com/test/repo', variant: 'github' },
       { type: 'text', text: ' ' },
-      { type: 'link', text: 'video', href: 'https://www.bilibili.com/video/BV1xx', variant: 'bilibili' },
+      {
+        type: 'link',
+        text: 'video',
+        href: 'https://www.bilibili.com/video/BV1xx',
+        variant: 'bilibili',
+      },
     ]);
   });
 
@@ -42,10 +47,9 @@ describe('parseWebDetailParagraph', () => {
   });
 
   it('matches copyable tokens with literal escaping and preserves surrounding text', () => {
-    const segments = parseWebDetailParagraph(
-      'Token: foo.bar and done',
-      [{ pattern: 'foo.bar', label: 'copy me' }],
-    );
+    const segments = parseWebDetailParagraph('Token: foo.bar and done', [
+      { pattern: 'foo.bar', label: 'copy me' },
+    ]);
 
     expect(segments).toEqual([
       { type: 'text', text: 'Token: ' },

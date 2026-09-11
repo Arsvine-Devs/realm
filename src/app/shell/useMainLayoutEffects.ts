@@ -2,7 +2,10 @@ import { startTransition, useEffect, useState } from 'react';
 
 import { useLayoutAnchors } from '@/features/navigation/model/LayoutAnchorsContext';
 import { classifyRoutePathname } from '@/features/navigation/model/contentHashNavigation';
-import { setHudTypingOverlaySuppressed, setHudTypingRouteEnabled } from '@/shared/lib/hud-typing-visibility';
+import {
+  setHudTypingOverlaySuppressed,
+  setHudTypingRouteEnabled,
+} from '@/shared/lib/hud-typing-visibility';
 import { markCursorTargetsDirty } from '@/shared/lib/cursor-targets';
 
 export function useWebglReadyLatch(animationsComplete: boolean) {

@@ -25,7 +25,9 @@
   animation: fallbackBannerIn 0.45s cubic-bezier(0.25, 0.8, 0.25, 1);
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 0.24s ease, transform 0.24s ease;
+  transition:
+    opacity 0.24s ease,
+    transform 0.24s ease;
 }
 
 // fallback —— 缺译，使用现有的暖琥珀色警示风格（保留默认色作兜底）
@@ -63,7 +65,10 @@
   justify-content: center;
   cursor: pointer;
   opacity: 0.72;
-  transition: opacity 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 
   &:hover {
     opacity: 1;

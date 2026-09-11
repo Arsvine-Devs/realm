@@ -13,7 +13,10 @@ import VinylDeck from './music-player/VinylDeck';
 import type { MusicTrack } from '@/features/music/contracts/musicTrack';
 import { useNavigationRuntime } from '@/features/navigation/model/NavigationRuntime';
 
-const commonLabelFallbacks: Record<Locale, Record<'expandPlaylist' | 'collapsePlaylist', string>> = {
+const commonLabelFallbacks: Record<
+  Locale,
+  Record<'expandPlaylist' | 'collapsePlaylist', string>
+> = {
   'zh-CN': {
     expandPlaylist: '展开列表',
     collapsePlaylist: '收起列表',
@@ -89,7 +92,7 @@ const MusicPlayer = ({ powerLevel }: { powerLevel: number }) => {
         if (!response.ok) {
           throw new Error(`audio api ${response.status}`);
         }
-        const data = await response.json() as { items?: MusicTrack[] };
+        const data = (await response.json()) as { items?: MusicTrack[] };
         setPlaylist(Array.isArray(data.items) ? data.items : []);
       } catch (error) {
         if ((error as Error).name === 'AbortError') {
@@ -203,6 +206,17 @@ const MusicPlayer = ({ powerLevel }: { powerLevel: number }) => {
             return !value;
           });
         }}
+        /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- the handle contains block layout and is a composed HUD control. */
+        role="button"
+        tabIndex={0}
+        aria-expanded={isOpen}
+        aria-label={tMusicPlayer(isOpen ? 'closeTitle' : 'openTitle')}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            event.currentTarget.click();
+          }
+        }}
         data-cursor-magnetic
       >
         <div className={styles.handleBarsContainer}>
@@ -217,6 +231,8 @@ const MusicPlayer = ({ powerLevel }: { powerLevel: number }) => {
         )}
       </div>
 
+      {/* Music playback is non-verbal audio; captions are not applicable to this control. */}
+      {/* oxlint-disable-next-line jsx-a11y/media-has-caption -- this element plays instrumental music and has no spoken track. */}
       <audio
         ref={audioRef}
         preload={shouldPreloadMetadata ? 'metadata' : 'none'}

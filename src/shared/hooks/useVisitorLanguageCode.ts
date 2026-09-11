@@ -11,7 +11,8 @@ function normalizeLanguageCode(value: string): string | null {
     .map((part, index) => {
       if (index === 0) return part.toLowerCase();
       if (/^[A-Za-z]{2}$/.test(part) || /^[0-9]{3}$/.test(part)) return part.toUpperCase();
-      if (/^[A-Za-z]{4}$/.test(part)) return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+      if (/^[A-Za-z]{4}$/.test(part))
+        return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
       return part;
     })
     .join('-');

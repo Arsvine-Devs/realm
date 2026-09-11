@@ -23,7 +23,9 @@
   },
   "musicPlayer": {
     "playTitle": "播放",
-    "pauseTitle": "暫停"
+    "pauseTitle": "暫停",
+    "openTitle": "開啟音樂播放器",
+    "closeTitle": "關閉音樂播放器"
   },
   "nav": {
     "top": "Top",

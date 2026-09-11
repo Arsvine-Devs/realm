@@ -1,7 +1,4 @@
-export function listenForWebglContextLoss(
-  canvas: HTMLCanvasElement,
-  onContextLost: () => void,
-) {
+export function listenForWebglContextLoss(canvas: HTMLCanvasElement, onContextLost: () => void) {
   let reported = false;
 
   const handleContextLost = (event: Event) => {

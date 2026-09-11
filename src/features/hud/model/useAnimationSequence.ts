@@ -2,10 +2,7 @@ import { useState, useEffect, useCallback, useLayoutEffect } from 'react';
 import type { AnimationSequenceState, ColumnPhase } from '@/features/hud/contracts/state';
 import { useSafeTimeouts } from '../../../shared/hooks/useSafeTimeouts';
 import { useResponsive } from '@/shared/hooks/useMediaQuery';
-import {
-  completeInitialBootSequence,
-  isInitialBootSequencePending,
-} from './homeLoadingSession';
+import { completeInitialBootSequence, isInitialBootSequencePending } from './homeLoadingSession';
 
 export default function useAnimationSequence(): AnimationSequenceState {
   const [initialBootPending] = useState(isInitialBootSequencePending);
@@ -40,21 +37,43 @@ export default function useAnimationSequence(): AnimationSequenceState {
     const isMobile = hookIsMobile;
 
     if (isMobile) {
-      safeTimers.setTimeout(() => { setLeftPanelAnimated(true); }, 100);
-      safeTimers.setTimeout(() => { setLeversVisible(true); }, 300);
-      safeTimers.setTimeout(() => { setLinesAnimated(true); }, 200);
-      safeTimers.setTimeout(() => { setHudVisible(true); }, 400);
-      safeTimers.setTimeout(() => { setTextVisible(true); }, 500);
-      safeTimers.setTimeout(() => { setAnimationsComplete(true); }, 1200);
+      safeTimers.setTimeout(() => {
+        setLeftPanelAnimated(true);
+      }, 100);
+      safeTimers.setTimeout(() => {
+        setLeversVisible(true);
+      }, 300);
+      safeTimers.setTimeout(() => {
+        setLinesAnimated(true);
+      }, 200);
+      safeTimers.setTimeout(() => {
+        setHudVisible(true);
+      }, 400);
+      safeTimers.setTimeout(() => {
+        setTextVisible(true);
+      }, 500);
+      safeTimers.setTimeout(() => {
+        setAnimationsComplete(true);
+      }, 1200);
     } else {
       safeTimers.setTimeout(() => {
         setLeftPanelAnimated(true);
-        safeTimers.setTimeout(() => { setLeversVisible(true); }, 800);
+        safeTimers.setTimeout(() => {
+          setLeversVisible(true);
+        }, 800);
       }, 200);
-      safeTimers.setTimeout(() => { setLinesAnimated(true); }, 1000);
-      safeTimers.setTimeout(() => { setHudVisible(true); }, 2200);
-      safeTimers.setTimeout(() => { setTextVisible(true); }, 2500);
-      safeTimers.setTimeout(() => { setAnimationsComplete(true); }, 4200);
+      safeTimers.setTimeout(() => {
+        setLinesAnimated(true);
+      }, 1000);
+      safeTimers.setTimeout(() => {
+        setHudVisible(true);
+      }, 2200);
+      safeTimers.setTimeout(() => {
+        setTextVisible(true);
+      }, 2500);
+      safeTimers.setTimeout(() => {
+        setAnimationsComplete(true);
+      }, 4200);
     }
   };
 
@@ -64,36 +83,42 @@ export default function useAnimationSequence(): AnimationSequenceState {
 
     const staggerDelay = 200;
     const animationDuration = 2000;
-    const pulseIntervalId = safeTimers.setInterval(() => {
-      setPulsingNormalIndices(null);
-      setPulsingReverseIndices(null);
-
-      const indices: number[] = [];
-      while (indices.length < 3) {
-        const randomIndex = Math.floor(Math.random() * 6);
-        if (!indices.includes(randomIndex)) {
-          indices.push(randomIndex);
-        }
-      }
-
-      safeTimers.setTimeout(() => {
-        setPulsingNormalIndices([indices[0]]);
-        setPulsingReverseIndices(null);
-      }, 0);
-
-      safeTimers.setTimeout(() => {
-        setPulsingNormalIndices(prev => (prev ? [...prev, indices[1]] : [indices[1]]));
-      }, staggerDelay);
-
-      safeTimers.setTimeout(() => {
-        setPulsingReverseIndices([indices[2]]);
-      }, staggerDelay * 2);
-
-      safeTimers.setTimeout(() => {
+    const pulseIntervalId = safeTimers.setInterval(
+      () => {
         setPulsingNormalIndices(null);
         setPulsingReverseIndices(null);
-      }, staggerDelay * 2 + animationDuration);
-    }, 2000 + staggerDelay * 2);
+
+        const indices: number[] = [];
+        while (indices.length < 3) {
+          const randomIndex = Math.floor(Math.random() * 6);
+          if (!indices.includes(randomIndex)) {
+            indices.push(randomIndex);
+          }
+        }
+
+        safeTimers.setTimeout(() => {
+          setPulsingNormalIndices([indices[0]]);
+          setPulsingReverseIndices(null);
+        }, 0);
+
+        safeTimers.setTimeout(() => {
+          setPulsingNormalIndices((prev) => (prev ? [...prev, indices[1]] : [indices[1]]));
+        }, staggerDelay);
+
+        safeTimers.setTimeout(() => {
+          setPulsingReverseIndices([indices[2]]);
+        }, staggerDelay * 2);
+
+        safeTimers.setTimeout(
+          () => {
+            setPulsingNormalIndices(null);
+            setPulsingReverseIndices(null);
+          },
+          staggerDelay * 2 + animationDuration,
+        );
+      },
+      2000 + staggerDelay * 2,
+    );
     // safeTimers 引用稳定，不放进依赖；只依赖 animationsComplete
 
     return () => {
@@ -101,31 +126,37 @@ export default function useAnimationSequence(): AnimationSequenceState {
     };
   }, [animationsComplete, safeTimers]);
 
-  const retractColumns = useCallback((onComplete: () => void) => {
-    setAnimationsComplete(false);
-    setPulsingNormalIndices(null);
-    setPulsingReverseIndices(null);
-    setColumnPhase('retracting');
+  const retractColumns = useCallback(
+    (onComplete: () => void) => {
+      setAnimationsComplete(false);
+      setPulsingNormalIndices(null);
+      setPulsingReverseIndices(null);
+      setColumnPhase('retracting');
 
-    safeTimers.setTimeout(() => {
-      setLinesAnimated(false);
-      setColumnPhase('idle');
-      onComplete();
-    }, 450);
-  }, [safeTimers]);
+      safeTimers.setTimeout(() => {
+        setLinesAnimated(false);
+        setColumnPhase('idle');
+        onComplete();
+      }, 450);
+    },
+    [safeTimers],
+  );
 
-  const expandColumns = useCallback((onComplete?: () => void) => {
-    setColumnPhase('expanding');
+  const expandColumns = useCallback(
+    (onComplete?: () => void) => {
+      setColumnPhase('expanding');
 
-    safeTimers.setTimeout(() => setLinesAnimated(true), 30);
-    safeTimers.setTimeout(() => setHudVisible(true), 250);
-    safeTimers.setTimeout(() => setTextVisible(true), 300);
-    safeTimers.setTimeout(() => {
-      setAnimationsComplete(true);
-      setColumnPhase('idle');
-      onComplete?.();
-    }, 800);
-  }, [safeTimers]);
+      safeTimers.setTimeout(() => setLinesAnimated(true), 30);
+      safeTimers.setTimeout(() => setHudVisible(true), 250);
+      safeTimers.setTimeout(() => setTextVisible(true), 300);
+      safeTimers.setTimeout(() => {
+        setAnimationsComplete(true);
+        setColumnPhase('idle');
+        onComplete?.();
+      }, 800);
+    },
+    [safeTimers],
+  );
 
   return {
     isLoading,

@@ -240,10 +240,12 @@
   }
 }
 
-
 // ===== 抽屉背景遮罩 =====
 .drawerBackdrop {
   display: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
 
   @include breakpoints.tablet-down {
     display: block;
@@ -282,7 +284,9 @@
     flex-direction: column;
     gap: 5px;
     cursor: none;
-    transition: background-color 0.3s, border-color 0.3s;
+    transition:
+      background-color 0.3s,
+      border-color 0.3s;
 
     &:hover,
     &:active {
@@ -295,7 +299,9 @@
       width: 20px;
       height: 1.5px;
       background-color: var(--ark-primary);
-      transition: transform 0.3s, opacity 0.3s;
+      transition:
+        transform 0.3s,
+        opacity 0.3s;
     }
 
     &.hamburgerOpen {
@@ -313,4 +319,3 @@
     }
   }
 }
-

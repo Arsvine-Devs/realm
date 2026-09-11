@@ -13,13 +13,12 @@ import {
 } from './blogPostState';
 import {
   blogContentLocaleLabels,
-  buildBlogPostHref,
   getRequestedContentLocaleFromPath,
   resolveDefaultContentLocale,
   type BlogVariantPayload,
 } from './blogClient';
 
-export { blogContentLocaleLabels, buildBlogPostHref };
+export { blogContentLocaleLabels };
 export type { BlogVariantPayload, BlogPostViewState };
 
 interface UseBlogPostStateOptions {
@@ -77,33 +76,37 @@ export default function useBlogPostState({
     () => resolveDefaultContentLocale(locale, availableContentLocales, actualContentLocale),
     [actualContentLocale, availableContentLocales, locale],
   );
-  const requestedContentLocale = getRequestedContentLocaleFromPath(routerAsPath) ?? defaultContentLocale;
+  const requestedContentLocale =
+    getRequestedContentLocaleFromPath(routerAsPath) ?? defaultContentLocale;
   const requiresAuth = isProtected && access.mode !== 'public';
-  const baseVariant = useMemo(
-    () => (mdxSource ? { meta, mdxSource } : null),
-    [mdxSource, meta],
+  const baseVariant = useMemo(() => (mdxSource ? { meta, mdxSource } : null), [mdxSource, meta]);
+  const variants = useMemo(
+    () => ({
+      ...contentVariants,
+      ...(baseVariant ? { [actualContentLocale]: baseVariant } : {}),
+    }),
+    [actualContentLocale, baseVariant, contentVariants],
   );
-  const variants = useMemo(() => ({
-    ...contentVariants,
-    ...(baseVariant ? { [actualContentLocale]: baseVariant } : {}),
-  }), [actualContentLocale, baseVariant, contentVariants]);
-  const articleInput = useMemo<BlogPostArticleInput>(() => ({
-    slug: meta.slug,
-    requestedContentLocale,
-    actualContentLocale,
-    requiresAuth,
-    accessGroup: access.group,
-    hydrationReady,
-    variants,
-  }), [
-    access.group,
-    actualContentLocale,
-    hydrationReady,
-    meta.slug,
-    requestedContentLocale,
-    requiresAuth,
-    variants,
-  ]);
+  const articleInput = useMemo<BlogPostArticleInput>(
+    () => ({
+      slug: meta.slug,
+      requestedContentLocale,
+      actualContentLocale,
+      requiresAuth,
+      accessGroup: access.group,
+      hydrationReady,
+      variants,
+    }),
+    [
+      access.group,
+      actualContentLocale,
+      hydrationReady,
+      meta.slug,
+      requestedContentLocale,
+      requiresAuth,
+      variants,
+    ],
+  );
 
   const [snapshot, send] = useActor(blogPostMachine, { input: articleInput });
 
@@ -117,10 +120,13 @@ export default function useBlogPostState({
     send({ type: 'ARTICLE_CHANGED', ...articleInput });
   }, [articleInput, send]);
 
-  const updateContentLocaleQuery = useCallback((nextContentLocale: BlogContentLocale) => {
-    writeContentLocaleQuery(nextContentLocale);
-    send({ type: 'SELECT_LOCALE', locale: nextContentLocale });
-  }, [send]);
+  const updateContentLocaleQuery = useCallback(
+    (nextContentLocale: BlogContentLocale) => {
+      writeContentLocaleQuery(nextContentLocale);
+      send({ type: 'SELECT_LOCALE', locale: nextContentLocale });
+    },
+    [send],
+  );
   const markAuthGranted = useCallback(() => send({ type: 'AUTH_GRANTED' }), [send]);
   const retryRequestedContentLocale = useCallback(() => send({ type: 'RETRY' }), [send]);
 
@@ -133,9 +139,9 @@ export default function useBlogPostState({
     actualContentLocale,
   });
   const effectiveStatus: TranslationStatus = suppressFallbackBanner ? 'source' : translationStatus;
-  const effectiveOriginLocale: Locale = ((selectedVariant?.meta.originLocale)
-    ?? meta.originLocale
-    ?? actualLocale) as Locale;
+  const effectiveOriginLocale: Locale = (selectedVariant?.meta.originLocale ??
+    meta.originLocale ??
+    actualLocale) as Locale;
 
   return {
     defaultContentLocale,

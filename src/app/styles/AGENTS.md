@@ -20,12 +20,12 @@ styles/
 
 ## 字体变量（`globals.scss`）
 
-| 变量 | 字体 | 用途 |
-|---|---|---|
-| `--font-display` | `ZELDA Free` | 装饰性英文 HUD 标题。**仅基础拉丁，无 CJK/无完整带音标拉丁** —— 不要用在博客标题、用户内容、需要国际化的位置 |
-| `--font-hud` | `Dosis` | HUD 数字/标签/博客标题等通用无衬线。Variable Font，wght 200–800 |
-| `--font-reading` | `Noto Serif SC` 栈 | MDX 博客正文。Variable Font，wght 200–900 |
-| `--font-typewriter` | Courier 栈 | 等宽 / 打字机 |
+| 变量                | 字体               | 用途                                                                                                         |
+| ------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `--font-display`    | `ZELDA Free`       | 装饰性英文 HUD 标题。**仅基础拉丁，无 CJK/无完整带音标拉丁** —— 不要用在博客标题、用户内容、需要国际化的位置 |
+| `--font-hud`        | `Dosis`            | HUD 数字/标签/博客标题等通用无衬线。Variable Font，wght 200–800                                              |
+| `--font-reading`    | `Noto Serif SC` 栈 | MDX 博客正文。Variable Font，wght 200–900                                                                    |
+| `--font-typewriter` | Courier 栈         | 等宽 / 打字机                                                                                                |
 
 > 历史教训：博客标题原本用 `--font-display`，法语 `é à ñ` 直接成方块。新增任何接收任意语言内容的标题/正文，**绝对不要**用 `--font-display`。
 

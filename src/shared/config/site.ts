@@ -1,9 +1,4 @@
-import type {
-  SiteAssets,
-  SiteFonts,
-  SiteLocale,
-  SitePages,
-} from '@/shared/types';
+import type { SiteAssets, SiteFonts, SiteLocale, SitePages } from '@/shared/types';
 
 /**
  * 站点集中配置 — 所有"我的"信息的单一信息源。
@@ -70,7 +65,8 @@ export const siteConfig: SiteConfig = {
   url: 'https://arsvine.com',
   copyrightYearStart: 2026,
   metaTitle: 'ARSVINE REALM',
-  metaDescription: 'Personal portfolio and blog - Exploring the realms of technology, creativity, and life.',
+  metaDescription:
+    'Personal portfolio and blog - Exploring the realms of technology, creativity, and life.',
   rssDescription: 'Personal blog - Exploring the realms of technology, creativity, and life.',
   tagline: {
     en: 'Я бы хотела жить с Вами в маленьком городе, Где вечные сумерки и вечные колокола.',
@@ -91,9 +87,7 @@ export const siteConfig: SiteConfig = {
     // 自有 CDN preconnect。所有访客都走 cdn.arsvine.com（腾讯云 COS 香港桶）：
     //   - 国内：Google Fonts 基本不可达，CDN 是唯一可行选项
     //   - 国外：HK COS 多 80-150ms 延迟，但保持单一字体源更简单可靠
-    cdnPreconnect: [
-      { href: 'https://cdn.arsvine.com', crossOrigin: 'anonymous' },
-    ],
+    cdnPreconnect: [{ href: 'https://cdn.arsvine.com', crossOrigin: 'anonymous' }],
     // 真理之源：所有字体 family + 权重都在这一行配置。
     // - Dosis: 300/400/500 (HUD UI 文字主力)
     // - Noto Sans SC: 300/400/500/700 (中文正文 + 部分粗体)

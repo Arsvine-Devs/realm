@@ -12,8 +12,13 @@ const MAX_DIMENSION = 30000;
 const MAX_OUTPUT_DIMENSION = 9999;
 const MAX_TOTAL_PIXELS = 250_000_000;
 const SITE_ASSET_KEYS = new Set([
-  'site/about-qr', 'site/travelling', 'decor/contour-map', 'decor/portfolio-title',
-  'decor/experience-title', 'decor/life-title', 'decor/texture-noise',
+  'site/about-qr',
+  'site/travelling',
+  'decor/contour-map',
+  'decor/portfolio-title',
+  'decor/experience-title',
+  'decor/life-title',
+  'decor/texture-noise',
 ]);
 
 function parseArgs(argv) {
@@ -40,7 +45,10 @@ function parseArgs(argv) {
 }
 
 function timestampVersion() {
-  return new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+  return new Date()
+    .toISOString()
+    .replace(/[-:]/g, '')
+    .replace(/\.\d{3}Z$/, 'Z');
 }
 
 function toPosix(value) {
@@ -61,7 +69,7 @@ async function walkFiles(root) {
   for (const entry of entries) {
     const fullPath = path.join(root, entry.name);
     if (entry.isDirectory()) {
-      files.push(...await walkFiles(fullPath));
+      files.push(...(await walkFiles(fullPath)));
       continue;
     }
     if (entry.isFile()) {
@@ -125,7 +133,8 @@ async function processImageFile(filePath, relativePath, outRoot, manifestEntries
   if (exceedsTotalPixels) warnings.push('Source image exceeds 250M total pixel limit');
   if (exceedsGifFrames) warnings.push('GIF frame count exceeds 300 frame guideline');
 
-  const needsResize = exceedsInputBytes || exceedsDimensions || exceedsTotalPixels || exceedsGifFrames;
+  const needsResize =
+    exceedsInputBytes || exceedsDimensions || exceedsTotalPixels || exceedsGifFrames;
   if (needsResize) {
     const constrained = calculateConstrainedSize(width, height);
     outputBuffer = await sharp(inputBuffer, { animated: true })
@@ -286,13 +295,23 @@ async function main() {
   for (const filePath of publicFiles) {
     const relativePath = toPosix(path.relative(publicRoot, filePath));
     if (relativePath.startsWith('realm/images/')) {
-      const imageResult = await processImageFile(filePath, relativePath, distPublicRoot, manifestEntries);
+      const imageResult = await processImageFile(
+        filePath,
+        relativePath,
+        distPublicRoot,
+        manifestEntries,
+      );
       assetMap.set(imageResult.sourceKey, imageResult);
       continue;
     }
 
     if (relativePath.startsWith('realm/audio/')) {
-      const audioResult = await processAudioFile(filePath, relativePath, distPublicRoot, manifestEntries);
+      const audioResult = await processAudioFile(
+        filePath,
+        relativePath,
+        distPublicRoot,
+        manifestEntries,
+      );
       assetMap.set(audioResult.sourceKey, audioResult);
       continue;
     }
@@ -309,10 +328,18 @@ async function main() {
     transformedSections[sectionName] = replaceSourceFields(loadedSection, assetMap, seenIds);
   }
   const legacyAssetsPath = path.join(metaRoot, 'legacy-asset-sources.json');
-  if (await stat(legacyAssetsPath).then(() => true).catch(() => false)) {
+  if (
+    await stat(legacyAssetsPath)
+      .then(() => true)
+      .catch(() => false)
+  ) {
     const legacySources = await loadMetaSection(metaRoot, 'legacy-asset-sources');
     transformedSections['static-assets'] = replaceSourceFields(
-      { assets: Object.fromEntries(Object.entries(legacySources).map(([key, source]) => [key, { source }])) },
+      {
+        assets: Object.fromEntries(
+          Object.entries(legacySources).map(([key, source]) => [key, { source }]),
+        ),
+      },
       assetMap,
       seenIds,
     );
@@ -339,12 +366,15 @@ async function main() {
   const publicSiteAssets = Object.fromEntries(
     Object.entries(staticAssets)
       .filter(([key]) => SITE_ASSET_KEYS.has(key))
-      .map(([key, record]) => [key, {
-        objectKey: record.objectKey,
-        ...(record.alt ? { alt: record.alt } : {}),
-        ...(record.width ? { width: record.width } : {}),
-        ...(record.height ? { height: record.height } : {}),
-      }]),
+      .map(([key, record]) => [
+        key,
+        {
+          objectKey: record.objectKey,
+          ...(record.alt ? { alt: record.alt } : {}),
+          ...(record.width ? { width: record.width } : {}),
+          ...(record.height ? { height: record.height } : {}),
+        },
+      ]),
   );
   const publicSiteCatalogRoot = path.join(distPublicRoot, 'realm', 'site-catalog');
   const publicSiteVersionRoot = path.join(publicSiteCatalogRoot, 'versions', version);
@@ -361,12 +391,16 @@ async function main() {
   await mkdir(distManifestRoot, { recursive: true });
   await writeFile(
     path.join(distManifestRoot, 'manifest.generated.json'),
-    JSON.stringify({
-      generatedAt: new Date().toISOString(),
-      workspaceRoot: toPosix(path.relative(process.cwd(), workspaceRoot)),
-      version,
-      assets: manifestEntries,
-    }, null, 2),
+    JSON.stringify(
+      {
+        generatedAt: new Date().toISOString(),
+        workspaceRoot: toPosix(path.relative(process.cwd(), workspaceRoot)),
+        version,
+        assets: manifestEntries,
+      },
+      null,
+      2,
+    ),
   );
 
   console.log(`[assets] version=${version}`);

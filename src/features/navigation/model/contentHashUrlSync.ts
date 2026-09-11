@@ -1,11 +1,4 @@
-export const contentSectionHashes = [
-  'works',
-  'experience',
-  'blog',
-  'life',
-  'contact',
-  'about',
-] as const;
+const contentSectionHashes = ['works', 'experience', 'blog', 'life', 'contact', 'about'] as const;
 
 export type ContentSectionHash = (typeof contentSectionHashes)[number];
 

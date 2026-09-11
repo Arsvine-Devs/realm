@@ -12,6 +12,8 @@ const READ_TOKEN = process.env.GITHUB_READ_TOKEN?.trim();
 // 不设超时 + GitHub 5xx/限流会直接拉满整页 → 504。
 const FETCH_TIMEOUT_MS = 8000;
 const GITHUB_CONTENTS_API_BASE_URL = new URL('https://api.github.com');
+// Control characters are rejected at the untrusted repo-path boundary.
+// oxlint-disable-next-line eslint/no-control-regex -- matching C0 controls is the security contract here.
 const CONTROL_CHAR_RE = /[\u0000-\u001F\u007F]/;
 const PROTOCOL_PREFIX_RE = /^[A-Za-z][A-Za-z\d+.-]*:/;
 
@@ -28,28 +30,41 @@ function isStringArray(value: unknown): value is string[] {
 }
 
 function isContentBlogIndex(value: unknown): value is ContentBlogIndex {
-  if (!isRecord(value) || typeof value.version !== 'number' || typeof value.updatedAt !== 'string' || !Array.isArray(value.posts)) {
+  if (
+    !isRecord(value) ||
+    typeof value.version !== 'number' ||
+    typeof value.updatedAt !== 'string' ||
+    !Array.isArray(value.posts)
+  ) {
     return false;
   }
 
   return value.posts.every((post) => {
-    if (!isRecord(post) || typeof post.slug !== 'string' || typeof post.date !== 'string'
-      || typeof post.updatedAt !== 'string' || !isStringArray(post.tags)
-      || typeof post.pinned !== 'boolean' || !isStringArray(post.availableLocales)
-      || !isRecord(post.access) || !isRecord(post.variants)) {
+    if (
+      !isRecord(post) ||
+      typeof post.slug !== 'string' ||
+      typeof post.date !== 'string' ||
+      typeof post.updatedAt !== 'string' ||
+      !isStringArray(post.tags) ||
+      typeof post.pinned !== 'boolean' ||
+      !isStringArray(post.availableLocales) ||
+      !isRecord(post.access) ||
+      !isRecord(post.variants)
+    ) {
       return false;
     }
     if (post.access.mode !== 'public' && post.access.mode !== 'totp') return false;
     if (post.access.mode === 'totp' && typeof post.access.group !== 'string') return false;
 
-    return Object.values(post.variants).every((variant) => (
-      isRecord(variant)
-      && typeof variant.title === 'string'
-      && typeof variant.excerpt === 'string'
-      && (variant.tags === undefined || isStringArray(variant.tags))
-      && (variant.originLocale === undefined || typeof variant.originLocale === 'string')
-      && (variant.readingMinutes === undefined || typeof variant.readingMinutes === 'number')
-    ));
+    return Object.values(post.variants).every(
+      (variant) =>
+        isRecord(variant) &&
+        typeof variant.title === 'string' &&
+        typeof variant.excerpt === 'string' &&
+        (variant.tags === undefined || isStringArray(variant.tags)) &&
+        (variant.originLocale === undefined || typeof variant.originLocale === 'string') &&
+        (variant.readingMinutes === undefined || typeof variant.readingMinutes === 'number'),
+    );
   });
 }
 
@@ -74,13 +89,13 @@ export function normalizeContentPath(path: string) {
   }
 
   if (
-    trimmed.startsWith('/')
-    || trimmed.startsWith('\\')
-    || trimmed.startsWith('//')
-    || trimmed.includes('\\')
-    || trimmed.includes('?')
-    || trimmed.includes('#')
-    || PROTOCOL_PREFIX_RE.test(trimmed)
+    trimmed.startsWith('/') ||
+    trimmed.startsWith('\\') ||
+    trimmed.startsWith('//') ||
+    trimmed.includes('\\') ||
+    trimmed.includes('?') ||
+    trimmed.includes('#') ||
+    PROTOCOL_PREFIX_RE.test(trimmed)
   ) {
     throw new Error('Invalid content path.');
   }
@@ -98,13 +113,13 @@ export function normalizeContentPath(path: string) {
     }
 
     if (
-      decodedSegment === '.'
-      || decodedSegment === '..'
-      || decodedSegment.includes('/')
-      || decodedSegment.includes('\\')
-      || decodedSegment.includes('?')
-      || decodedSegment.includes('#')
-      || CONTROL_CHAR_RE.test(decodedSegment)
+      decodedSegment === '.' ||
+      decodedSegment === '..' ||
+      decodedSegment.includes('/') ||
+      decodedSegment.includes('\\') ||
+      decodedSegment.includes('?') ||
+      decodedSegment.includes('#') ||
+      CONTROL_CHAR_RE.test(decodedSegment)
     ) {
       throw new Error('Invalid content path.');
     }
@@ -164,7 +179,9 @@ async function getBundledFallbackBlogIndex(): Promise<ContentBlogIndex> {
     const parsed = matter(raw);
     const title = typeof parsed.data.title === 'string' ? parsed.data.title.trim() : '初次见面';
     const excerpt = typeof parsed.data.excerpt === 'string' ? parsed.data.excerpt.trim() : '';
-    const tags = Array.isArray(parsed.data.tags) ? parsed.data.tags.filter((tag) => typeof tag === 'string') : [];
+    const tags = Array.isArray(parsed.data.tags)
+      ? parsed.data.tags.filter((tag) => typeof tag === 'string')
+      : [];
     const date = typeof parsed.data.date === 'string' ? parsed.data.date : baseDate;
 
     variants[locale] = { title, excerpt, tags };

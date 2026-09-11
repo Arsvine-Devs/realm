@@ -16,7 +16,11 @@ import {
 
 function StateHarness() {
   const [tab, setTab] = useLocaleStableState('tab', 'web');
-  return <button type="button" onClick={() => setTab('game')}>{tab}</button>;
+  return (
+    <button type="button" onClick={() => setTab('game')}>
+      {tab}
+    </button>
+  );
 }
 
 describe('locale page state', () => {

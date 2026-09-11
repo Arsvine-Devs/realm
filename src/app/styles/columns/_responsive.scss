@@ -172,7 +172,9 @@
   .column:active:not(.nonInteractive) {
     border-left: 2px solid rgba(var(--ark-highlight-green-rgb), 0.6);
     background: rgba(var(--ark-highlight-green-rgb), 0.06);
-    transition: border-left 0.05s ease, background 0.05s ease;
+    transition:
+      border-left 0.05s ease,
+      background 0.05s ease;
 
     .verticalText .charItem > div {
       transform: scale(1.05);

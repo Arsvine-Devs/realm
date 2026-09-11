@@ -19,6 +19,8 @@ export const blogContentLocaleLabels: Record<BlogContentLocale, string> = {
   fr: 'Français',
 };
 
+// Control characters are rejected before remote content paths are constructed.
+// oxlint-disable-next-line eslint/no-control-regex -- matching C0 controls is the security contract here.
 const CONTROL_CHAR_RE = /[\u0000-\u001F\u007F]/;
 const PROTOCOL_PREFIX_RE = /^[A-Za-z][A-Za-z\d+.-]*:/;
 
@@ -70,34 +72,30 @@ export function isSafeBlogSlugSegment(value: unknown): value is string {
   }
 
   return (
-    value.length > 0
-    && !CONTROL_CHAR_RE.test(value)
-    && !value.startsWith('/')
-    && !value.startsWith('\\')
-    && !value.startsWith('//')
-    && !PROTOCOL_PREFIX_RE.test(value)
-    && !value.includes('/')
-    && !value.includes('\\')
-    && !value.includes('?')
-    && !value.includes('#')
-    && !value.includes('..')
-    && decodedValue.length > 0
-    && decodedValue !== '.'
-    && decodedValue !== '..'
-    && !CONTROL_CHAR_RE.test(decodedValue)
-    && !decodedValue.includes('/')
-    && !decodedValue.includes('\\')
-    && !decodedValue.includes('?')
-    && !decodedValue.includes('#')
-    && !decodedValue.includes('..')
+    value.length > 0 &&
+    !CONTROL_CHAR_RE.test(value) &&
+    !value.startsWith('/') &&
+    !value.startsWith('\\') &&
+    !value.startsWith('//') &&
+    !PROTOCOL_PREFIX_RE.test(value) &&
+    !value.includes('/') &&
+    !value.includes('\\') &&
+    !value.includes('?') &&
+    !value.includes('#') &&
+    !value.includes('..') &&
+    decodedValue.length > 0 &&
+    decodedValue !== '.' &&
+    decodedValue !== '..' &&
+    !CONTROL_CHAR_RE.test(decodedValue) &&
+    !decodedValue.includes('/') &&
+    !decodedValue.includes('\\') &&
+    !decodedValue.includes('?') &&
+    !decodedValue.includes('#') &&
+    !decodedValue.includes('..')
   );
 }
 
-export function buildBlogPostHref(
-  locale: Locale,
-  slug: string,
-  contentLocale: BlogContentLocale,
-) {
+export function buildBlogPostHref(locale: Locale, slug: string, contentLocale: BlogContentLocale) {
   const safeLocale = isLocale(locale) ? locale : defaultLocale;
   const safeContentLocale = isBlogContentLocale(contentLocale) ? contentLocale : safeLocale;
   if (!isSafeBlogSlugSegment(slug)) {

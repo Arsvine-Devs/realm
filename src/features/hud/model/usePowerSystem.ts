@@ -35,8 +35,9 @@ function readPersistedPowerState() {
   }
 
   try {
-    const raw = window.sessionStorage.getItem(POWER_SYSTEM_STORAGE_KEY)
-      ?? window.localStorage.getItem(POWER_SYSTEM_STORAGE_KEY);
+    const raw =
+      window.sessionStorage.getItem(POWER_SYSTEM_STORAGE_KEY) ??
+      window.localStorage.getItem(POWER_SYSTEM_STORAGE_KEY);
     if (!raw) return null;
 
     const parsed = JSON.parse(raw);
@@ -123,12 +124,15 @@ export default function usePowerSystem(mainVisible: boolean): PowerSystemState {
     document.documentElement.setAttribute('data-theme-mode', themeMode);
   }, [isInverted]);
 
-  useEffect(() => () => {
-    if (persistTimeoutRef.current !== null) {
-      window.clearTimeout(persistTimeoutRef.current);
-    }
-    persistPowerState(latestPersistedStateRef.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (persistTimeoutRef.current !== null) {
+        window.clearTimeout(persistTimeoutRef.current);
+      }
+      persistPowerState(latestPersistedStateRef.current);
+    },
+    [],
+  );
 
   const stopDischarge = useCallback(() => {
     if (dischargeIntervalRef.current) {
@@ -146,7 +150,7 @@ export default function usePowerSystem(mainVisible: boolean): PowerSystemState {
     if (!mainVisible) return;
 
     const intervalId = setInterval(() => {
-      setPowerLevel(prevLevel => {
+      setPowerLevel((prevLevel) => {
         if (!isDischarging && prevLevel < 100) {
           const decrease = Math.floor(Math.random() * 3) + 1;
           return Math.max(0, prevLevel - decrease);
@@ -163,7 +167,7 @@ export default function usePowerSystem(mainVisible: boolean): PowerSystemState {
     if (isDischargingRef.current) {
       stopDischarge();
     }
-    setPowerLevel(prevLevel => {
+    setPowerLevel((prevLevel) => {
       if (prevLevel >= 100) return 100;
       const newLevel = Math.min(100, prevLevel + CHARGE_STEP);
       return newLevel;
@@ -185,7 +189,7 @@ export default function usePowerSystem(mainVisible: boolean): PowerSystemState {
         clearInterval(dischargeIntervalRef.current);
       }
       dischargeIntervalRef.current = setInterval(() => {
-        setPowerLevel(prevLevel => {
+        setPowerLevel((prevLevel) => {
           const nextLevel = Math.max(0, prevLevel - DISCHARGE_STEP);
           if (nextLevel === 0) {
             stopDischarge();

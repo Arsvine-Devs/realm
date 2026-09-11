@@ -11,10 +11,13 @@ export default async function handler(request: Request) {
     60_000,
   );
   if (!limiter.ok) {
-    return jsonResponse({ message: 'Too many requests' }, {
-      status: 429,
-      headers: { 'Retry-After': String(Math.ceil(limiter.retryAfterMs / 1000)) },
-    });
+    return jsonResponse(
+      { message: 'Too many requests' },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(Math.ceil(limiter.retryAfterMs / 1000)) },
+      },
+    );
   }
 
   const auth = await authenticateRevalidation(request, { allowQuerySecret: true });

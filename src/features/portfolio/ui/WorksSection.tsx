@@ -40,10 +40,18 @@ function WorksSection({
   skillCategories,
 }: WorksSectionProps) {
   const { isInverted } = useHudPower();
-  const [earlyExpanded, setEarlyExpanded] = useLocaleStableState('content.works.early-expanded', false);
-  const [skillsExpanded, setSkillsExpanded] = useLocaleStableState('content.works.skills-expanded', false);
+  const [earlyExpanded, setEarlyExpanded] = useLocaleStableState(
+    'content.works.early-expanded',
+    false,
+  );
+  const [skillsExpanded, setSkillsExpanded] = useLocaleStableState(
+    'content.works.skills-expanded',
+    false,
+  );
   const [displayedWorkTab, setDisplayedWorkTab] = useState(activeWorkTab);
-  const [tabTransitionStage, setTabTransitionStage] = useState<'idle' | 'fadeOut' | 'fadeIn'>('idle');
+  const [tabTransitionStage, setTabTransitionStage] = useState<'idle' | 'fadeOut' | 'fadeIn'>(
+    'idle',
+  );
   const safeTimers = useSafeTimeouts();
   const t = useTranslations('sections.works');
   const activeProjects = displayedWorkTab === 'web' ? webProjects : gameProjects;
@@ -71,7 +79,11 @@ function WorksSection({
   }, [activeWorkTab, displayedWorkTab, safeTimers]);
 
   return (
-    <div id="works-section" ref={worksSectionRef} className={`${styles.contentSection} ${styles.worksSection}`}>
+    <div
+      id="works-section"
+      ref={worksSectionRef}
+      className={`${styles.contentSection} ${styles.worksSection}`}
+    >
       <h2 className={styles.worksTitleWithBackground}>PORTFOLIO</h2>
       <div className={styles.workTabButtons}>
         <button
@@ -99,7 +111,7 @@ function WorksSection({
           }`}
         >
           <div className={styles.projectGrid}>
-            {activeProjects.map(project => (
+            {activeProjects.map((project) => (
               <ProjectCard
                 key={project.id}
                 project={project}
@@ -117,7 +129,7 @@ function WorksSection({
         <div className={styles.earlySection}>
           <button
             className={`${styles.earlySectionToggle} ${earlyExpanded ? styles.expanded : ''}`}
-            onClick={() => setEarlyExpanded(prev => !prev)}
+            onClick={() => setEarlyExpanded((prev) => !prev)}
           >
             <span className={styles.earlySectionToggleIcon}>{earlyExpanded ? '▾' : '▸'}</span>
             <span>{t('earlyWorks')}</span>
@@ -125,7 +137,7 @@ function WorksSection({
           </button>
           <div className={`${styles.earlySectionContent} ${earlyExpanded ? styles.expanded : ''}`}>
             <div className={styles.projectGrid}>
-              {earlyProjects.map(project => (
+              {earlyProjects.map((project) => (
                 <ProjectCard
                   key={project.id}
                   project={project}
@@ -142,7 +154,7 @@ function WorksSection({
       <div className={styles.earlySection}>
         <button
           className={`${styles.earlySectionToggle} ${skillsExpanded ? styles.expanded : ''}`}
-          onClick={() => setSkillsExpanded(prev => !prev)}
+          onClick={() => setSkillsExpanded((prev) => !prev)}
         >
           <span className={styles.earlySectionToggleIcon}>{skillsExpanded ? '▾' : '▸'}</span>
           <span>{t('skillsProficiency')}</span>

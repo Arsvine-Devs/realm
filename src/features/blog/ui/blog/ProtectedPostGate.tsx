@@ -50,67 +50,74 @@ export default function ProtectedPostGate({
     return () => clearTimeout(timer);
   }, []);
 
-  const submitToken = useCallback(async (nextToken: string) => {
-    if (submitting || nextToken.length !== 6 || lastSubmittedTokenRef.current === nextToken) {
-      return;
-    }
-
-    lastSubmittedTokenRef.current = nextToken;
-    setSubmitting(true);
-    setError('');
-
-    try {
-      const response = await fetch('/api/protected-verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          group,
-          token: nextToken,
-          next: buildBlogPostHref(locale, meta.slug, nextContentLocale),
-        }),
-      });
-
-      const json = (await response.json()) as ProtectedVerifyResponse;
-
-      if (!response.ok || !json.ok) {
-        if ('error' in json) {
-          throw new Error(json.error.message || t('invalidToken'));
-        }
-        throw new Error(t('invalidToken'));
+  const submitToken = useCallback(
+    async (nextToken: string) => {
+      if (submitting || nextToken.length !== 6 || lastSubmittedTokenRef.current === nextToken) {
+        return;
       }
 
-      await onVerified();
-    } catch (submissionError) {
-      setError(
-        submissionError instanceof Error ? submissionError.message : t('invalidToken'),
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  }, [group, locale, meta.slug, nextContentLocale, onVerified, submitting, t]);
+      lastSubmittedTokenRef.current = nextToken;
+      setSubmitting(true);
+      setError('');
 
-  const handleTokenChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const nextToken = event.target.value.replace(/\D+/g, '').slice(0, 6);
-    lastSubmittedTokenRef.current = nextToken.length === 6 ? lastSubmittedTokenRef.current : null;
-    setError('');
-    setToken(nextToken);
-    if (nextToken.length === 6) {
-      void submitToken(nextToken);
-    }
-  }, [submitToken]);
+      try {
+        const response = await fetch('/api/protected-verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            group,
+            token: nextToken,
+            next: buildBlogPostHref(locale, meta.slug, nextContentLocale),
+          }),
+        });
+
+        const json = (await response.json()) as ProtectedVerifyResponse;
+
+        if (!response.ok || !json.ok) {
+          if ('error' in json) {
+            throw new Error(json.error.message || t('invalidToken'));
+          }
+          throw new Error(t('invalidToken'));
+        }
+
+        await onVerified();
+      } catch (submissionError) {
+        setError(submissionError instanceof Error ? submissionError.message : t('invalidToken'));
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [group, locale, meta.slug, nextContentLocale, onVerified, submitting, t],
+  );
+
+  const handleTokenChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const nextToken = event.target.value.replace(/\D+/g, '').slice(0, 6);
+      lastSubmittedTokenRef.current = nextToken.length === 6 ? lastSubmittedTokenRef.current : null;
+      setError('');
+      setToken(nextToken);
+      if (nextToken.length === 6) {
+        void submitToken(nextToken);
+      }
+    },
+    [submitToken],
+  );
 
   const handleFieldClick = useCallback(() => {
     inputRef.current?.focus();
   }, []);
 
-  const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (token.length === 6) {
-      void submitToken(token);
-    }
-  }, [submitToken, token]);
+  const handleSubmit = useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (token.length === 6) {
+        void submitToken(token);
+      }
+    },
+    [submitToken, token],
+  );
 
   return (
     <>
@@ -120,7 +127,7 @@ export default function ProtectedPostGate({
         allPosts={allPosts}
         defaultContentLocale={defaultContentLocale}
         headerEntered={entered}
-        headerContent={(
+        headerContent={
           <div className={styles.headerContent}>
             <span className={styles.headerSignal}>{t('heading')}</span>
             <h1 className={styles.headerTitle}>{meta.title}</h1>
@@ -129,8 +136,8 @@ export default function ProtectedPostGate({
               <span className={styles.headerReadingTime}>{t('description')}</span>
             </div>
           </div>
-        )}
-        contentContent={(
+        }
+        contentContent={
           <div className={`${accessStyles.page} ${accessStyles.embedded}`}>
             <form className={accessStyles.card} onSubmit={handleSubmit}>
               <label className={accessStyles.label} htmlFor="totp-token-inline">
@@ -149,6 +156,7 @@ export default function ProtectedPostGate({
                   autoComplete="one-time-code"
                   pattern="[0-9]*"
                   maxLength={6}
+                  /* oxlint-disable-next-line jsx-a11y/no-autofocus -- the gate has one visible field represented by this focused input. */
                   autoFocus
                   value={token}
                   disabled={submitting}
@@ -159,7 +167,8 @@ export default function ProtectedPostGate({
                 <div className={accessStyles.slotGrid} aria-hidden="true">
                   {Array.from({ length: 6 }, (_, index) => {
                     const char = token[index] ?? '';
-                    const isActive = isFocused && index === Math.min(token.length, 5) && token.length < 6;
+                    const isActive =
+                      isFocused && index === Math.min(token.length, 5) && token.length < 6;
                     const isFilled = char !== '';
 
                     return (
@@ -178,10 +187,15 @@ export default function ProtectedPostGate({
                 {submitting ? t('verifying') : ' '}
               </p>
               {error ? <p className={accessStyles.error}>{error}</p> : null}
-              <button className={accessStyles.hiddenSubmit} type="submit" tabIndex={-1} aria-hidden="true" />
+              <button
+                className={accessStyles.hiddenSubmit}
+                type="submit"
+                tabIndex={-1}
+                aria-hidden="true"
+              />
             </form>
           </div>
-        )}
+        }
       />
     </>
   );

@@ -35,12 +35,12 @@
 
   .branch1 {
     animation: slideOutRight 0.5s ease-out forwards;
-    animation-delay: 0.90s;
+    animation-delay: 0.9s;
   }
 
   .branch1 .branchText {
     animation: fadeInTextDown 0.4s ease-out forwards;
-    animation-delay: 1.20s;
+    animation-delay: 1.2s;
   }
 
   .branch2 {
@@ -267,7 +267,9 @@
   margin-right: 8px;
   flex-shrink: 0;
   opacity: 0;
-  transition: background-color 0.5s ease-in-out, filter 0.5s ease-in-out;
+  transition:
+    background-color 0.5s ease-in-out,
+    filter 0.5s ease-in-out;
 }
 
 .taskTextWrapper {
@@ -287,7 +289,9 @@
   opacity: 0;
   transform: translateX(0);
   clip-path: inset(0 100% 0 0);
-  transition: color 0.5s ease-in-out, text-shadow 0.5s ease-in-out;
+  transition:
+    color 0.5s ease-in-out,
+    text-shadow 0.5s ease-in-out;
 }
 
 .taskLine {
@@ -314,7 +318,8 @@
   $stagger-delay: 0.04s;
   $initial-delay: 0.1s;
   $total-tasks: 30;
-  $time_per_cycle: $square-duration + $text-reveal-duration + $stagger-delay + $line-duration + $stagger-delay;
+  $time_per_cycle: $square-duration + $text-reveal-duration + $stagger-delay + $line-duration +
+    $stagger-delay;
 
   @for $i from 1 through $total-tasks {
     $task-start: $initial-delay + ($i - 1) * $time_per_cycle;
@@ -362,7 +367,9 @@
   transition: opacity 0.2s ease-out;
 
   .column3:hover:not(.nonInteractive) & {
-    animation: scanHud 1.5s linear infinite, fadeInScanlines 0.2s ease-out forwards;
+    animation:
+      scanHud 1.5s linear infinite,
+      fadeInScanlines 0.2s ease-out forwards;
     animation-delay: 0.2s, 0.2s;
   }
 }
@@ -377,7 +384,9 @@
   );
 
   .column3:hover:not(.nonInteractive) & {
-    animation: scanHud 1.5s linear infinite, fadeInScanlines 0.2s ease-out forwards;
+    animation:
+      scanHud 1.5s linear infinite,
+      fadeInScanlines 0.2s ease-out forwards;
     animation-delay: 0.2s, 0.2s;
   }
 }

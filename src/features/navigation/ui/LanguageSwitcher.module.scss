@@ -30,7 +30,9 @@
   font: inherit;
   letter-spacing: inherit;
   opacity: 0.55;
-  transition: opacity 0.15s ease, color 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease;
 
   @include breakpoints.tablet-down {
     cursor: auto;

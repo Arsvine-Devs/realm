@@ -28,16 +28,20 @@ export default function PlayerControls({
         <div className={styles.trackInfo}>
           <div
             className={`${styles.trackTitle} ${shouldMarqueeTitle ? styles.trackTitleMarquee : ''}`}
-            style={shouldMarqueeTitle
-              ? { '--track-marquee-duration': marqueeDuration } as CSSProperties
-              : undefined}
+            style={
+              shouldMarqueeTitle
+                ? ({ '--track-marquee-duration': marqueeDuration } as CSSProperties)
+                : undefined
+            }
           >
             {shouldMarqueeTitle ? (
               <div className={styles.trackTitleMarqueeInner}>
                 <span>{displayTitle}</span>
                 <span aria-hidden="true">{displayTitle}</span>
               </div>
-            ) : displayTitle}
+            ) : (
+              displayTitle
+            )}
           </div>
         </div>
         <button

@@ -182,12 +182,13 @@ export class EnvTelemetryController {
   private patchSnapshot(patch: Partial<EnvParamsTypingState>) {
     const next = { ...this.snapshot, ...patch };
     if (
-      next.displayedEnvParams === this.snapshot.displayedEnvParams
-      && next.isEnvParamsTyping === this.snapshot.isEnvParamsTyping
-      && next.envData === this.snapshot.envData
-      && next.envDataVersion === this.snapshot.envDataVersion
-      && next.envArtifactStage === this.snapshot.envArtifactStage
-    ) return;
+      next.displayedEnvParams === this.snapshot.displayedEnvParams &&
+      next.isEnvParamsTyping === this.snapshot.isEnvParamsTyping &&
+      next.envData === this.snapshot.envData &&
+      next.envDataVersion === this.snapshot.envDataVersion &&
+      next.envArtifactStage === this.snapshot.envArtifactStage
+    )
+      return;
     this.snapshot = next;
     this.emit();
   }
@@ -288,7 +289,8 @@ export class EnvTelemetryController {
       temp: this.currentTemp,
       rad: Math.floor(200 + random() * 300),
       o2: Number((8 + random() * 2).toFixed(1)),
-      pollution: pollutionLevels[Math.floor(random() * pollutionLevels.length)] ?? pollutionLevels[0],
+      pollution:
+        pollutionLevels[Math.floor(random() * pollutionLevels.length)] ?? pollutionLevels[0],
       acidRain: rainStatus[Math.floor(random() * rainStatus.length)] ?? rainStatus[0],
     };
   }
@@ -320,7 +322,10 @@ export class EnvTelemetryController {
         return;
       }
       this.patchSnapshot({ displayedEnvParams: this.snapshot.displayedEnvParams + target[index] });
-      this.animationTimer = this.dependencies.scheduler.setTimeout(() => step(index + 1), ENV_INITIAL_TYPE_DELAY_MS);
+      this.animationTimer = this.dependencies.scheduler.setTimeout(
+        () => step(index + 1),
+        ENV_INITIAL_TYPE_DELAY_MS,
+      );
     };
     step(0);
   }
@@ -354,8 +359,9 @@ export class EnvTelemetryController {
         return;
       }
       const random = this.dependencies.random;
-      const batchSize = ENV_OVERWRITE_BATCH_MIN
-        + Math.floor(random() * (ENV_OVERWRITE_BATCH_MAX - ENV_OVERWRITE_BATCH_MIN + 1));
+      const batchSize =
+        ENV_OVERWRITE_BATCH_MIN +
+        Math.floor(random() * (ENV_OVERWRITE_BATCH_MAX - ENV_OVERWRITE_BATCH_MIN + 1));
       for (let count = 0; count < batchSize && indices.length; count += 1) {
         const picked = Math.floor(random() * indices.length);
         const targetIndex = indices.splice(picked, 1)[0];
@@ -374,12 +380,12 @@ export class EnvTelemetryController {
     }
     this.dependencies.scheduler.clearTimeout(this.animationTimer);
     this.animationTimer = undefined;
-    const envData = refreshSnapshot || !this.snapshot.envData
-      ? this.createNextEnvData()
-      : this.snapshot.envData;
-    const telemetry = refreshSnapshot || !this.currentTelemetrySnapshot
-      ? this.syncEnvSnapshot(envData)
-      : this.currentTelemetrySnapshot;
+    const envData =
+      refreshSnapshot || !this.snapshot.envData ? this.createNextEnvData() : this.snapshot.envData;
+    const telemetry =
+      refreshSnapshot || !this.currentTelemetrySnapshot
+        ? this.syncEnvSnapshot(envData)
+        : this.currentTelemetrySnapshot;
     const stage = computeArtifactStage(this.artifactLoad);
     this.applyStage(stage);
     this.pulseCounter += 1;

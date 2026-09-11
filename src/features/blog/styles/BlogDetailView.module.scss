@@ -10,7 +10,9 @@
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   @include breakpoints.mobile {
     padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
@@ -159,7 +161,11 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   opacity: 0.75;
-  transition: border-color 0.25s ease, background-color 0.25s ease, color 0.25s ease, opacity 0.25s ease;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    color 0.25s ease,
+    opacity 0.25s ease;
   cursor: none;
 
   @include breakpoints.tablet-down {
@@ -198,7 +204,11 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: none;
-  transition: border-color 0.25s ease, background-color 0.25s ease, color 0.25s ease, opacity 0.25s ease;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    color 0.25s ease,
+    opacity 0.25s ease;
 
   &:hover:not(:disabled) {
     border-color: var(--ark-primary);
@@ -262,8 +272,13 @@
 }
 
 @keyframes blogLoadingPulse {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .contentBody {
@@ -272,7 +287,9 @@
   > :global(*) {
     opacity: 0;
     transform: translateY(20px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transition:
+      opacity 0.6s ease-out,
+      transform 0.6s ease-out;
   }
 }
 
@@ -325,7 +342,11 @@
   text-transform: uppercase;
   text-decoration: none;
   opacity: 0.7;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s, opacity 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    border-color 0.3s,
+    opacity 0.3s;
   cursor: none;
 
   @include breakpoints.tablet-down {
@@ -377,7 +398,9 @@
   gap: 8px;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
 
   &.visible {
     opacity: 1;
@@ -400,7 +423,11 @@
   cursor: none;
   position: relative;
   font-size: 0;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s, opacity 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    border-color 0.3s,
+    opacity 0.3s;
   opacity: 0.7;
   backdrop-filter: blur(4px);
   font-family: 'Dosis', monospace;
@@ -414,7 +441,9 @@
     font-size: 1.1rem;
     line-height: 1;
     color: inherit;
-    transition: color 0.3s, opacity 0.3s;
+    transition:
+      color 0.3s,
+      opacity 0.3s;
   }
 
   &:hover {
@@ -447,7 +476,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   opacity: 0.6;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s, opacity 0.3s, padding-left 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    border-color 0.3s,
+    opacity 0.3s,
+    padding-left 0.3s;
 
   &:hover {
     background: var(--ark-primary);

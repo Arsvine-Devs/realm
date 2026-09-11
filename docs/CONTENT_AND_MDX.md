@@ -104,9 +104,9 @@ UI locale 只有 `zh-CN`、`zh-TW`、`en`。博客额外允许 `ja`、`ru`、`fr
 
 ```mdx
 ---
-title: "标题"
-date: "2026-07-14"
-excerpt: "摘要"
+title: '标题'
+date: '2026-07-14'
+excerpt: '摘要'
 tags: []
 pinned: false
 originLocale: zh-CN
@@ -119,14 +119,14 @@ originLocale: zh-CN
 
 常用组件：
 
-| 组件 | 用途 |
-|---|---|
-| `<Term note="...">word</Term>` | 短词、专有名词或缩写的 ruby 注解 |
+| 组件                                   | 用途                                      |
+| -------------------------------------- | ----------------------------------------- |
+| `<Term note="...">word</Term>`         | 短词、专有名词或缩写的 ruby 注解          |
 | `<Explain note="...">phrase</Explain>` | 较长的 tooltip / mobile bottom sheet 说明 |
-| `<Lead>` | 开篇导语 |
-| `<Aside>` | 补充说明块 |
-| `<Mark>` | section 标记 |
-| `<Ref>` | 引用/参考 section |
+| `<Lead>`                               | 开篇导语                                  |
+| `<Aside>`                              | 补充说明块                                |
+| `<Mark>`                               | section 标记                              |
+| `<Ref>`                                | 引用/参考 section                         |
 
 示例：
 
@@ -159,11 +159,11 @@ MDX link 允许安全的 `http:`、`https:`、`mailto:`、站内相对路径和 
 
 状态含义：
 
-| 状态 | 含义 |
-|---|---|
-| `source` | 当前正文是源 locale |
+| 状态         | 含义                                                       |
+| ------------ | ---------------------------------------------------------- |
+| `source`     | 当前正文是源 locale                                        |
 | `translated` | 当前 UI locale 有正文，但 `originLocale` 指向其他源 locale |
-| `fallback` | 请求 UI locale 没有正文，显示其他 locale |
+| `fallback`   | 请求 UI locale 没有正文，显示其他 locale                   |
 
 用户在博客详情内选择 `ja`、`ru`、`fr` 时，只切正文 query/state，并抑制不适用的 UI fallback banner。
 

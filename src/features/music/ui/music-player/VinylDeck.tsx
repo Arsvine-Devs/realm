@@ -28,9 +28,14 @@ export default function VinylDeck({
   setContainerRef,
 }: VinylDeckProps) {
   return (
+    // The record surface is a pointer-only drag enhancement; keyboard users can choose tracks from the playlist.
+    // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- the surface is a labelled drag group, not a standalone keyboard control.
     <div
       ref={setContainerRef}
       className={styles.vinylMechanismContainer}
+      /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- a fieldset would add form semantics to a visual playback surface. */
+      role="group"
+      aria-label={isPlaying ? pauseTitle : playTitle}
       onMouseDown={(event) => {
         if (event.button !== 0) {
           return;
@@ -72,17 +77,23 @@ export default function VinylDeck({
       </div>
 
       <div className={`${styles.tonearmAssembly} ${isPlaying ? styles.tonearmPlaying : ''}`}>
-        <div
+        <button
+          type="button"
           className={styles.tonearmHitbox}
           onClick={(event) => {
             event.stopPropagation();
             onTogglePlay();
           }}
           title={isPlaying ? pauseTitle : playTitle}
+          aria-label={isPlaying ? pauseTitle : playTitle}
+          aria-pressed={isPlaying}
         />
         <div
           className={`${styles.tonearm} ${!isFullPower ? styles.tonearmLowPower : ''}`}
-          style={{ boxShadow: isPlaying && isFullPower ? '0 0 5px rgba(var(--ark-primary-rgb), 0.3)' : 'none' }}
+          style={{
+            boxShadow:
+              isPlaying && isFullPower ? '0 0 5px rgba(var(--ark-primary-rgb), 0.3)' : 'none',
+          }}
         />
       </div>
     </div>

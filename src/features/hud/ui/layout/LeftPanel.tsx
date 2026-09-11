@@ -141,22 +141,23 @@ export default function LeftPanel({
       : 'FULL CHARGE REQUIRED';
 
   const showBackAndNav =
-    leftPanelAnimated && (
-      activeSection === 'content' ||
+    leftPanelAnimated &&
+    (activeSection === 'content' ||
       activeSection === 'lifeDetail' ||
       activeSection === 'workDetail' ||
       activeSection === 'experienceDetail' ||
       activeSection === 'blog' ||
       activeSection === 'blogDetail' ||
-      activeSection === 'friendLinkDetail'
-    );
+      activeSection === 'friendLinkDetail');
 
   const { allowLogoEffects } = useHudPerformance();
   const logoRef = useRef<HTMLDivElement | null>(null);
   useLogoEffects(logoRef, allowLogoEffects && leftPanelAnimated && !isStandalone);
 
   return (
-    <div className={`${styles.leftPanel} ${leftPanelAnimated ? styles.animated : ''} ${drawerOpen ? styles.drawerOpen : ''} ${isStandalone ? styles.standaloneHide : ''}`}>
+    <div
+      className={`${styles.leftPanel} ${leftPanelAnimated ? styles.animated : ''} ${drawerOpen ? styles.drawerOpen : ''} ${isStandalone ? styles.standaloneHide : ''}`}
+    >
       <div className={styles.topRightDecoration}></div>
       <div className={styles.leverGroup}>
         {mainVisible && (
@@ -183,14 +184,16 @@ export default function LeftPanel({
         onClick={handleGlobalBackClick}
         data-cursor-label="BACK"
         aria-label="BACK"
-      >
-      </button>
-      <div className={`${styles.globalBackButtonDivider} ${showBackAndNav ? styles.visible : ''}`}></div>
+      ></button>
+      <div
+        className={`${styles.globalBackButtonDivider} ${showBackAndNav ? styles.visible : ''}`}
+      ></div>
       <div className={`${styles.leftNavLinks} ${showBackAndNav ? styles.visible : ''}`}>
-          {navLinks.map((link: DrawerNavLink, i: number) => (
+        {navLinks.map((link: DrawerNavLink, i: number) => (
           <Fragment key={link.href}>
             {i === 0 && (
               <div
+                /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- hr cannot contain the visible localized group label. */
                 role="separator"
                 aria-label={tNav('groupContent')}
                 className={styles.leftNavGroupLabel}
@@ -200,6 +203,7 @@ export default function LeftPanel({
             )}
             {i === 6 && (
               <div
+                /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- hr cannot contain the visible localized group label. */
                 role="separator"
                 aria-label={tNav('groupStandalone')}
                 className={styles.leftNavGroupLabel}
@@ -207,10 +211,7 @@ export default function LeftPanel({
                 <span>{tNav('groupStandalone')}</span>
               </div>
             )}
-            <button
-              className={styles.leftNavLink}
-              onClick={() => handleLeftNavLinkClick(link)}
-            >
+            <button className={styles.leftNavLink} onClick={() => handleLeftNavLinkClick(link)}>
               {link.label}
             </button>
           </Fragment>
@@ -241,7 +242,9 @@ export default function LeftPanel({
           </div>
         </div>
       </div>
-      <div className={`${styles.fateTextContainer} ${isFateTypingActive ? styles.typingActive : ''}`}>
+      <div
+        className={`${styles.fateTextContainer} ${isFateTypingActive ? styles.typingActive : ''}`}
+      >
         <span className={styles.fateText}>{displayedFateText}</span>
         <div className={styles.fateLine}></div>
       </div>
@@ -249,9 +252,7 @@ export default function LeftPanel({
         className={`${styles.envParamsContainer} ${isEnvParamsTyping ? styles.typingActive : ''} ${leftPanelAnimated ? styles.animated : ''}`}
         data-env-stage={envArtifactStage}
       >
-        <pre className={styles.envParamsText}>
-          {displayedEnvParams}
-        </pre>
+        <pre className={styles.envParamsText}>{displayedEnvParams}</pre>
       </div>
       <div className={styles.brailleText} aria-hidden="true">
         ⠠⠕⠗⠁⠉⠇⠑⠀⠠⠏⠗⠊⠑⠎⠞⠑⠎⠎⠀⠠⠁⠗⠅

@@ -84,11 +84,11 @@ curl -X POST https://arsvine.com/api/revalidate-content \
   -d '{"secret":"REPLACE_ME","slug":"example-post"}'
 ```
 
-| Route | 刷新范围 |
-|---|---|
-| `POST /api/revalidate` | 三个 locale 的 tweets page |
+| Route                          | 刷新范围                                             |
+| ------------------------------ | ---------------------------------------------------- |
+| `POST /api/revalidate`         | 三个 locale 的 tweets page                           |
 | `POST /api/revalidate-content` | 三个 locale 的 content；可选安全 slug 的 blog detail |
-| `POST /api/revalidate-assets` | home、content、friends、web/life detail |
+| `POST /api/revalidate-assets`  | home、content、friends、web/life detail              |
 
 `/api/revalidate` 为旧管理客户端保留 `GET ?secret=`，新自动化应使用 POST body。其他两个 endpoint 不接受 query secret。
 
@@ -147,7 +147,7 @@ Redis 失败时系统可用性优先，会退回本地 limiter；这不是多实
 NEXT_PUBLIC_TELEMETRY_PROVIDER=vercel
 ```
 
-未设置时 telemetry 完全禁用。业务模块只调用本地 `trackTelemetryEvent`，不能直接依赖 provider package。Provider render 或 event failure 由边界隔离，不得阻断页面。
+未设置时 telemetry 完全禁用。页面只通过 `TelemetryRoot` 加载 provider，不能直接依赖 provider package。Provider render failure 由边界隔离，不得阻断页面。
 
 检查 preview/localhost 是否按预期禁用数据采集，production domain 是否出现在 Vercel Analytics/Speed Insights。
 

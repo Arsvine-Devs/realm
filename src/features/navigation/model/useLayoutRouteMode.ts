@@ -17,9 +17,9 @@ export default function useLayoutRouteMode(
     const isHome = routeTemplate === '/[locale]';
     const isContentPage = routeTemplate === '/[locale]/content';
     const isStandalone =
-      routeTemplate.startsWith('/[locale]/web/')
-      || routeTemplate.startsWith('/[locale]/life/')
-      || routeTemplate.startsWith('/[locale]/blog/');
+      routeTemplate.startsWith('/[locale]/web/') ||
+      routeTemplate.startsWith('/[locale]/life/') ||
+      routeTemplate.startsWith('/[locale]/blog/');
 
     return {
       isHome,

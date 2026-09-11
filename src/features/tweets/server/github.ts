@@ -1,35 +1,55 @@
-import type { TweetIndexItem, TweetItem, TweetMonthGroup, TweetMonthGroupsPage } from '../model/types';
+import type {
+  TweetIndexItem,
+  TweetItem,
+  TweetMonthGroup,
+  TweetMonthGroupsPage,
+} from '../model/types';
 import { fetchGitHubJson } from '@/shared/lib/content/github';
 
 const STRESS_TEST_ENABLED = process.env.TWEETS_STRESS_TEST === '1';
 const STRESS_TEST_YEARS = parsePositiveInt(process.env.TWEETS_STRESS_YEARS, 6);
 const STRESS_TEST_MONTHS_PER_YEAR = parsePositiveInt(process.env.TWEETS_STRESS_MONTHS_PER_YEAR, 12);
-const STRESS_TEST_TWEETS_PER_MONTH = parsePositiveInt(process.env.TWEETS_STRESS_TWEETS_PER_MONTH, 24);
+const STRESS_TEST_TWEETS_PER_MONTH = parsePositiveInt(
+  process.env.TWEETS_STRESS_TWEETS_PER_MONTH,
+  24,
+);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function isTweetIndex(value: unknown): value is TweetIndexItem[] {
-  return Array.isArray(value) && value.every((item) => (
-    isRecord(item)
-    && typeof item.month === 'string'
-    && typeof item.path === 'string'
-    && (item.count === undefined || typeof item.count === 'number')
-    && (item.updatedAt === undefined || typeof item.updatedAt === 'string')
-  ));
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (item) =>
+        isRecord(item) &&
+        typeof item.month === 'string' &&
+        typeof item.path === 'string' &&
+        (item.count === undefined || typeof item.count === 'number') &&
+        (item.updatedAt === undefined || typeof item.updatedAt === 'string'),
+    )
+  );
 }
 
 function isTweetList(value: unknown): value is TweetItem[] {
-  return Array.isArray(value) && value.every((item) => (
-    isRecord(item)
-    && typeof item.id === 'string'
-    && typeof item.createdAt === 'string'
-    && typeof item.content === 'string'
-    && (item.updatedAt === undefined || typeof item.updatedAt === 'string')
-    && (item.tags === undefined || (Array.isArray(item.tags) && item.tags.every((tag) => typeof tag === 'string')))
-    && (item.visibility === undefined || item.visibility === 'public' || item.visibility === 'hidden' || item.visibility === 'private')
-  ));
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (item) =>
+        isRecord(item) &&
+        typeof item.id === 'string' &&
+        typeof item.createdAt === 'string' &&
+        typeof item.content === 'string' &&
+        (item.updatedAt === undefined || typeof item.updatedAt === 'string') &&
+        (item.tags === undefined ||
+          (Array.isArray(item.tags) && item.tags.every((tag) => typeof tag === 'string'))) &&
+        (item.visibility === undefined ||
+          item.visibility === 'public' ||
+          item.visibility === 'hidden' ||
+          item.visibility === 'private'),
+    )
+  );
 }
 
 function parsePositiveInt(rawValue: string | undefined, fallback: number) {
@@ -106,11 +126,7 @@ function buildStressTweet(month: string, index: number): TweetItem {
     updatedAt: createdAt,
     content,
     lang,
-    tags: [
-      `year-${year}`,
-      `month-${monthNumber}`,
-      index % 2 === 0 ? 'preview' : 'stress',
-    ],
+    tags: [`year-${year}`, `month-${monthNumber}`, index % 2 === 0 ? 'preview' : 'stress'],
     visibility: 'public',
     pinned: index % 10 === 0,
     translations,
@@ -125,9 +141,8 @@ function buildStressMonthGroups(): TweetMonthGroup[] {
     const year = now.getFullYear() - yearOffset;
     for (let monthIndex = STRESS_TEST_MONTHS_PER_YEAR; monthIndex >= 1; monthIndex -= 1) {
       const month = `${year}-${String(monthIndex).padStart(2, '0')}`;
-      const tweets = Array.from(
-        { length: STRESS_TEST_TWEETS_PER_MONTH },
-        (_, index) => buildStressTweet(month, index),
+      const tweets = Array.from({ length: STRESS_TEST_TWEETS_PER_MONTH }, (_, index) =>
+        buildStressTweet(month, index),
       );
 
       groups.push({

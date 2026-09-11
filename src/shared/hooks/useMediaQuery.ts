@@ -1,23 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
 function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia(query).matches;
-  });
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      if (typeof window === 'undefined') return () => undefined;
 
-  useEffect(() => {
-    const mql = window.matchMedia(query);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Required: matchMedia's "change" event only fires on value changes, so this synchronous sync is needed to initialize matches for the new query
-    if (mql.matches !== matches) setMatches(mql.matches);
+      const mediaQueryList = window.matchMedia(query);
+      mediaQueryList.addEventListener('change', onStoreChange);
+      return () => mediaQueryList.removeEventListener('change', onStoreChange);
+    },
+    [query],
+  );
+  const getSnapshot = useCallback(
+    () => (typeof window === 'undefined' ? false : window.matchMedia(query).matches),
+    [query],
+  );
 
-    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
-    mql.addEventListener('change', handler);
-    return () => mql.removeEventListener('change', handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
-
-  return matches;
+  return useSyncExternalStore(subscribe, getSnapshot, () => false);
 }
 
 export function useResponsive() {

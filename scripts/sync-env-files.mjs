@@ -19,7 +19,9 @@ const SECTIONS = [
         key: 'NEXT_PUBLIC_SITE_URL',
         localDefault: 'https://arsvine.com',
         exampleValue: 'https://arsvine.com',
-        comments: ['Canonical site URL used by sitemap, RSS, robots, Open Graph, and canonical tags.'],
+        comments: [
+          'Canonical site URL used by sitemap, RSS, robots, Open Graph, and canonical tags.',
+        ],
       },
     ],
   },
@@ -32,7 +34,9 @@ const SECTIONS = [
         localDefault: '""',
         exampleValue: 'vercel',
         commentOutInExample: true,
-        comments: ['Optional telemetry provider. Supported value: vercel. Unset disables telemetry.'],
+        comments: [
+          'Optional telemetry provider. Supported value: vercel. Unset disables telemetry.',
+        ],
       },
       {
         key: 'NEXT_PUBLIC_CDN_BASE',
@@ -90,7 +94,8 @@ const SECTIONS = [
       {
         key: 'TOTP_GROUPS_JSON',
         localDefault: '',
-        exampleValue: '{"friends-a":{"current":"JBSWY3DPEHPK3PXP","period":30,"digits":6,"window":1}}',
+        exampleValue:
+          '{"friends-a":{"current":"JBSWY3DPEHPK3PXP","period":30,"digits":6,"window":1}}',
         commentOutInExample: true,
         comments: ['Server-side TOTP groups JSON map.'],
       },
@@ -106,7 +111,9 @@ const SECTIONS = [
         localDefault: '""',
         exampleValue: '1',
         commentOutInExample: true,
-        comments: ['Trust forwarded client IP headers for rate-limited APIs behind a trusted self-hosted proxy. Vercel is detected automatically.'],
+        comments: [
+          'Trust forwarded client IP headers for rate-limited APIs behind a trusted self-hosted proxy. Vercel is detected automatically.',
+        ],
       },
     ],
   },
@@ -235,7 +242,9 @@ const SECTIONS = [
   },
 ];
 
-const ALLOWED_KEYS = new Set(SECTIONS.flatMap((section) => section.entries.map((entry) => entry.key)));
+const ALLOWED_KEYS = new Set(
+  SECTIONS.flatMap((section) => section.entries.map((entry) => entry.key)),
+);
 
 function parseArgs(argv) {
   const options = {
@@ -328,15 +337,15 @@ function renderLocalFile(currentValues) {
     lines.push(...renderSectionHeader(section.title));
     for (const entry of section.entries) {
       managedKeys.add(entry.key);
-      const value = currentValues.has(entry.key) ? currentValues.get(entry.key) : entry.localDefault;
+      const value = currentValues.has(entry.key)
+        ? currentValues.get(entry.key)
+        : entry.localDefault;
       lines.push(`${entry.key}=${value ?? ''}`);
     }
   }
 
   // 保留 .env.local 中不在注册表的未知键（开发者临时调试 env），避免静默清除
-  const unmanagedKeys = [...currentValues.keys()]
-    .filter((key) => !managedKeys.has(key))
-    .sort();
+  const unmanagedKeys = [...currentValues.keys()].filter((key) => !managedKeys.has(key)).sort();
   if (unmanagedKeys.length > 0) {
     lines.push('');
     lines.push('# (unmanaged) keys below are not in the env registry; kept as-is');

@@ -22,19 +22,24 @@ if (channels !== 3 && channels !== 4) {
 
 const out = Buffer.alloc(width * height * 4);
 for (let i = 0, j = 0; i < data.length; i += channels, j += 4) {
-  const r = data[i], g = data[i + 1], b = data[i + 2];
+  const r = data[i],
+    g = data[i + 1],
+    b = data[i + 2];
   // whiteness = min(r,g,b)/255 → fully white pixel becomes alpha=0
   const minRGB = Math.min(r, g, b);
   const alpha = 255 - minRGB;
   if (alpha === 0) {
-    out[j] = 0; out[j + 1] = 0; out[j + 2] = 0; out[j + 3] = 0;
+    out[j] = 0;
+    out[j + 1] = 0;
+    out[j + 2] = 0;
+    out[j + 3] = 0;
     continue;
   }
   // Unmix: original = (current - white * (1-a)) / a, where a is alpha/255 and white=255
   // Simplifies to: orig_c = ((c - 255) * 255 + 255 * alpha) / alpha
   //              = ((c - 255) * 255) / alpha + 255
   const unmix = (c) => Math.max(0, Math.min(255, ((c - 255) * 255) / alpha + 255));
-  out[j]     = unmix(r);
+  out[j] = unmix(r);
   out[j + 1] = unmix(g);
   out[j + 2] = unmix(b);
   out[j + 3] = alpha;

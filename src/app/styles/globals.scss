@@ -17,7 +17,7 @@
   --medium-gray: #777777;
   --light-gray: #f1f1f1;
   --white: #ffffff;
-  
+
   // --- 字体族 ---
   --font-display: 'ZELDA Free', 'Noto Sans SC', 'PingFang SC', sans-serif;
   --font-hud: 'Dosis', sans-serif;
@@ -31,22 +31,22 @@
   --mobile-detail-top-offset: calc(var(--mobile-hud-clearance) + 8px);
 
   // --- 字号阶梯 ---
-  --fs-micro:   0.5rem;
-  --fs-2xs:     0.55rem;
-  --fs-xs:      0.6rem;
-  --fs-sm:      0.65rem;
+  --fs-micro: 0.5rem;
+  --fs-2xs: 0.55rem;
+  --fs-xs: 0.6rem;
+  --fs-sm: 0.65rem;
   --fs-caption: 0.75rem;
-  --fs-base:    0.8rem;
-  --fs-body:    0.9rem;
-  --fs-md:      1rem;
-  --fs-sub:     1.1rem;
-  --fs-lg:      1.2rem;
-  --fs-xl:      1.3rem;
-  --fs-2xl:     1.4rem;
-  --fs-3xl:     1.5rem;
-  --fs-title:   2rem;
+  --fs-base: 0.8rem;
+  --fs-body: 0.9rem;
+  --fs-md: 1rem;
+  --fs-sub: 1.1rem;
+  --fs-lg: 1.2rem;
+  --fs-xl: 1.3rem;
+  --fs-2xl: 1.4rem;
+  --fs-3xl: 1.5rem;
+  --fs-title: 2rem;
   --fs-display: 3rem;
-  --fs-hero:    4.5rem;
+  --fs-hero: 4.5rem;
 
   --transition-slow: 0.7s cubic-bezier(0.6, 0.05, 0.01, 0.9);
   --transition-medium: 0.5s cubic-bezier(0.6, 0.05, 0.01, 0.9);
@@ -139,7 +139,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   cursor: none; /* 隐藏系统光标 */
-  
+
   @include breakpoints.tablet-down {
     cursor: auto; /* 平板/移动端恢复系统光标 */
   }
@@ -152,17 +152,23 @@ html[data-custom-cursor='off'] body * {
 }
 
 body::-webkit-scrollbar {
-  display: none; 
+  display: none;
 }
 
 a {
   color: inherit;
   text-decoration: none;
   cursor: none;
-  @include breakpoints.tablet-down { cursor: auto; }
+  @include breakpoints.tablet-down {
+    cursor: auto;
+  }
 }
 
-h1, h2, h3, h4, h5 {
+h1,
+h2,
+h3,
+h4,
+h5 {
   font-family: var(--font-hud);
   font-weight: 400;
   line-height: 1.3;
@@ -177,7 +183,9 @@ img {
 button {
   font-family: var(--font-hud);
   cursor: none;
-  @include breakpoints.tablet-down { cursor: auto; }
+  @include breakpoints.tablet-down {
+    cursor: auto;
+  }
 }
 
 .section {
@@ -203,7 +211,7 @@ button {
   transition: all var(--transition-fast);
   position: relative;
   overflow: hidden;
-  
+
   &:hover {
     background: var(--dark-gray);
     color: var(--white);
@@ -231,7 +239,7 @@ button {
   z-index: 1;
   mix-blend-mode: difference;
   transition: transform 0.2s ease;
-  
+
   &.active {
     transform: translate(-50%, -50%) scale(0.8);
     background-color: var(--dark-gray);
@@ -349,7 +357,9 @@ body > div,
 }
 
 /* 确保 body 和其他主要容器不会覆盖 Canvas */
-body, html, #__next {
+body,
+html,
+#__next {
   /* 可能需要调整背景色或透明度，取决于你的设计 */
   background-color: transparent; /* 让 Three.js 背景可见 */
 }
@@ -361,7 +371,9 @@ body, html, #__next {
 
 /* 无障碍: 尊重用户的减少动画偏好 */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -373,12 +385,12 @@ body, html, #__next {
    由根布局写入 <html data-x-blocked="true">；同步内联脚本在
    hydration 前完成，避免首屏闪烁。React 渲染本身仍会输出 X 节点，
    隐藏只发生在 CSS 层面 —— 切换 VPN 后 cookie 变化、刷新即可恢复显示。 */
-html[data-x-blocked="true"] [data-hide-when-x-blocked] {
+html[data-x-blocked='true'] [data-hide-when-x-blocked] {
   display: none !important;
 }
 
 /* Bilibili 反向地区隐藏：海外访客（非 CN/HK/MO/TW）隐藏 Bilibili 图标，
    B 站海外体验差（版权限制 / 限流 / 503），该图标对海外访客几乎没意义。 */
-html[data-bilibili-blocked="true"] [data-hide-when-bilibili-blocked] {
+html[data-bilibili-blocked='true'] [data-hide-when-bilibili-blocked] {
   display: none !important;
 }

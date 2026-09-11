@@ -14,15 +14,15 @@
 
 ## Tier 与能力
 
-| Tier | Logo | Ambient WebGL | Heavy CSS | Decorative motion | Interactive WebGL | Custom cursor |
-|---|---:|---:|---:|---:|---:|---:|
-| `full` | on | on | on | on | on | on |
-| `logo-reduced` | off | on | on | on | on | on |
-| `ambient-reduced` | off | off | on | on | on | on |
-| `css-reduced` | off | off | off | on | on | on |
-| `motion-reduced` | off | off | off | off | on | on |
-| `webgl-reduced` | off | off | off | off | off | on |
-| `minimal` | off | off | off | off | off | off |
+| Tier              | Logo | Ambient WebGL | Heavy CSS | Decorative motion | Interactive WebGL | Custom cursor |
+| ----------------- | ---: | ------------: | --------: | ----------------: | ----------------: | ------------: |
+| `full`            |   on |            on |        on |                on |                on |            on |
+| `logo-reduced`    |  off |            on |        on |                on |                on |            on |
+| `ambient-reduced` |  off |           off |        on |                on |                on |            on |
+| `css-reduced`     |  off |           off |       off |                on |                on |            on |
+| `motion-reduced`  |  off |           off |       off |               off |                on |            on |
+| `webgl-reduced`   |  off |           off |       off |               off |               off |            on |
+| `minimal`         |  off |           off |       off |               off |               off |           off |
 
 Logo 本体在所有 tier 可见；`allowLogoEffects=false` 只移除 pointer、rAF、parallax 和 chromatic layers。
 
@@ -30,11 +30,11 @@ Logo 本体在所有 tier 可见；`allowLogoEffects=false` 只移除 pointer、
 
 document bootstrap 只读取明确用户信号：
 
-| 信号 | 初始 tier | reason |
-|---|---|---|
-| `prefers-reduced-motion` | `minimal` | `reduced-motion` |
-| Save-Data | `motion-reduced` | `save-data` |
-| 无 | `full` | `none` |
+| 信号                     | 初始 tier        | reason           |
+| ------------------------ | ---------------- | ---------------- |
+| `prefers-reduced-motion` | `minimal`        | `reduced-motion` |
+| Save-Data                | `motion-reduced` | `save-data`      |
+| 无                       | `full`           | `none`           |
 
 不使用 effective type、RTT、downlink、device memory 或 CPU concurrency 决定视觉 tier，因为它们不代表 frame pacing，且经常过期或粗糙。
 
@@ -99,10 +99,10 @@ Context loss 通过共享 listener 捕获，阻止默认恢复风暴并通知能
 
 ## React Three Fiber Timer patch
 
-`@react-three/fiber` 精确固定为 `9.6.1`。`pnpm-workspace.yaml` 应用：
+`@react-three/fiber` 精确固定为 `9.7.0`。`pnpm-workspace.yaml` 应用：
 
 ```text
-patches/@react-three__fiber@9.6.1.patch
+patches/@react-three__fiber@9.7.0.patch
 ```
 
 补丁把 built dist 中的 `THREE.Clock` 替换为 `THREE.Timer` compatibility clock，使 Canvas 可安全切换 `frameloop`；详情页暂停 Tesseract 时使用 `frameloop="never"`，恢复后切回 `"always"`。
@@ -144,8 +144,8 @@ Custom cursor 保留到 `minimal` 前一层。静止且非 hover 时停止 rAF�
 在浏览器检查 `<html>`：
 
 ```js
-document.documentElement.dataset.performanceTier
-document.documentElement.dataset.performanceReason
+document.documentElement.dataset.performanceTier;
+document.documentElement.dataset.performanceReason;
 ```
 
 如果效果未出现，先确认 capability attribute，再检查 lazy import、context loss 和 reduced motion，不要直接删除 gate。

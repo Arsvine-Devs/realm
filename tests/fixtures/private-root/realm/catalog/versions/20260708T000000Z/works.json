@@ -1,16 +1,108 @@
 [
-  { "id": "work-alpha-old", "status": "published", "objectKey": "realm/images/works/work-alpha-old.a1b2c3d4.webp", "collection": "alpha", "tags": ["web"], "order": 1, "date": "2026-07-01" },
-  { "id": "work-alpha-new", "status": "published", "objectKey": "realm/images/works/work-alpha-new.a1b2c3d4.webp", "collection": "alpha", "tags": ["web"], "order": 1, "date": "2026-07-02" },
-  { "id": "work-alpha-api", "status": "published", "objectKey": "realm/images/works/work-alpha-api.a1b2c3d4.webp", "collection": "alpha", "tags": ["api"], "order": 2, "date": "2026-07-03" },
-  { "id": "work-beta-web", "status": "published", "objectKey": "realm/images/works/work-beta-web.a1b2c3d4.webp", "collection": "beta", "tags": ["web"], "order": 3, "date": "2026-07-04" },
-  { "id": "work-05", "status": "published", "objectKey": "realm/images/works/work-05.a1b2c3d4.webp", "order": 5, "date": "2026-07-05" },
-  { "id": "work-06", "status": "published", "objectKey": "realm/images/works/work-06.a1b2c3d4.webp", "order": 6, "date": "2026-07-06" },
-  { "id": "work-07", "status": "published", "objectKey": "realm/images/works/work-07.a1b2c3d4.webp", "order": 7, "date": "2026-07-07" },
-  { "id": "work-08", "status": "published", "objectKey": "realm/images/works/work-08.a1b2c3d4.webp", "order": 8, "date": "2026-07-08" },
-  { "id": "work-09", "status": "published", "objectKey": "realm/images/works/work-09.a1b2c3d4.webp", "order": 9, "date": "2026-07-09" },
-  { "id": "work-10", "status": "published", "objectKey": "realm/images/works/work-10.a1b2c3d4.webp", "order": 10, "date": "2026-07-10" },
-  { "id": "work-11", "status": "published", "objectKey": "realm/images/works/work-11.a1b2c3d4.webp", "order": 11, "date": "2026-07-11" },
-  { "id": "work-12", "status": "published", "objectKey": "realm/images/works/work-12.a1b2c3d4.webp", "order": 12, "date": "2026-07-12" },
-  { "id": "work-13", "status": "published", "objectKey": "realm/images/works/work-13.a1b2c3d4.webp", "order": 13, "date": "2026-07-13" },
-  { "id": "work-draft", "status": "draft", "objectKey": "realm/images/works/work-draft.a1b2c3d4.webp", "order": 0, "date": "2026-07-14" }
+  {
+    "id": "work-alpha-old",
+    "status": "published",
+    "objectKey": "realm/images/works/work-alpha-old.a1b2c3d4.webp",
+    "collection": "alpha",
+    "tags": ["web"],
+    "order": 1,
+    "date": "2026-07-01"
+  },
+  {
+    "id": "work-alpha-new",
+    "status": "published",
+    "objectKey": "realm/images/works/work-alpha-new.a1b2c3d4.webp",
+    "collection": "alpha",
+    "tags": ["web"],
+    "order": 1,
+    "date": "2026-07-02"
+  },
+  {
+    "id": "work-alpha-api",
+    "status": "published",
+    "objectKey": "realm/images/works/work-alpha-api.a1b2c3d4.webp",
+    "collection": "alpha",
+    "tags": ["api"],
+    "order": 2,
+    "date": "2026-07-03"
+  },
+  {
+    "id": "work-beta-web",
+    "status": "published",
+    "objectKey": "realm/images/works/work-beta-web.a1b2c3d4.webp",
+    "collection": "beta",
+    "tags": ["web"],
+    "order": 3,
+    "date": "2026-07-04"
+  },
+  {
+    "id": "work-05",
+    "status": "published",
+    "objectKey": "realm/images/works/work-05.a1b2c3d4.webp",
+    "order": 5,
+    "date": "2026-07-05"
+  },
+  {
+    "id": "work-06",
+    "status": "published",
+    "objectKey": "realm/images/works/work-06.a1b2c3d4.webp",
+    "order": 6,
+    "date": "2026-07-06"
+  },
+  {
+    "id": "work-07",
+    "status": "published",
+    "objectKey": "realm/images/works/work-07.a1b2c3d4.webp",
+    "order": 7,
+    "date": "2026-07-07"
+  },
+  {
+    "id": "work-08",
+    "status": "published",
+    "objectKey": "realm/images/works/work-08.a1b2c3d4.webp",
+    "order": 8,
+    "date": "2026-07-08"
+  },
+  {
+    "id": "work-09",
+    "status": "published",
+    "objectKey": "realm/images/works/work-09.a1b2c3d4.webp",
+    "order": 9,
+    "date": "2026-07-09"
+  },
+  {
+    "id": "work-10",
+    "status": "published",
+    "objectKey": "realm/images/works/work-10.a1b2c3d4.webp",
+    "order": 10,
+    "date": "2026-07-10"
+  },
+  {
+    "id": "work-11",
+    "status": "published",
+    "objectKey": "realm/images/works/work-11.a1b2c3d4.webp",
+    "order": 11,
+    "date": "2026-07-11"
+  },
+  {
+    "id": "work-12",
+    "status": "published",
+    "objectKey": "realm/images/works/work-12.a1b2c3d4.webp",
+    "order": 12,
+    "date": "2026-07-12"
+  },
+  {
+    "id": "work-13",
+    "status": "published",
+    "objectKey": "realm/images/works/work-13.a1b2c3d4.webp",
+    "order": 13,
+    "date": "2026-07-13"
+  },
+  {
+    "id": "work-draft",
+    "status": "draft",
+    "objectKey": "realm/images/works/work-draft.a1b2c3d4.webp",
+    "order": 0,
+    "date": "2026-07-14"
+  }
 ]

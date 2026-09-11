@@ -2,10 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import type { ColumnHoverState } from '@/features/hud/contracts/state';
 
 export default function useColumnHover(): ColumnHoverState {
-  const initialRandomTexts = [
-    'DATA-Ø05',
-    ...Array(5).fill('DATA-Ø??')
-  ];
+  const initialRandomTexts = ['DATA-Ø05', ...Array(5).fill('DATA-Ø??')];
   const [randomHudTexts, setRandomHudTexts] = useState<string[]>(initialRandomTexts);
   const [branchText1, setBranchText1] = useState('');
   const [branchText2, setBranchText2] = useState('');
@@ -26,9 +23,10 @@ export default function useColumnHover(): ColumnHoverState {
   };
 
   const generateRandomChars = (length?: number) => {
-    const targetLength = length ?? (Math.floor(Math.random() * 4) + 3);
+    const targetLength = length ?? Math.floor(Math.random() * 4) + 3;
 
-    const chars = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:'\",.<>/?~`§±¥₩£¢€©®™×÷≠≤≥∞∑∫√≈≠≡";
+    const chars =
+      'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:\'",.<>/?~`§±¥₩£¢€©®™×÷≠≤≥∞∑∫√≈≠≡';
     let result = '';
     const safeTargetLength = Math.max(0, targetLength);
 
@@ -42,11 +40,13 @@ export default function useColumnHover(): ColumnHoverState {
   };
 
   const handleColumnMouseEnter = (index: number) => {
-    if (index === 5) { // ABOUT column
+    if (index === 5) {
+      // ABOUT column
       updateRandomHudTexts();
       if (intervalRef.current) clearInterval(intervalRef.current);
       intervalRef.current = setInterval(updateRandomHudTexts, 50);
-    } else if (index === 1) { // EXPERIENCE column
+    } else if (index === 1) {
+      // EXPERIENCE column
       branchUpdateCounterRef.current = 0;
       if (branchIntervalRef.current) clearInterval(branchIntervalRef.current);
 
@@ -88,12 +88,14 @@ export default function useColumnHover(): ColumnHoverState {
   };
 
   const handleColumnMouseLeave = (index: number) => {
-    if (index === 5) { // ABOUT column
+    if (index === 5) {
+      // ABOUT column
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-    } else if (index === 1) { // EXPERIENCE column
+    } else if (index === 1) {
+      // EXPERIENCE column
       if (branchIntervalRef.current) {
         clearInterval(branchIntervalRef.current);
         branchIntervalRef.current = null;

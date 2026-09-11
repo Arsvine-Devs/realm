@@ -1,4 +1,5 @@
-export type ValidatedCatalogSection = unknown[] | { items?: unknown[]; collections?: unknown[]; assets?: Record<string, unknown> };
+export type ValidatedCatalogSection =
+  unknown[] | { items?: unknown[]; collections?: unknown[]; assets?: Record<string, unknown> };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -9,7 +10,8 @@ function assertRecordList(value: unknown, section: string) {
   const ids = new Set<string>();
   for (const [index, item] of value.entries()) {
     if (!isRecord(item)) throw new Error(`[catalog] ${section}[${index}] must be an object`);
-    if (typeof item.id !== 'string' || !item.id) throw new Error(`[catalog] ${section}[${index}] is missing id`);
+    if (typeof item.id !== 'string' || !item.id)
+      throw new Error(`[catalog] ${section}[${index}] is missing id`);
     if (ids.has(item.id)) throw new Error(`[catalog] ${section} contains duplicate id: ${item.id}`);
     ids.add(item.id);
     if (typeof item.objectKey !== 'string' || !item.objectKey) {
@@ -32,7 +34,8 @@ export function parseCatalogSection(section: string, raw: string): ValidatedCata
       if (!isRecord(collection) || typeof collection.slug !== 'string' || !collection.slug) {
         throw new Error(`[catalog] collections[${index}] is missing slug`);
       }
-      if (slugs.has(collection.slug)) throw new Error(`[catalog] duplicate collection slug: ${collection.slug}`);
+      if (slugs.has(collection.slug))
+        throw new Error(`[catalog] duplicate collection slug: ${collection.slug}`);
       slugs.add(collection.slug);
       assertRecordList(collection.items, `collections.${collection.slug}.items`);
     }
@@ -40,7 +43,8 @@ export function parseCatalogSection(section: string, raw: string): ValidatedCata
   }
 
   if (section === 'static-assets') {
-    if (!isRecord(value) || !isRecord(value.assets)) throw new Error('[catalog] static-assets must contain an assets object');
+    if (!isRecord(value) || !isRecord(value.assets))
+      throw new Error('[catalog] static-assets must contain an assets object');
     for (const [id, asset] of Object.entries(value.assets)) {
       if (!isRecord(asset) || typeof asset.objectKey !== 'string' || !asset.objectKey) {
         throw new Error(`[catalog] static-assets.${id} is missing objectKey`);

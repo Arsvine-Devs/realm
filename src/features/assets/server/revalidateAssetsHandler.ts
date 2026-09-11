@@ -13,17 +13,22 @@ export default async function handler(request: Request) {
     60_000,
   );
   if (!limiter.ok) {
-    return jsonResponse({ message: 'Too many requests' }, {
-      status: 429,
-      headers: { 'Retry-After': String(Math.ceil(limiter.retryAfterMs / 1000)) },
-    });
+    return jsonResponse(
+      { message: 'Too many requests' },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(Math.ceil(limiter.retryAfterMs / 1000)) },
+      },
+    );
   }
 
   const auth = await authenticateRevalidation(request);
   if (!auth.ok) return auth.response;
 
   const paths = locales.flatMap((locale) => [
-    `/${locale}`, `/${locale}/content`, `/${locale}/friends`,
+    `/${locale}`,
+    `/${locale}/content`,
+    `/${locale}/friends`,
     ...getPortfolioPaths(locale),
     ...getLifePaths(locale),
   ]);
@@ -38,7 +43,10 @@ export default async function handler(request: Request) {
   });
 
   if (failed.length === paths.length) {
-    return jsonResponse({ revalidated: false, paths, failed, message: 'All revalidations failed' }, { status: 500 });
+    return jsonResponse(
+      { revalidated: false, paths, failed, message: 'All revalidations failed' },
+      { status: 500 },
+    );
   }
   if (failed.length > 0) {
     return jsonResponse({ revalidated: false, paths, failed, partial: true });

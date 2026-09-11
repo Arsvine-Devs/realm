@@ -29,11 +29,7 @@ interface UseDrawerNavigationOptions {
   tCommon: (key: string) => string;
 }
 
-export default function useDrawerNavigation({
-  locale,
-  tNav,
-  tCommon,
-}: UseDrawerNavigationOptions) {
+export default function useDrawerNavigation({ locale, tNav, tCommon }: UseDrawerNavigationOptions) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const toggleDrawer = useCallback(() => {
@@ -44,26 +40,44 @@ export default function useDrawerNavigation({
     setDrawerOpen(false);
   }, []);
 
-  const navLinks = useMemo<NavLink[]>(() => ([
-    { label: tNav('works'), href: `/${locale}/content#works`, hash: 'works', group: 'content' },
-    { label: tNav('experience'), href: `/${locale}/content#experience`, hash: 'experience', group: 'content' },
-    { label: tNav('blog'), href: `/${locale}/content#blog`, hash: 'blog', group: 'content' },
-    { label: tNav('life'), href: `/${locale}/content#life`, hash: 'life', group: 'content' },
-    { label: tNav('contact'), href: `/${locale}/content#contact`, hash: 'contact', group: 'content' },
-    { label: tNav('about'), href: `/${locale}/content#about`, hash: 'about', group: 'content' },
-    { label: tNav('tweets'), href: `/${locale}/tweets`, group: 'standalone' },
-    { label: tNav('friends'), href: `/${locale}/friends`, group: 'standalone' },
-  ]), [locale, tNav]);
+  const navLinks = useMemo<NavLink[]>(
+    () => [
+      { label: tNav('works'), href: `/${locale}/content#works`, hash: 'works', group: 'content' },
+      {
+        label: tNav('experience'),
+        href: `/${locale}/content#experience`,
+        hash: 'experience',
+        group: 'content',
+      },
+      { label: tNav('blog'), href: `/${locale}/content#blog`, hash: 'blog', group: 'content' },
+      { label: tNav('life'), href: `/${locale}/content#life`, hash: 'life', group: 'content' },
+      {
+        label: tNav('contact'),
+        href: `/${locale}/content#contact`,
+        hash: 'contact',
+        group: 'content',
+      },
+      { label: tNav('about'), href: `/${locale}/content#about`, hash: 'about', group: 'content' },
+      { label: tNav('tweets'), href: `/${locale}/tweets`, group: 'standalone' },
+      { label: tNav('friends'), href: `/${locale}/friends`, group: 'standalone' },
+    ],
+    [locale, tNav],
+  );
 
-  const resolveCommonLabel = useCallback((key: 'openMenu' | 'closeMenu') => {
-    const translated = tCommon(key);
-    return translated === key ? commonLabelFallbacks[locale][key] : translated;
-  }, [locale, tCommon]);
+  const resolveCommonLabel = useCallback(
+    (key: 'openMenu' | 'closeMenu') => {
+      const translated = tCommon(key);
+      return translated === key ? commonLabelFallbacks[locale][key] : translated;
+    },
+    [locale, tCommon],
+  );
 
   return {
     drawerOpen,
     navLinks,
-    drawerToggleLabel: drawerOpen ? resolveCommonLabel('closeMenu') : resolveCommonLabel('openMenu'),
+    drawerToggleLabel: drawerOpen
+      ? resolveCommonLabel('closeMenu')
+      : resolveCommonLabel('openMenu'),
     toggleDrawer,
     closeDrawer,
   };

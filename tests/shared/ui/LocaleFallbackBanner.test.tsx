@@ -26,13 +26,22 @@ function renderBanner(
 describe('LocaleFallbackBanner', () => {
   it('renders fallback and translated copy from next-intl messages', () => {
     const { rerender } = renderBanner('zh-CN', zhCNMessages, {
-      requestedLocale: 'zh-CN', actualLocale: 'en', status: 'fallback',
+      requestedLocale: 'zh-CN',
+      actualLocale: 'en',
+      status: 'fallback',
     });
-    expect(screen.getByRole('status').textContent).toBe('本页暂未提供 简体中文 译本，正在以 English 显示。');
+    expect(screen.getByRole('status').textContent).toBe(
+      '本页暂未提供 简体中文 译本，正在以 English 显示。',
+    );
 
     rerender(
       <NextIntlClientProvider locale="en" messages={enMessages}>
-        <LocaleFallbackBanner requestedLocale="en" actualLocale="en" originLocale="zh-TW" status="translated" />
+        <LocaleFallbackBanner
+          requestedLocale="en"
+          actualLocale="en"
+          originLocale="zh-TW"
+          status="translated"
+        />
       </NextIntlClientProvider>,
     );
     expect(screen.getByRole('status').textContent).toBe('This page is translated from 繁體中文.');
@@ -41,7 +50,10 @@ describe('LocaleFallbackBanner', () => {
   it('dismisses after the translated timeout and exit animation', () => {
     vi.useFakeTimers();
     renderBanner('en', enMessages, {
-      requestedLocale: 'en', actualLocale: 'en', originLocale: 'zh-CN', status: 'translated',
+      requestedLocale: 'en',
+      actualLocale: 'en',
+      originLocale: 'zh-CN',
+      status: 'translated',
     });
 
     act(() => vi.advanceTimersByTime(5000));
@@ -51,7 +63,9 @@ describe('LocaleFallbackBanner', () => {
 
   it('uses the localized dismiss label', () => {
     renderBanner('en', enMessages, {
-      requestedLocale: 'en', actualLocale: 'zh-CN', status: 'fallback',
+      requestedLocale: 'en',
+      actualLocale: 'zh-CN',
+      status: 'fallback',
     });
     fireEvent.click(screen.getByRole('button', { name: 'Dismiss notice' }));
     expect(screen.queryByRole('status')).not.toBeNull();

@@ -181,8 +181,14 @@
 }
 
 @keyframes tweetCaretBlink {
-  0%, 49% { opacity: 0.85; }
-  50%, 100% { opacity: 0; }
+  0%,
+  49% {
+    opacity: 0.85;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .translationRow {
@@ -216,7 +222,10 @@
   // `button { @include breakpoints.tablet-down cursor: auto }` 兜底，
   // 不要写 cursor: pointer，否则系统指针会在自定义光标之外露出。
   cursor: none;
-  transition: border-color 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    color 0.25s ease;
 
   @include breakpoints.tablet-down {
     cursor: auto;
@@ -253,7 +262,10 @@
   font-size: var(--fs-xs);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  transition: border-color 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
 .loadMoreButton:disabled {

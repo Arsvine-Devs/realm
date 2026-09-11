@@ -116,11 +116,13 @@
   width: 25%;
   height: 100%;
   pointer-events: none;
-  background: repeating-linear-gradient(to bottom,
-      rgba(var(--ark-primary-rgb), 0.15),
-      rgba(var(--ark-primary-rgb), 0.15) 1px,
-      transparent 1px,
-      transparent 4px);
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(var(--ark-primary-rgb), 0.15),
+    rgba(var(--ark-primary-rgb), 0.15) 1px,
+    transparent 1px,
+    transparent 4px
+  );
   mask-image: linear-gradient(to left, black 50%, transparent 100%);
   -webkit-mask-image: linear-gradient(to left, black 50%, transparent 100%);
   opacity: 0.6;
@@ -295,4 +297,3 @@
     stroke-dashoffset: -200;
   }
 }
-

@@ -29,7 +29,8 @@ export const webProjects: Project[] = [
   {
     ...portfolioSourceFields('endfield-planner'),
     title: '終末地卡池模擬及規劃器',
-    description: '面向《明日方舟：終末地》的抽卡模擬與資源規劃工具，嘗試把玩家直覺轉化為可計算的策略。',
+    description:
+      '面向《明日方舟：終末地》的抽卡模擬與資源規劃工具，嘗試把玩家直覺轉化為可計算的策略。',
     role: 'Full Stack Developer / System Designer',
     year: '2026',
     status: 'wip',
@@ -70,9 +71,6 @@ export const earlyProjects: Project[] = [
 我把它們歸檔在這裡，不是為了證明過去有多厲害，而是為了保留一條軌跡：很多現在看似清晰的偏好，其實都來自早期那些混亂的小實驗。`,
   },
 ];
-
-export const learnProjects = earlyProjects;
-export const workProjects = [...webProjects, ...gameProjects];
 
 export const copyableTokens: CopyableToken[] = [
   { pattern: 'arsvine.com', label: '主站地址' },

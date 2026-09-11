@@ -67,7 +67,8 @@ afterEach(() => {
 
 describe('enforceRateLimit — local Map path (Upstash 未配置)', () => {
   it('allows up to limit then blocks subsequent requests', async () => {
-    const { enforceRateLimit, isRateLimitPersistent } = await import('@/shared/lib/content/rate-limit');
+    const { enforceRateLimit, isRateLimitPersistent } =
+      await import('@/shared/lib/content/rate-limit');
     expect(isRateLimitPersistent()).toBe(false);
 
     const key = `totp:1.2.3.4:test-a-${Math.random()}`;
@@ -128,7 +129,8 @@ describe('enforceRateLimit — local Map path (Upstash 未配置)', () => {
 describe('enforceRateLimit — Upstash path (Upstash 已配置)', () => {
   it('allows up to limit then blocks', async () => {
     setUpstashEnv();
-    const { enforceRateLimit, isRateLimitPersistent } = await import('@/shared/lib/content/rate-limit');
+    const { enforceRateLimit, isRateLimitPersistent } =
+      await import('@/shared/lib/content/rate-limit');
     expect(isRateLimitPersistent()).toBe(true);
 
     const key = `totp:1.2.3.4:upstash-a-${Math.random()}`;

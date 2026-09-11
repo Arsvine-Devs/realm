@@ -30,20 +30,6 @@ export const HIDE_X_COUNTRIES: ReadonlySet<string> = new Set(['CN', 'IR', 'KP', 
  *   - 注册流程需大陆手机号
  * 综合体验差，外链图标对海外访客几乎没意义。
  *
- * 不放进集合则视为"被屏蔽"，但 country 未知（null/空）仍按显示处理 —— 见 isBilibiliBlockedRegion。
+ * 不放进集合则视为"被屏蔽"，country 未知时由 document-bootstrap 按显示处理。
  */
 export const BILIBILI_FRIENDLY_COUNTRIES: ReadonlySet<string> = new Set(['CN', 'HK', 'MO', 'TW']);
-
-export function isXBlockedRegion(country: string | null | undefined): boolean {
-  if (!country) return false;
-  return HIDE_X_COUNTRIES.has(country.toUpperCase());
-}
-
-/**
- * country 已知 且 不在 BILIBILI_FRIENDLY_COUNTRIES 时返回 true。
- * 未知 country 返回 false（默认显示），保持与 X 策略一致的"未知即开放"原则。
- */
-export function isBilibiliBlockedRegion(country: string | null | undefined): boolean {
-  if (!country) return false;
-  return !BILIBILI_FRIENDLY_COUNTRIES.has(country.toUpperCase());
-}

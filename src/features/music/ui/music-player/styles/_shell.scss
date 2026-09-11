@@ -2,15 +2,25 @@
 
 // 唱片旋转动画
 @keyframes spinRecord {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // 抽屉把手播放指示波浪动画
 @keyframes waveEffect {
-  0%   { width: 30%; }
-  50%  { width: 60%; } // 动画中间状态宽度
-  100% { width: 30%; }
+  0% {
+    width: 30%;
+  }
+  50% {
+    width: 60%;
+  } // 动画中间状态宽度
+  100% {
+    width: 30%;
+  }
 }
 
 .playerContainer {

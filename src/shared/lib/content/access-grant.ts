@@ -18,9 +18,7 @@ function getSecret() {
 }
 
 function sign(group: string, exp: number) {
-  return createHmac('sha256', getSecret())
-    .update(`${group}:${exp}`)
-    .digest('base64url');
+  return createHmac('sha256', getSecret()).update(`${group}:${exp}`).digest('base64url');
 }
 
 export function createAccessGrant(group: string, ttlMs = ACCESS_GRANT_TTL_MS) {
@@ -35,7 +33,9 @@ export function createAccessGrant(group: string, ttlMs = ACCESS_GRANT_TTL_MS) {
 
 function decodeGrant(value: string): AccessGrantPayload | null {
   try {
-    const parsed = JSON.parse(Buffer.from(value, 'base64url').toString('utf8')) as AccessGrantPayload;
+    const parsed = JSON.parse(
+      Buffer.from(value, 'base64url').toString('utf8'),
+    ) as AccessGrantPayload;
     if (
       !parsed ||
       typeof parsed.group !== 'string' ||

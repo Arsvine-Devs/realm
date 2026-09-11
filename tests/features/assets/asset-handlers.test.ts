@@ -1,16 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const {
-  getAudioAssetsMock,
-  getCollectionAssetsMock,
-  getHomeAssetsMock,
-  getWorksAssetsMock,
-} = vi.hoisted(() => ({
-  getAudioAssetsMock: vi.fn(),
-  getCollectionAssetsMock: vi.fn(),
-  getHomeAssetsMock: vi.fn(),
-  getWorksAssetsMock: vi.fn(),
-}));
+const { getAudioAssetsMock, getCollectionAssetsMock, getHomeAssetsMock, getWorksAssetsMock } =
+  vi.hoisted(() => ({
+    getAudioAssetsMock: vi.fn(),
+    getCollectionAssetsMock: vi.fn(),
+    getHomeAssetsMock: vi.fn(),
+    getWorksAssetsMock: vi.fn(),
+  }));
 
 vi.mock('@/features/assets/server/catalog/catalog-provider', () => ({
   getAudioAssets: getAudioAssetsMock,
@@ -56,9 +52,9 @@ describe('asset Route Handlers', () => {
 
   it('parses works filters from Web URL search parameters', async () => {
     getWorksAssetsMock.mockResolvedValue({ items: [], page: 3 });
-    const response = await worksHandler(new Request(
-      'https://arsvine.com/api/assets/works?page=3&collection=featured&tag=web',
-    ));
+    const response = await worksHandler(
+      new Request('https://arsvine.com/api/assets/works?page=3&collection=featured&tag=web'),
+    );
 
     expect(response.status).toBe(200);
     expect(getWorksAssetsMock).toHaveBeenCalledWith({

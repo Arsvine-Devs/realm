@@ -25,11 +25,11 @@ interface LazyImageProps {
   preset?: ImagePreset | null;
 }
 
-const LazyImage = ({ 
-  src, 
-  alt, 
-  className = '', 
-  thumbnailSrc = null, 
+const LazyImage = ({
+  src,
+  alt,
+  className = '',
+  thumbnailSrc = null,
   onLoad = null,
   enableWebP = true,
   quality = 'medium', // low, medium, high
@@ -62,7 +62,7 @@ const LazyImage = ({
           observer.disconnect();
         }
       },
-      { threshold: 0.1, rootMargin: '50px' }
+      { threshold: 0.1, rootMargin: '50px' },
     );
 
     if (imgRef.current) {
@@ -114,8 +114,12 @@ const LazyImage = ({
     <div ref={imgRef} className={`${styles.lazyImageContainer} ${className}`}>
       {currentSrc ? (
         <picture>
-          {enableWebP && pictureSources?.avifUrl && <source srcSet={pictureSources.avifUrl} type="image/avif" />}
-          {enableWebP && pictureSources?.webpUrl && <source srcSet={pictureSources.webpUrl} type="image/webp" />}
+          {enableWebP && pictureSources?.avifUrl && (
+            <source srcSet={pictureSources.avifUrl} type="image/avif" />
+          )}
+          {enableWebP && pictureSources?.webpUrl && (
+            <source srcSet={pictureSources.webpUrl} type="image/webp" />
+          )}
           <img
             src={currentSrc}
             alt={resolvedAlt}
@@ -132,4 +136,4 @@ const LazyImage = ({
   );
 };
 
-export default LazyImage; 
+export default LazyImage;

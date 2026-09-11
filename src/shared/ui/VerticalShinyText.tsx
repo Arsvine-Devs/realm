@@ -10,7 +10,14 @@ interface VerticalShinyTextProps {
   animationDelay?: string;
 }
 
-const VerticalShinyText = ({ text, disabled = false, speed = 3, className = '', textVisible, animationDelay }: VerticalShinyTextProps) => {
+const VerticalShinyText = ({
+  text,
+  disabled = false,
+  speed = 3,
+  className = '',
+  textVisible,
+  animationDelay,
+}: VerticalShinyTextProps) => {
   const animationDuration = `${speed}s`;
 
   return (

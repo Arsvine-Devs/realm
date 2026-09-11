@@ -10,7 +10,9 @@
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   @include breakpoints.mobile {
     padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
@@ -21,7 +23,6 @@
   position: relative;
   z-index: 2;
 }
-
 
 .sectionHeader {
   font-family: var(--font-hud);
@@ -44,4 +45,3 @@
     background: var(--ark-primary);
   }
 }
-

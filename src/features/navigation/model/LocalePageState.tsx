@@ -51,27 +51,32 @@ export function LocalePageStateProvider({ children }: { children: ReactNode }) {
     }
   }, [routeIdentity]);
 
-  const read = useCallback(<T,>(key: string) => (
-    routeStoresRef.current.get(routeIdentity)?.get(key) as T | undefined
-  ), [routeIdentity]);
-  const write = useCallback(<T,>(key: string, value: T) => {
-    let routeStore = routeStoresRef.current.get(routeIdentity);
-    if (!routeStore) {
-      routeStore = new Map<string, unknown>();
-      routeStoresRef.current.set(routeIdentity, routeStore);
-    }
-    routeStore.set(key, value);
-  }, [routeIdentity]);
-  const value = useMemo<LocalePageStateContextValue>(() => ({
-    routeIdentity,
-    read,
-    write,
-  }), [read, routeIdentity, write]);
+  const read = useCallback(
+    <T,>(key: string) => routeStoresRef.current.get(routeIdentity)?.get(key) as T | undefined,
+    [routeIdentity],
+  );
+  const write = useCallback(
+    <T,>(key: string, value: T) => {
+      let routeStore = routeStoresRef.current.get(routeIdentity);
+      if (!routeStore) {
+        routeStore = new Map<string, unknown>();
+        routeStoresRef.current.set(routeIdentity, routeStore);
+      }
+      routeStore.set(key, value);
+    },
+    [routeIdentity],
+  );
+  const value = useMemo<LocalePageStateContextValue>(
+    () => ({
+      routeIdentity,
+      read,
+      write,
+    }),
+    [read, routeIdentity, write],
+  );
 
   return (
-    <LocalePageStateContext.Provider value={value}>
-      {children}
-    </LocalePageStateContext.Provider>
+    <LocalePageStateContext.Provider value={value}>{children}</LocalePageStateContext.Provider>
   );
 }
 
@@ -85,9 +90,7 @@ export function useLocaleStableState<T>(
   const [value, setValue] = useState<T>(() => {
     const stored = pageStateStore.read<T>(key);
     if (stored !== undefined) return stored;
-    return typeof initialValue === 'function'
-      ? (initialValue as () => T)()
-      : initialValue;
+    return typeof initialValue === 'function' ? (initialValue as () => T)() : initialValue;
   });
 
   useLayoutEffect(() => {
@@ -101,10 +104,7 @@ export function useLocalePageStateStore() {
   return useContext(LocalePageStateContext) ?? fallbackPageStateStore;
 }
 
-export function useLocaleStableScroll(
-  key: string,
-  scrollRef: RefObject<HTMLElement | null>,
-) {
+export function useLocaleStableScroll(key: string, scrollRef: RefObject<HTMLElement | null>) {
   const context = useLocalePageStateStore();
   const restoreFrameRef = useRef<number | null>(null);
 
@@ -113,7 +113,10 @@ export function useLocaleStableScroll(
     if (!element) return;
     const savedScrollTop = context.read<number>(key) ?? 0;
     restoreFrameRef.current = window.requestAnimationFrame(() => {
-      element.scrollTop = Math.min(savedScrollTop, Math.max(0, element.scrollHeight - element.clientHeight));
+      element.scrollTop = Math.min(
+        savedScrollTop,
+        Math.max(0, element.scrollHeight - element.clientHeight),
+      );
       restoreFrameRef.current = null;
     });
 

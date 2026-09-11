@@ -7,7 +7,8 @@
   .copyrightStamp {
     opacity: 0;
     transform: translateY(18px);
-    transition: opacity 0.65s cubic-bezier(0.25, 0.8, 0.25, 1),
+    transition:
+      opacity 0.65s cubic-bezier(0.25, 0.8, 0.25, 1),
       transform 0.65s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
@@ -25,7 +26,6 @@
 }
 
 .copyrightEntered {
-
   h2,
   .copyrightArticle,
   .copyrightStamp {
@@ -72,7 +72,9 @@
     color: var(--ark-primary);
     text-decoration: none;
     border-bottom: 1px solid rgba(var(--ark-primary-rgb), 0.4);
-    transition: color 0.25s, border-color 0.25s;
+    transition:
+      color 0.25s,
+      border-color 0.25s;
 
     &:hover {
       color: var(--ark-highlight-green, var(--ark-primary));

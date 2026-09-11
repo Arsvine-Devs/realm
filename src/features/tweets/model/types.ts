@@ -2,9 +2,7 @@ import type { Locale } from '@/shared/contracts/locale';
 
 export type TweetLang = 'zh-CN' | 'zh-TW' | 'en' | 'ja' | 'other';
 export type TweetTranslationPromptKey =
-  | 'translate-to-zh-CN'
-  | 'translate-to-zh-TW'
-  | 'translate-to-en';
+  'translate-to-zh-CN' | 'translate-to-zh-TW' | 'translate-to-en';
 
 export type TweetTranslation = {
   content: string;

@@ -3,7 +3,7 @@
 // language change never replays it.
 let initialBootSequencePending = true;
 
-export const INITIAL_BOOT_COMPLETE_ATTRIBUTE = 'data-initial-boot-complete';
+const INITIAL_BOOT_COMPLETE_ATTRIBUTE = 'data-initial-boot-complete';
 
 function isDocumentBootComplete(): boolean {
   return (

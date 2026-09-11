@@ -67,7 +67,9 @@
   color: var(--ark-text);
   opacity: 0.8;
   background: rgba(var(--white-rgb), 0.03);
-  transition: border-color 0.3s, color 0.3s;
+  transition:
+    border-color 0.3s,
+    color 0.3s;
 
   &:hover {
     border-color: var(--ark-primary);
@@ -97,7 +99,9 @@
   color: var(--ark-text);
   opacity: 0;
   transform: translateX(-15px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
   line-height: 1.7;
 
   &.visible {
@@ -112,7 +116,6 @@
   flex-shrink: 0;
   opacity: 0.6;
 }
-
 
 /* ==================== LINKS SECTION ==================== */
 
@@ -142,7 +145,11 @@
   background: transparent;
   border: 1px solid transparent;
   text-decoration: none;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s, padding-left 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    border-color 0.3s,
+    padding-left 0.3s;
   cursor: none;
   position: relative;
 
@@ -186,7 +193,9 @@
   height: 22px;
   color: var(--ark-primary);
   opacity: 0.8;
-  transition: color 0.3s ease, opacity 0.3s ease;
+  transition:
+    color 0.3s ease,
+    opacity 0.3s ease;
 }
 
 .linkInfo {
@@ -210,7 +219,9 @@
   opacity: 0.4;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  transition: color 0.3s, opacity 0.3s;
+  transition:
+    color 0.3s,
+    opacity 0.3s;
 }
 
 /* ==================== FOOTER SECTION ==================== */
@@ -242,7 +253,11 @@
   text-transform: uppercase;
   text-decoration: none;
   opacity: 0.7;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s, opacity 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    border-color 0.3s,
+    opacity 0.3s;
   cursor: none;
 
   @include breakpoints.tablet-down {

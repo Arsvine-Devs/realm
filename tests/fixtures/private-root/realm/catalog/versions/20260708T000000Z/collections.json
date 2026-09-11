@@ -3,9 +3,27 @@
     {
       "slug": "alpha",
       "items": [
-        { "id": "collection-old", "status": "published", "objectKey": "realm/images/collections/collection-old.a1b2c3d4.webp", "order": 1, "date": "2026-07-01" },
-        { "id": "collection-new", "status": "published", "objectKey": "realm/images/collections/collection-new.a1b2c3d4.webp", "order": 1, "date": "2026-07-02" },
-        { "id": "collection-draft", "status": "draft", "objectKey": "realm/images/collections/collection-draft.a1b2c3d4.webp", "order": 0, "date": "2026-07-03" }
+        {
+          "id": "collection-old",
+          "status": "published",
+          "objectKey": "realm/images/collections/collection-old.a1b2c3d4.webp",
+          "order": 1,
+          "date": "2026-07-01"
+        },
+        {
+          "id": "collection-new",
+          "status": "published",
+          "objectKey": "realm/images/collections/collection-new.a1b2c3d4.webp",
+          "order": 1,
+          "date": "2026-07-02"
+        },
+        {
+          "id": "collection-draft",
+          "status": "draft",
+          "objectKey": "realm/images/collections/collection-draft.a1b2c3d4.webp",
+          "order": 0,
+          "date": "2026-07-03"
+        }
       ]
     }
   ]

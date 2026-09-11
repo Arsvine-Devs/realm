@@ -1,0 +1,81 @@
+diff --git a/request.js b/request.js
+index 15c8865b70bb0c3c5620945940d9615cfc973495..65e2cb34a1745b377713750554d2c99ebe6a2433 100644
+--- a/request.js
++++ b/request.js
+@@ -30,6 +30,49 @@ var Tunnel = require('./lib/tunnel').Tunnel
+ var now = require('performance-now')
+ var Buffer = require('safe-buffer').Buffer
+ 
++// Node 24 deprecates the legacy url.parse() API. Keep the legacy request
++// object fields that this package consumes while parsing absolute URLs with
++// the WHATWG URL implementation.
++function parseRequestUrl (value) {
++  if (typeof value !== 'string') {
++    return value
++  }
++
++  try {
++    var parsed = new url.URL(value)
++    parsed.query = parsed.search ? parsed.search.slice(1) : null
++    parsed.path = parsed.pathname + (parsed.search || '')
++    if (parsed.username || parsed.password) {
++      parsed.auth = decodeURIComponent(parsed.username) + ':' + decodeURIComponent(parsed.password)
++    }
++    return parsed
++  } catch (error) {
++    // Preserve request's invalid/relative URL error path without invoking the
++    // deprecated parser. COS SDK requests use absolute URLs.
++    var hashIndex = value.indexOf('#')
++    var withoutHash = hashIndex === -1 ? value : value.slice(0, hashIndex)
++    var queryIndex = withoutHash.indexOf('?')
++    var pathname = queryIndex === -1 ? withoutHash : withoutHash.slice(0, queryIndex)
++    var search = queryIndex === -1 ? null : withoutHash.slice(queryIndex)
++    var hash = hashIndex === -1 ? null : value.slice(hashIndex)
++
++    return {
++      protocol: null,
++      slashes: null,
++      auth: null,
++      host: null,
++      port: null,
++      hostname: null,
++      hash: hash,
++      search: search,
++      query: search ? search.slice(1) : null,
++      pathname: pathname,
++      path: pathname + (search || ''),
++      href: value
++    }
++  }
++}
++
+ var safeStringify = helpers.safeStringify
+ var isReadStream = helpers.isReadStream
+ var toBase64 = helpers.toBase64
+@@ -233,7 +276,7 @@ Request.prototype.init = function (options) {
+ 
+   // If a string URI/URL was given, parse it into a URL object
+   if (typeof self.uri === 'string') {
+-    self.uri = url.parse(self.uri)
++    self.uri = parseRequestUrl(self.uri)
+   }
+ 
+   // Some URL objects are not from a URL parsed string and need href added
+@@ -630,7 +673,7 @@ Request.prototype.getNewAgent = function () {
+   // ca option is only relevant if proxy or destination are https
+   var proxy = self.proxy
+   if (typeof proxy === 'string') {
+-    proxy = url.parse(proxy)
++    proxy = parseRequestUrl(proxy)
+   }
+   var isHttps = (proxy && proxy.protocol === 'https:') || this.uri.protocol === 'https:'
+ 
+@@ -1226,7 +1269,7 @@ Request.prototype.qs = function (q, clobber) {
+     return self
+   }
+ 
+-  self.uri = url.parse(self.uri.href.split('?')[0] + '?' + qs)
++  self.uri = parseRequestUrl(self.uri.href.split('?')[0] + '?' + qs)
+   self.url = self.uri
+   self.path = self.uri.path
+ 

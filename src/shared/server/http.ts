@@ -14,7 +14,7 @@ export async function readJsonObject(request: Request): Promise<Record<string, u
   try {
     const body = await request.json();
     return body && typeof body === 'object' && !Array.isArray(body)
-      ? body as Record<string, unknown>
+      ? (body as Record<string, unknown>)
       : {};
   } catch {
     return {};
@@ -24,15 +24,17 @@ export async function readJsonObject(request: Request): Promise<Record<string, u
 export function parseCookieHeader(rawCookie: string | null): Record<string, string> {
   if (!rawCookie) return {};
 
-  return Object.fromEntries(rawCookie.split(';').flatMap((part) => {
-    const [rawName, ...rawValue] = part.trim().split('=');
-    if (!rawName || rawValue.length === 0) return [];
-    try {
-      return [[rawName, decodeURIComponent(rawValue.join('='))]];
-    } catch {
-      return [];
-    }
-  }));
+  return Object.fromEntries(
+    rawCookie.split(';').flatMap((part) => {
+      const [rawName, ...rawValue] = part.trim().split('=');
+      if (!rawName || rawValue.length === 0) return [];
+      try {
+        return [[rawName, decodeURIComponent(rawValue.join('='))]];
+      } catch {
+        return [];
+      }
+    }),
+  );
 }
 
 export function secureStringEqual(left: string, right: string) {
@@ -41,7 +43,7 @@ export function secureStringEqual(left: string, right: string) {
   return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer);
 }
 
-export function isProxyTrusted() {
+function isProxyTrusted() {
   const configured = process.env.TRUST_PROXY?.trim().toLowerCase();
   if (configured) {
     return configured === '1' || configured === 'true' || configured === 'yes';

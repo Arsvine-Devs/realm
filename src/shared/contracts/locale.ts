@@ -48,5 +48,5 @@ export function getLocaleFromPath(path: string | null | undefined): Locale | und
 }
 
 export function resolveLocale(rawLocale: unknown, path?: string | null): Locale {
-  return isLocale(rawLocale) ? rawLocale : getLocaleFromPath(path) ?? defaultLocale;
+  return isLocale(rawLocale) ? rawLocale : (getLocaleFromPath(path) ?? defaultLocale);
 }

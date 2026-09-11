@@ -196,7 +196,9 @@
   z-index: 3;
   pointer-events: none;
   opacity: 0;
-  box-shadow: 0 0 3px rgba(var(--white-rgb), 0.3), 0 0 1px rgba(var(--white-rgb), 0.5);
+  box-shadow:
+    0 0 3px rgba(var(--white-rgb), 0.3),
+    0 0 1px rgba(var(--white-rgb), 0.5);
 
   &.animated {
     animation-duration: 0.8s;
@@ -318,7 +320,9 @@
     filter: blur(0.3px);
     background-position: 0 0;
     z-index: 1;
-    transition: opacity 0.2s ease-out, background 0.5s ease-in-out;
+    transition:
+      opacity 0.2s ease-out,
+      background 0.5s ease-in-out;
   }
 
   &::before {
@@ -341,7 +345,10 @@
   border-width: 0;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease-out, border-color 0.5s ease-in-out, filter 0.5s ease-in-out;
+  transition:
+    opacity 0.2s ease-out,
+    border-color 0.5s ease-in-out,
+    filter 0.5s ease-in-out;
   filter: drop-shadow(0 0 3px var(--ark-highlight-green));
   z-index: 3;
 }
@@ -369,7 +376,9 @@
   opacity: 0;
   transform: translateY(5px);
   pointer-events: none;
-  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
   white-space: nowrap;
 }
 
@@ -379,7 +388,9 @@
   height: 8px;
   background-color: var(--ark-highlight-green);
   filter: drop-shadow(0 0 2px var(--ark-highlight-green));
-  transition: background-color 0.5s ease-in-out, filter 0.5s ease-in-out;
+  transition:
+    background-color 0.5s ease-in-out,
+    filter 0.5s ease-in-out;
 }
 
 .imageHudText {
@@ -389,7 +400,9 @@
   letter-spacing: 1px;
   font-weight: bold;
   text-shadow: 0 0 3px rgba(var(--ark-highlight-green-rgb), 0.5);
-  transition: color 0.5s ease-in-out, text-shadow 0.5s ease-in-out;
+  transition:
+    color 0.5s ease-in-out,
+    text-shadow 0.5s ease-in-out;
 }
 
 // --- 通用列悬停效果 ---
@@ -403,7 +416,9 @@
   }
 
   .hudOverlay::after {
-    animation: scanHud 1.5s linear infinite, fadeInScanlines 0.2s ease-out forwards;
+    animation:
+      scanHud 1.5s linear infinite,
+      fadeInScanlines 0.2s ease-out forwards;
   }
 
   .cornerHudTopLeft,

@@ -54,32 +54,35 @@ const CustomCursor = () => {
     dot.style.transform = `translate(${x - dotSize.current.w / 2}px, ${y - dotSize.current.h / 2}px)`;
   }, []);
 
-  const applyLineMask = useCallback((target: { x: number; y: number; w: number; h: number } | null) => {
-    const hLine = hLineRef.current;
-    const vLine = vLineRef.current;
-    if (!hLine || !vLine) return;
+  const applyLineMask = useCallback(
+    (target: { x: number; y: number; w: number; h: number } | null) => {
+      const hLine = hLineRef.current;
+      const vLine = vLineRef.current;
+      if (!hLine || !vLine) return;
 
-    if (!target) {
-      hLine.style.maskImage = '';
-      hLine.style.webkitMaskImage = '';
-      vLine.style.maskImage = '';
-      vLine.style.webkitMaskImage = '';
-      return;
-    }
+      if (!target) {
+        hLine.style.maskImage = '';
+        hLine.style.webkitMaskImage = '';
+        vLine.style.maskImage = '';
+        vLine.style.webkitMaskImage = '';
+        return;
+      }
 
-    const left = clamp(target.x - target.w / 2, 0, window.innerWidth);
-    const right = clamp(target.x + target.w / 2, 0, window.innerWidth);
-    const top = clamp(target.y - target.h / 2, 0, window.innerHeight);
-    const bottom = clamp(target.y + target.h / 2, 0, window.innerHeight);
+      const left = clamp(target.x - target.w / 2, 0, window.innerWidth);
+      const right = clamp(target.x + target.w / 2, 0, window.innerWidth);
+      const top = clamp(target.y - target.h / 2, 0, window.innerHeight);
+      const bottom = clamp(target.y + target.h / 2, 0, window.innerHeight);
 
-    const horizontalMask = `linear-gradient(to right, #000 0, #000 ${left}px, transparent ${left}px, transparent ${right}px, #000 ${right}px, #000 100%)`;
-    const verticalMask = `linear-gradient(to bottom, #000 0, #000 ${top}px, transparent ${top}px, transparent ${bottom}px, #000 ${bottom}px, #000 100%)`;
+      const horizontalMask = `linear-gradient(to right, #000 0, #000 ${left}px, transparent ${left}px, transparent ${right}px, #000 ${right}px, #000 100%)`;
+      const verticalMask = `linear-gradient(to bottom, #000 0, #000 ${top}px, transparent ${top}px, transparent ${bottom}px, #000 ${bottom}px, #000 100%)`;
 
-    hLine.style.maskImage = horizontalMask;
-    hLine.style.webkitMaskImage = horizontalMask;
-    vLine.style.maskImage = verticalMask;
-    vLine.style.webkitMaskImage = verticalMask;
-  }, []);
+      hLine.style.maskImage = horizontalMask;
+      hLine.style.webkitMaskImage = horizontalMask;
+      vLine.style.maskImage = verticalMask;
+      vLine.style.webkitMaskImage = verticalMask;
+    },
+    [],
+  );
 
   const syncHoverTarget = useCallback(() => {
     const el = hoverEl.current;
@@ -120,8 +123,14 @@ const CustomCursor = () => {
 
     const hLine = hLineRef.current;
     const vLine = vLineRef.current;
-    if (hLine) { hLine.style.maskImage = ''; hLine.style.webkitMaskImage = ''; }
-    if (vLine) { vLine.style.maskImage = ''; vLine.style.webkitMaskImage = ''; }
+    if (hLine) {
+      hLine.style.maskImage = '';
+      hLine.style.webkitMaskImage = '';
+    }
+    if (vLine) {
+      vLine.style.maskImage = '';
+      vLine.style.webkitMaskImage = '';
+    }
 
     const labelEl = labelRef.current;
     if (labelEl) {
@@ -176,8 +185,12 @@ const CustomCursor = () => {
         const my = mouse.current.y;
         const margin = 60;
 
-        if (mx < hoverRect.left - margin || mx > hoverRect.right + margin ||
-            my < hoverRect.top - margin || my > hoverRect.bottom + margin) {
+        if (
+          mx < hoverRect.left - margin ||
+          mx > hoverRect.right + margin ||
+          my < hoverRect.top - margin ||
+          my > hoverRect.bottom + margin
+        ) {
           resetHoverState();
         }
       }
@@ -197,41 +210,47 @@ const CustomCursor = () => {
     return () => cancelAnimationFrame(rafId.current);
   }, [applyPosition, interactiveElsRef, resetHoverState, syncHoverTarget]);
 
-  const handleRegisteredEnter = useCallback((el: HTMLElement) => {
-    if (!isCursorInteractive(el)) return;
+  const handleRegisteredEnter = useCallback(
+    (el: HTMLElement) => {
+      if (!isCursorInteractive(el)) return;
 
-    hoverEl.current = el;
-    isHovering.current = true;
-    snapTarget.current = getCursorTargetBounds(el);
+      hoverEl.current = el;
+      isHovering.current = true;
+      snapTarget.current = getCursorTargetBounds(el);
 
-    const label = resolveCursorLabel(el);
-    syncHoverTarget();
+      const label = resolveCursorLabel(el);
+      syncHoverTarget();
 
-    const labelEl = labelRef.current;
-    if (labelEl) {
-      labelEl.textContent = label;
-      if (label) {
-        gsap.to(labelEl, { opacity: 1, duration: 0.2 });
+      const labelEl = labelRef.current;
+      if (labelEl) {
+        labelEl.textContent = label;
+        if (label) {
+          gsap.to(labelEl, { opacity: 1, duration: 0.2 });
+        }
       }
-    }
 
-    dotRef.current?.classList.add(styles.hovering);
+      dotRef.current?.classList.add(styles.hovering);
 
-    if (!runningRef.current) {
-      runningRef.current = true;
-      rafId.current = requestAnimationFrame(tickRef.current);
-    }
-  }, [syncHoverTarget]);
+      if (!runningRef.current) {
+        runningRef.current = true;
+        rafId.current = requestAnimationFrame(tickRef.current);
+      }
+    },
+    [syncHoverTarget],
+  );
 
-  const handleRegisteredLeave = useCallback((event: MouseEvent, currentTarget: HTMLElement) => {
-    const nextTarget = getInteractiveCursorTarget(event.relatedTarget);
-    if (nextTarget && (nextTarget === hoverEl.current || nextTarget === currentTarget)) {
-      return;
-    }
-    if (nextTarget && nextTarget !== hoverEl.current) return;
-    if (hoverEl.current && hoverEl.current !== currentTarget) return;
-    resetHoverState();
-  }, [resetHoverState]);
+  const handleRegisteredLeave = useCallback(
+    (event: MouseEvent, currentTarget: HTMLElement) => {
+      const nextTarget = getInteractiveCursorTarget(event.relatedTarget);
+      if (nextTarget && (nextTarget === hoverEl.current || nextTarget === currentTarget)) {
+        return;
+      }
+      if (nextTarget && nextTarget !== hoverEl.current) return;
+      if (hoverEl.current && hoverEl.current !== currentTarget) return;
+      resetHoverState();
+    },
+    [resetHoverState],
+  );
 
   useCursorTargetRegistry({
     interactiveElsRef,
@@ -285,9 +304,15 @@ const CustomCursor = () => {
       setIsTesseractMode(active);
     };
 
-    window.addEventListener('arsvine:tesseract-cursor-hover', handleTesseractCursorHover as EventListener);
+    window.addEventListener(
+      'arsvine:tesseract-cursor-hover',
+      handleTesseractCursorHover as EventListener,
+    );
     return () => {
-      window.removeEventListener('arsvine:tesseract-cursor-hover', handleTesseractCursorHover as EventListener);
+      window.removeEventListener(
+        'arsvine:tesseract-cursor-hover',
+        handleTesseractCursorHover as EventListener,
+      );
     };
   }, []);
 
@@ -316,7 +341,10 @@ const CustomCursor = () => {
   }, []);
 
   return (
-    <div ref={rootRef} className={`${styles.cursorRoot} ${isTesseractMode ? styles.tesseractMode : ''}`}>
+    <div
+      ref={rootRef}
+      className={`${styles.cursorRoot} ${isTesseractMode ? styles.tesseractMode : ''}`}
+    >
       <div ref={hLineRef} className={styles.hLine} />
       <div ref={vLineRef} className={styles.vLine} />
       <div ref={xLineARef} className={styles.xLineA} />

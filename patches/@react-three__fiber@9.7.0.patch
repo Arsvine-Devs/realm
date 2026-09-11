@@ -1,59 +1,7 @@
-diff --git a/dist/events-583399dd.cjs.prod.js b/dist/events-583399dd.cjs.prod.js
-index f3834fa28aa8504b48da031e326acb332a722965..ee34915b637e3e500c27e105f66994b57269aedb 100644
---- a/dist/events-583399dd.cjs.prod.js
-+++ b/dist/events-583399dd.cjs.prod.js
-@@ -1018,6 +1018,38 @@ const createStore = (invalidate, advance) => {
-       }
-     }));
-     const pointer = new THREE__namespace.Vector2();
-+    const clock = new THREE__namespace.Timer();
-+    clock.autoStart = true;
-+    clock.running = false;
-+    clock.elapsedTime = 0;
-+    clock.oldTime = 0;
-+    clock.start = () => {
-+      clock.reset();
-+      clock.running = true;
-+      clock.elapsedTime = 0;
-+      clock.oldTime = 0;
-+    };
-+    clock.getDelta = () => {
-+      if (clock.autoStart && !clock.running) {
-+        clock.start();
-+        return 0;
-+      }
-+      if (!clock.running) return 0;
-+      clock.update();
-+      const delta = THREE__namespace.Timer.prototype.getDelta.call(clock);
-+      clock.oldTime = clock.elapsedTime;
-+      clock.elapsedTime += delta;
-+      return delta;
-+    };
-+    clock.getElapsedTime = () => {
-+      clock.getDelta();
-+      return clock.elapsedTime;
-+    };
-+    clock.stop = () => {
-+      clock.getElapsedTime();
-+      clock.running = false;
-+      clock.autoStart = false;
-+    };
-     const rootState = {
-       set,
-       get,
-@@ -1038,7 +1070,7 @@ const createStore = (invalidate, advance) => {
-       linear: false,
-       flat: false,
-       controls: null,
--      clock: new THREE__namespace.Clock(),
-+      clock,
-       pointer,
-       mouse: pointer,
-       frameloop: 'always',
-diff --git a/dist/events-b389eeca.esm.js b/dist/events-b389eeca.esm.js
-index 76f308c96cb09a20e854133e48ec9ef7682edecc..b001134d49dd926a1f7c9e2751e0864654cf66cc 100644
---- a/dist/events-b389eeca.esm.js
-+++ b/dist/events-b389eeca.esm.js
+diff --git a/dist/events-156d8d12.esm.js b/dist/events-156d8d12.esm.js
+index 9681d0c62238d67f2d5ad389307dfd45ee8ba7ba..401aecfcdab79609811ac02c38e812ffac46aefc 100644
+--- a/dist/events-156d8d12.esm.js
++++ b/dist/events-156d8d12.esm.js
 @@ -993,6 +993,38 @@ const createStore = (invalidate, advance) => {
        }
      }));
@@ -102,10 +50,62 @@ index 76f308c96cb09a20e854133e48ec9ef7682edecc..b001134d49dd926a1f7c9e2751e08646
        pointer,
        mouse: pointer,
        frameloop: 'always',
-diff --git a/dist/events-f19bcc32.cjs.dev.js b/dist/events-f19bcc32.cjs.dev.js
-index 07d45d4c0bd7d57301d338040e8aa71c88fce7c5..dbb849f772c92fbebb36a8862ebc763eb7b427fa 100644
---- a/dist/events-f19bcc32.cjs.dev.js
-+++ b/dist/events-f19bcc32.cjs.dev.js
+diff --git a/dist/events-4c71f21f.cjs.prod.js b/dist/events-4c71f21f.cjs.prod.js
+index 65e702ef67d954387307b168529752690a586fd0..8540f7b5870e939770ef13e3357d835370531858 100644
+--- a/dist/events-4c71f21f.cjs.prod.js
++++ b/dist/events-4c71f21f.cjs.prod.js
+@@ -1018,6 +1018,38 @@ const createStore = (invalidate, advance) => {
+       }
+     }));
+     const pointer = new THREE__namespace.Vector2();
++    const clock = new THREE__namespace.Timer();
++    clock.autoStart = true;
++    clock.running = false;
++    clock.elapsedTime = 0;
++    clock.oldTime = 0;
++    clock.start = () => {
++      clock.reset();
++      clock.running = true;
++      clock.elapsedTime = 0;
++      clock.oldTime = 0;
++    };
++    clock.getDelta = () => {
++      if (clock.autoStart && !clock.running) {
++        clock.start();
++        return 0;
++      }
++      if (!clock.running) return 0;
++      clock.update();
++      const delta = THREE__namespace.Timer.prototype.getDelta.call(clock);
++      clock.oldTime = clock.elapsedTime;
++      clock.elapsedTime += delta;
++      return delta;
++    };
++    clock.getElapsedTime = () => {
++      clock.getDelta();
++      return clock.elapsedTime;
++    };
++    clock.stop = () => {
++      clock.getElapsedTime();
++      clock.running = false;
++      clock.autoStart = false;
++    };
+     const rootState = {
+       set,
+       get,
+@@ -1038,7 +1070,7 @@ const createStore = (invalidate, advance) => {
+       linear: false,
+       flat: false,
+       controls: null,
+-      clock: new THREE__namespace.Clock(),
++      clock,
+       pointer,
+       mouse: pointer,
+       frameloop: 'always',
+diff --git a/dist/events-b1bdeb1a.cjs.dev.js b/dist/events-b1bdeb1a.cjs.dev.js
+index 7785529f79299cdefe706c0df1d5c756817ca274..7affaadfa4edb51d951bba10bfdba1f6e1fc58ce 100644
+--- a/dist/events-b1bdeb1a.cjs.dev.js
++++ b/dist/events-b1bdeb1a.cjs.dev.js
 @@ -1018,6 +1018,38 @@ const createStore = (invalidate, advance) => {
        }
      }));

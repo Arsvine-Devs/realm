@@ -13,23 +13,43 @@ vi.mock('@/shared/lib/hud-typing-visibility', () => ({
 
 vi.mock('@/features/hud/model/useAnimationSequence', () => ({
   default: () => ({
-    isLoading: false, mainVisible: true, linesAnimated: true, hudVisible: true,
-    leftPanelAnimated: true, textVisible: true, animationsComplete: true, leversVisible: true,
-    pulsingNormalIndices: [], pulsingReverseIndices: [], handleLoadingComplete: vi.fn(),
-    columnPhase: 'expanded', retractColumns: vi.fn(), expandColumns: vi.fn(),
+    isLoading: false,
+    mainVisible: true,
+    linesAnimated: true,
+    hudVisible: true,
+    leftPanelAnimated: true,
+    textVisible: true,
+    animationsComplete: true,
+    leversVisible: true,
+    pulsingNormalIndices: [],
+    pulsingReverseIndices: [],
+    handleLoadingComplete: vi.fn(),
+    columnPhase: 'expanded',
+    retractColumns: vi.fn(),
+    expandColumns: vi.fn(),
   }),
 }));
 vi.mock('@/features/hud/model/useAdaptivePerformance', () => ({
   default: () => ({
-    performanceTier: 'full', performanceReason: 'default', allowHeavyCssEffects: true,
-    allowDecorativeMotion: true, allowLogoEffects: true, allowAmbientWebGL: true,
-    allowInteractiveWebGL: true, allowCustomCursor: true,
+    performanceTier: 'full',
+    performanceReason: 'default',
+    allowHeavyCssEffects: true,
+    allowDecorativeMotion: true,
+    allowLogoEffects: true,
+    allowAmbientWebGL: true,
+    allowInteractiveWebGL: true,
+    allowCustomCursor: true,
   }),
 }));
 vi.mock('@/features/hud/model/usePowerSystem', () => ({
   default: () => ({
-    powerLevel, isInverted: false, isTesseractActivated: false, isDischarging: false,
-    chargeBattery: vi.fn(), deactivateTesseract: vi.fn(), handleActivateTesseract: vi.fn(),
+    powerLevel,
+    isInverted: false,
+    isTesseractActivated: false,
+    isDischarging: false,
+    chargeBattery: vi.fn(),
+    deactivateTesseract: vi.fn(),
+    handleActivateTesseract: vi.fn(),
     handleDischargeLeverPull: vi.fn(),
   }),
 }));
@@ -41,14 +61,22 @@ vi.mock('@/features/hud/model/useFateTypingEffect', () => ({
 }));
 vi.mock('@/features/hud/model/useEnvParamsTypingEffect', () => ({
   useEnvParamsTypingEffect: () => ({
-    displayedEnvParams: '', isEnvParamsTyping: false, envData: null,
-    envDataVersion: 0, envArtifactStage: 0,
+    displayedEnvParams: '',
+    isEnvParamsTyping: false,
+    envData: null,
+    envDataVersion: 0,
+    envArtifactStage: 0,
   }),
 }));
 vi.mock('@/features/hud/model/useColumnHover', () => ({
   default: () => ({
-    branchText1: '', branchText2: '', branchText3: '', branchText4: '', randomHudTexts: [],
-    handleColumnMouseEnter: vi.fn(), handleColumnMouseLeave: vi.fn(),
+    branchText1: '',
+    branchText2: '',
+    branchText3: '',
+    branchText4: '',
+    randomHudTexts: [],
+    handleColumnMouseEnter: vi.fn(),
+    handleColumnMouseLeave: vi.fn(),
   }),
 }));
 

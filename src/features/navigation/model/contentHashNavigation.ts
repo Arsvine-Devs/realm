@@ -45,11 +45,7 @@ export function classifyRoutePathname(pathname: string): RouteKind {
     return 'content';
   }
 
-  if (
-    routeSegments[0] === 'web'
-    || routeSegments[0] === 'life'
-    || routeSegments[0] === 'blog'
-  ) {
+  if (routeSegments[0] === 'web' || routeSegments[0] === 'life' || routeSegments[0] === 'blog') {
     return 'standalone';
   }
 
@@ -64,9 +60,7 @@ export function resolveContentHashTransitionMode(
     return 'not-content-hash';
   }
 
-  return classifyRoutePathname(sourcePathname) === 'content'
-    ? 'same-page'
-    : 'cross-page';
+  return classifyRoutePathname(sourcePathname) === 'content' ? 'same-page' : 'cross-page';
 }
 
 function getTargetSegments(url: string) {
@@ -99,7 +93,8 @@ export function resolveNavigationTransitionPlan({
   if (contentHashMode === 'same-page') return 'samePageHash';
   const sourceKind = classifyRoutePathname(sourcePathname);
   const goingHome = isHomeUrl(targetUrl);
-  if (sourceKind === 'home' && !goingHome) return mobile ? 'homeForwardMobile' : 'homeForwardDesktop';
+  if (sourceKind === 'home' && !goingHome)
+    return mobile ? 'homeForwardMobile' : 'homeForwardDesktop';
   if (sourceKind !== 'home' && contentHashMode === 'cross-page') return 'crossPageHash';
   if (sourceKind !== 'home' && goingHome) return mobile ? 'returnHomeMobile' : 'returnHomeDesktop';
   if (isBlogDetailUrl(targetUrl)) return 'blogDetailFade';

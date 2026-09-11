@@ -19,7 +19,9 @@ export function NavigationRuntimeProvider({
   value: NavigationRuntimeValue;
   children: ReactNode;
 }) {
-  return <NavigationRuntimeContext.Provider value={value}>{children}</NavigationRuntimeContext.Provider>;
+  return (
+    <NavigationRuntimeContext.Provider value={value}>{children}</NavigationRuntimeContext.Provider>
+  );
 }
 
 export function useNavigationRuntime(): NavigationRuntimeValue {

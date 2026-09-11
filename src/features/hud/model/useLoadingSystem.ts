@@ -14,11 +14,11 @@ const MIN_DISPLAY_TIME = 1800;
 const TASK_TIMEOUT = 6000;
 const CRITICAL_IMAGE_URLS = ['/images/texture-noise.jpg', '/avatar_transparent.webp'];
 
-const withTimeout = <T,>(promise: Promise<T>, timeoutMs: number): Promise<T | 'timeout'> => {
-  return new Promise(resolve => {
+const withTimeout = <T>(promise: Promise<T>, timeoutMs: number): Promise<T | 'timeout'> => {
+  return new Promise((resolve) => {
     const timeoutId = setTimeout(() => resolve('timeout'), timeoutMs);
     promise
-      .then(value => resolve(value))
+      .then((value) => resolve(value))
       .catch(() => resolve('timeout'))
       .finally(() => clearTimeout(timeoutId));
   });
@@ -28,13 +28,16 @@ const waitForWindowLoad = async (): Promise<LoadingTaskStatus> => {
   if (typeof window === 'undefined' || typeof document === 'undefined') return 'ready';
   if (document.readyState === 'complete') return 'ready';
 
-  const result = await withTimeout(new Promise<LoadingTaskStatus>(resolve => {
-    const handleLoad = () => {
-      window.removeEventListener('load', handleLoad);
-      resolve('ready');
-    };
-    window.addEventListener('load', handleLoad, { once: true });
-  }), TASK_TIMEOUT);
+  const result = await withTimeout(
+    new Promise<LoadingTaskStatus>((resolve) => {
+      const handleLoad = () => {
+        window.removeEventListener('load', handleLoad);
+        resolve('ready');
+      };
+      window.addEventListener('load', handleLoad, { once: true });
+    }),
+    TASK_TIMEOUT,
+  );
 
   return result === 'timeout' ? 'fallback' : result;
 };
@@ -45,12 +48,15 @@ const waitForFonts = async (): Promise<LoadingTaskStatus> => {
   const fontSet = document.fonts;
   if (!fontSet?.ready) return 'ready';
 
-  const result = await withTimeout(fontSet.ready.then(() => 'ready' as const), TASK_TIMEOUT);
+  const result = await withTimeout(
+    fontSet.ready.then(() => 'ready' as const),
+    TASK_TIMEOUT,
+  );
   return result === 'timeout' ? 'fallback' : result;
 };
 
 const loadImage = (url: string): Promise<LoadingTaskStatus> => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const image = new Image();
     let settled = false;
 
@@ -78,7 +84,10 @@ const loadImage = (url: string): Promise<LoadingTaskStatus> => {
 
     if (image.complete) {
       if ('decode' in image) {
-        image.decode().then(() => finish('ready')).catch(() => finish('fallback'));
+        image
+          .decode()
+          .then(() => finish('ready'))
+          .catch(() => finish('fallback'));
       } else {
         finish('ready');
       }
@@ -89,9 +98,9 @@ const loadImage = (url: string): Promise<LoadingTaskStatus> => {
 const waitForCriticalImages = async (): Promise<LoadingTaskStatus> => {
   if (typeof window === 'undefined') return 'ready';
 
-  const imageLoads = CRITICAL_IMAGE_URLS.map(url => withTimeout(loadImage(url), TASK_TIMEOUT));
+  const imageLoads = CRITICAL_IMAGE_URLS.map((url) => withTimeout(loadImage(url), TASK_TIMEOUT));
   const results = await Promise.all(imageLoads);
-  return results.every(result => result === 'ready') ? 'ready' : 'fallback';
+  return results.every((result) => result === 'ready') ? 'ready' : 'fallback';
 };
 
 export const useLoadingSystem = (startLogging: boolean = true) => {
@@ -123,7 +132,7 @@ export const useLoadingSystem = (startLogging: boolean = true) => {
       }
 
       const line = logQueueRef.current.shift()!;
-      setLogLines(prev => [...prev, line]);
+      setLogLines((prev) => [...prev, line]);
     }, 70);
   }, []);
 
@@ -152,32 +161,35 @@ export const useLoadingSystem = (startLogging: boolean = true) => {
     minDisplayTimeoutRef.current = setTimeout(waitForQueueDrain, remaining);
   }, [waitForQueueDrain]);
 
-  const tasks = useCallback((): LoadingTask[] => [
-    {
-      id: 'document',
-      label: 'DOCUMENT CHANNEL',
-      weight: 25,
-      run: waitForWindowLoad,
-    },
-    {
-      id: 'fonts',
-      label: 'FONT SYSTEM',
-      weight: 25,
-      run: waitForFonts,
-    },
-    {
-      id: 'images',
-      label: 'VISUAL ASSETS',
-      weight: 35,
-      run: waitForCriticalImages,
-    },
-    {
-      id: 'interface',
-      label: 'HUD INTERFACE',
-      weight: 15,
-      run: async () => 'ready',
-    },
-  ], []);
+  const tasks = useCallback(
+    (): LoadingTask[] => [
+      {
+        id: 'document',
+        label: 'DOCUMENT CHANNEL',
+        weight: 25,
+        run: waitForWindowLoad,
+      },
+      {
+        id: 'fonts',
+        label: 'FONT SYSTEM',
+        weight: 25,
+        run: waitForFonts,
+      },
+      {
+        id: 'images',
+        label: 'VISUAL ASSETS',
+        weight: 35,
+        run: waitForCriticalImages,
+      },
+      {
+        id: 'interface',
+        label: 'HUD INTERFACE',
+        weight: 15,
+        run: async () => 'ready',
+      },
+    ],
+    [],
+  );
 
   useEffect(() => {
     return () => {
@@ -204,7 +216,10 @@ export const useLoadingSystem = (startLogging: boolean = true) => {
       if (cancelled) return;
 
       completedWeightRef.current += task.weight;
-      const nextProgress = Math.min(100, Math.round((completedWeightRef.current / totalWeight) * 100));
+      const nextProgress = Math.min(
+        100,
+        Math.round((completedWeightRef.current / totalWeight) * 100),
+      );
       setProgress(nextProgress);
       queueLog(`${task.label} ${status === 'ready' ? 'READY' : 'FALLBACK READY'} 100%`);
 
@@ -216,10 +231,11 @@ export const useLoadingSystem = (startLogging: boolean = true) => {
       }
     };
 
-    taskList.forEach(task => {
+    taskList.forEach((task) => {
       queueLog(`INITIALIZING ${task.label}...`);
-      task.run()
-        .then(status => completeTask(task, status))
+      task
+        .run()
+        .then((status) => completeTask(task, status))
         .catch(() => completeTask(task, 'fallback'));
     });
 

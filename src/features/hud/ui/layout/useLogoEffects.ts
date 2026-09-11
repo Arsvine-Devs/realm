@@ -47,9 +47,10 @@ export default function useLogoEffects(
       );
       element.style.setProperty('--avatar-split', split.toFixed(3));
 
-      const stillMoving = Math.abs(target.x - current.x) > 0.05
-        || Math.abs(target.y - current.y) > 0.05
-        || split > 0.005;
+      const stillMoving =
+        Math.abs(target.x - current.x) > 0.05 ||
+        Math.abs(target.y - current.y) > 0.05 ||
+        split > 0.005;
       if (stillMoving) {
         frameId = window.requestAnimationFrame(tick);
         return;
@@ -60,8 +61,10 @@ export default function useLogoEffects(
     const onPointerMove = (event: PointerEvent) => {
       const width = window.innerWidth || 1;
       const height = window.innerHeight || 1;
-      target.x = Math.max(-1, Math.min(1, (event.clientX - width / 2) / (width / 2))) * MAX_OFFSET_PX;
-      target.y = Math.max(-1, Math.min(1, (event.clientY - height / 2) / (height / 2))) * MAX_OFFSET_PX;
+      target.x =
+        Math.max(-1, Math.min(1, (event.clientX - width / 2) / (width / 2))) * MAX_OFFSET_PX;
+      target.y =
+        Math.max(-1, Math.min(1, (event.clientY - height / 2) / (height / 2))) * MAX_OFFSET_PX;
       if (running) return;
 
       running = true;

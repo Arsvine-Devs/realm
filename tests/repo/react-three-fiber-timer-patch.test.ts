@@ -11,12 +11,12 @@ describe('React Three Fiber timer compatibility patch', () => {
     const workspace = readSource('pnpm-workspace.yaml');
 
     expect(workspace).toContain(
-      "'@react-three/fiber@9.6.1': patches/@react-three__fiber@9.6.1.patch",
+      "'@react-three/fiber@9.7.0': patches/@react-three__fiber@9.7.0.patch",
     );
   });
 
   it('replaces Fiber clock construction with a Timer-backed compatibility clock', () => {
-    const patch = readSource('patches/@react-three__fiber@9.6.1.patch');
+    const patch = readSource('patches/@react-three__fiber@9.7.0.patch');
 
     expect(patch).toContain('new THREE.Timer()');
     expect(patch).toContain('new THREE__namespace.Timer()');
@@ -31,6 +31,6 @@ describe('React Three Fiber timer compatibility patch', () => {
     expect(match).not.toBeNull();
     // 精确锁版（无 ^/~ 前缀）：caret 会自动跳到未打补丁的 patch 版本，
     // pnpm 届时只打 warning 不应用补丁，导致 3D 可暂停 clock 静默退回 THREE.Clock()。
-    expect(match![1]).toBe('9.6.1');
+    expect(match![1]).toBe('9.7.0');
   });
 });

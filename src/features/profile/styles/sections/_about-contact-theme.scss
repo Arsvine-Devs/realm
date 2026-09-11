@@ -17,12 +17,13 @@
   }
 
   .radarDisplay .scanner {
-    background: conic-gradient(from 0deg,
-        rgba(var(--ark-primary-rgb), 0.6) 0deg,
-        rgba(var(--ark-primary-rgb), 0.1) 30deg,
-        transparent 30.1deg 360deg);
+    background: conic-gradient(
+      from 0deg,
+      rgba(var(--ark-primary-rgb), 0.6) 0deg,
+      rgba(var(--ark-primary-rgb), 0.1) 30deg,
+      transparent 30.1deg 360deg
+    );
   }
-
 }
 
 :global(html[data-theme-mode='inverted']) {

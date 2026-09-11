@@ -21,15 +21,12 @@ export default function SkillTree({ categories, expanded }: SkillTreeProps) {
 
   const isCollapsing = !expanded && wasExpanded;
 
-  const allSkills = useMemo(
-    () => categories.flatMap(c => c.skills),
-    [categories],
-  );
+  const allSkills = useMemo(() => categories.flatMap((c) => c.skills), [categories]);
 
   const activeId = hoveredId ?? tappedId;
 
   const activeSkill = useMemo(
-    () => allSkills.find(sk => sk.id === activeId) ?? null,
+    () => allSkills.find((sk) => sk.id === activeId) ?? null,
     [allSkills, activeId],
   );
 
@@ -39,7 +36,7 @@ export default function SkillTree({ categories, expanded }: SkillTreeProps) {
   );
 
   const handleLeafTap = useCallback((skillId: string) => {
-    setTappedId(prev => (prev === skillId ? null : skillId));
+    setTappedId((prev) => (prev === skillId ? null : skillId));
   }, []);
 
   useEffect(() => {
@@ -63,11 +60,9 @@ export default function SkillTree({ categories, expanded }: SkillTreeProps) {
 
   let lineIdx = 0;
 
-  const treeClass = [
-    s.skillTree,
-    expanded ? s.expanded : '',
-    isCollapsing ? s.collapsing : '',
-  ].filter(Boolean).join(' ');
+  const treeClass = [s.skillTree, expanded ? s.expanded : '', isCollapsing ? s.collapsing : '']
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className={treeClass}>
@@ -81,10 +76,12 @@ export default function SkillTree({ categories, expanded }: SkillTreeProps) {
                 <div
                   key={cat.id}
                   className={`${s.branch} ${isLastBranch ? s.last : ''}`}
-                  style={{
-                    '--delay': branchIdx,
-                    '--delay-rev': totalLines - 1 - branchIdx,
-                  } as React.CSSProperties}
+                  style={
+                    {
+                      '--delay': branchIdx,
+                      '--delay-rev': totalLines - 1 - branchIdx,
+                    } as React.CSSProperties
+                  }
                 >
                   <div className={s.branchHeader}>
                     <span className={s.branchName}>{cat.name}</span>
@@ -102,18 +99,28 @@ export default function SkillTree({ categories, expanded }: SkillTreeProps) {
                       return (
                         <div
                           key={skill.id}
-                          className={[
-                            s.leaf,
-                            isLastLeaf ? s.last : '',
-                            isActive ? s.hovered : '',
-                          ].filter(Boolean).join(' ')}
-                          style={{
-                            '--delay': leafIdx,
-                            '--delay-rev': totalLines - 1 - leafIdx,
-                          } as React.CSSProperties}
+                          className={[s.leaf, isLastLeaf ? s.last : '', isActive ? s.hovered : '']
+                            .filter(Boolean)
+                            .join(' ')}
+                          style={
+                            {
+                              '--delay': leafIdx,
+                              '--delay-rev': totalLines - 1 - leafIdx,
+                            } as React.CSSProperties
+                          }
                           onMouseEnter={() => setHoveredId(skill.id)}
                           onMouseLeave={() => setHoveredId(null)}
                           onClick={() => handleLeafTap(skill.id)}
+                          /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- the leaf contains block layout and an inline description panel. */
+                          role="button"
+                          tabIndex={0}
+                          aria-label={skill.name}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault();
+                              handleLeafTap(skill.id);
+                            }
+                          }}
                         >
                           <div className={s.leafRow}>
                             <span className={s.leafName}>{skill.name}</span>

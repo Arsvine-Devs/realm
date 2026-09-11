@@ -24,7 +24,10 @@
   box-shadow: inset 0 0 0 1px rgba(var(--ark-primary-rgb), 0.04);
   color: var(--ark-text-secondary);
   flex-shrink: 0;
-  transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s ease;
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s,
+    transform 0.3s ease;
 }
 
 .logIcon {
@@ -35,7 +38,9 @@
   stroke: none;
   color: var(--ark-primary);
   opacity: 0.8;
-  transition: color 0.3s, opacity 0.3s;
+  transition:
+    color 0.3s,
+    opacity 0.3s;
 
   .logItem:hover & {
     color: var(--ark-text);
@@ -50,10 +55,12 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: conic-gradient(from 0deg,
-      rgba(var(--ark-highlight-green-rgb), 0.6) 0deg,
-      rgba(var(--ark-highlight-green-rgb), 0.1) 30deg,
-      transparent 30.1deg 360deg);
+  background: conic-gradient(
+    from 0deg,
+    rgba(var(--ark-highlight-green-rgb), 0.6) 0deg,
+    rgba(var(--ark-highlight-green-rgb), 0.1) 30deg,
+    transparent 30.1deg 360deg
+  );
   animation: rotateScanner 4s linear infinite;
   animation-direction: reverse;
   opacity: 0.8;
@@ -97,7 +104,9 @@
   color: var(--ark-dark-blue);
   font-size: var(--fs-caption);
   white-space: nowrap;
-  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  transition:
+    transform 0.3s ease-out,
+    opacity 0.3s ease-out;
   pointer-events: none;
   z-index: 4;
 }
@@ -153,19 +162,23 @@
   }
 
   &::before {
-    background-image: repeating-linear-gradient(to bottom,
-        rgba(var(--ark-primary-rgb), 0.1) 0,
-        rgba(var(--ark-primary-rgb), 0.1) 1px,
-        transparent 1px,
-        transparent 20px);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(var(--ark-primary-rgb), 0.1) 0,
+      rgba(var(--ark-primary-rgb), 0.1) 1px,
+      transparent 1px,
+      transparent 20px
+    );
   }
 
   &::after {
-    background-image: repeating-linear-gradient(to right,
-        rgba(var(--ark-primary-rgb), 0.1) 0,
-        rgba(var(--ark-primary-rgb), 0.1) 1px,
-        transparent 1px,
-        transparent 20px);
+    background-image: repeating-linear-gradient(
+      to right,
+      rgba(var(--ark-primary-rgb), 0.1) 0,
+      rgba(var(--ark-primary-rgb), 0.1) 1px,
+      transparent 1px,
+      transparent 20px
+    );
   }
 }
 

@@ -36,9 +36,7 @@ type BlogIndexVariant = {
 };
 
 export function isBlogContentLocale(value: unknown): value is BlogContentLocale {
-  return (
-    typeof value === 'string' && (blogContentLocales as readonly string[]).includes(value)
-  );
+  return typeof value === 'string' && (blogContentLocales as readonly string[]).includes(value);
 }
 
 export function normalizeAccess(access?: ContentPostAccess): ContentPostAccess {
@@ -56,7 +54,10 @@ function buildVariantPath(slug: string, locale: BlogContentLocale) {
   return `blog/${slug}/${locale}.mdx`;
 }
 
-function getVariantForLocale(entry: ContentBlogIndexItem, locale: BlogContentLocale): BlogIndexVariant | null {
+function getVariantForLocale(
+  entry: ContentBlogIndexItem,
+  locale: BlogContentLocale,
+): BlogIndexVariant | null {
   return (entry.variants[locale] as BlogIndexVariant | undefined) ?? null;
 }
 
@@ -156,7 +157,7 @@ function sanitizeProtectedPostMeta(meta: BlogPostMeta): BlogPostMeta {
   };
 }
 
-export function estimateReadingMinutes(content: string, locale: BlogContentLocale): number {
+function estimateReadingMinutes(content: string, locale: BlogContentLocale): number {
   if (!content) return 1;
 
   const stripped = content
@@ -193,9 +194,9 @@ export async function getAvailablePostContentLocales(slug: string): Promise<Blog
   const entry = await getBlogIndexEntry(slug);
   if (!entry) return [];
 
-  return entry.availableLocales.filter(isBlogContentLocale).sort(
-    (left, right) => blogContentLocales.indexOf(left) - blogContentLocales.indexOf(right),
-  );
+  return entry.availableLocales
+    .filter(isBlogContentLocale)
+    .sort((left, right) => blogContentLocales.indexOf(left) - blogContentLocales.indexOf(right));
 }
 
 export async function getPostBySlugAndContentLocale(slug: string, locale: BlogContentLocale) {
@@ -233,7 +234,9 @@ export async function getPostMetaBySlugAndLocale(slug: string, locale: Locale) {
     meta,
     requestedLocale: locale,
     actualLocale:
-      actualContentLocale === 'zh-CN' || actualContentLocale === 'zh-TW' || actualContentLocale === 'en'
+      actualContentLocale === 'zh-CN' ||
+      actualContentLocale === 'zh-TW' ||
+      actualContentLocale === 'en'
         ? actualContentLocale
         : defaultLocale,
     actualContentLocale,
@@ -286,4 +289,3 @@ export async function getPublicPostsForLocale(locale: Locale): Promise<BlogPostM
 export function getProtectedPostPublicMeta(meta: BlogPostMeta): BlogPostMeta {
   return sanitizeProtectedPostMeta(meta);
 }
-

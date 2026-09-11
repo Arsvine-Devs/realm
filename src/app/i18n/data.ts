@@ -113,7 +113,12 @@ export function loadProjects(locale: Locale): ProjectsModule {
 export function resolveWebProject(
   id: number,
   locale: Locale,
-): { project: Project; status: TranslationStatus; actualLocale: Locale; originLocale: Locale } | null {
+): {
+  project: Project;
+  status: TranslationStatus;
+  actualLocale: Locale;
+  originLocale: Locale;
+} | null {
   const current = loadProjects(locale).webProjects.find((project) => project.id === id);
   if (current) {
     const origin = current.originLocale ?? defaultLocale;
@@ -159,7 +164,12 @@ export function loadLife(locale: Locale): LifeModule {
 export function resolveLifeItem(
   slug: string,
   locale: Locale,
-): { item: LifeItem; status: TranslationStatus; actualLocale: Locale; originLocale: Locale } | null {
+): {
+  item: LifeItem;
+  status: TranslationStatus;
+  actualLocale: Locale;
+  originLocale: Locale;
+} | null {
   const flatten = (mod: LifeModule) => [...mod.gameData, ...mod.travelData, ...mod.otherData];
 
   const current = flatten(loadLife(locale)).find((item) => item.id === slug);

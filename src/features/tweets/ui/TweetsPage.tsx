@@ -27,15 +27,15 @@ export default function TweetsPage({
 }: TweetsPageProps) {
   return (
     <SectionPageLayout>
-        <TweetsSection
-          locale={locale}
-          monthGroups={monthGroups}
-          totalMonths={totalMonths}
-          monthBatchSize={monthBatchSize}
-          generatedAt={generatedAt}
-          sourceUnavailable={sourceUnavailable}
-          sourceError={sourceError}
-        />
+      <TweetsSection
+        locale={locale}
+        monthGroups={monthGroups}
+        totalMonths={totalMonths}
+        monthBatchSize={monthBatchSize}
+        generatedAt={generatedAt}
+        sourceUnavailable={sourceUnavailable}
+        sourceError={sourceError}
+      />
     </SectionPageLayout>
   );
 }

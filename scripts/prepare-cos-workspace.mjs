@@ -109,7 +109,9 @@ async function buildLegacyIndex(root) {
 }
 
 function buildImageDestination(section, slug, variant, ext) {
-  return toPosix(path.join('realm', 'images', section, ...CANONICAL_DATE, `${slug}-${variant}${ext}`));
+  return toPosix(
+    path.join('realm', 'images', section, ...CANONICAL_DATE, `${slug}-${variant}${ext}`),
+  );
 }
 
 async function stageStructuredAssets(legacyFiles) {
@@ -135,7 +137,9 @@ async function stageStructuredAssets(legacyFiles) {
     );
 
     for (const [galleryIndex, legacyRelative] of item.gallery.entries()) {
-      const variant = legacyRelative.startsWith('posts/') ? `shot-${galleryIndex + 1}` : `gallery-${galleryIndex + 1}`;
+      const variant = legacyRelative.startsWith('posts/')
+        ? `shot-${galleryIndex + 1}`
+        : `gallery-${galleryIndex + 1}`;
       await stageLegacyAsset(
         legacyRelative,
         buildImageDestination('works', slug, variant, path.extname(legacyRelative)),
@@ -168,12 +172,12 @@ async function stageStructuredAssets(legacyFiles) {
     const coverRecord = {
       id: slug,
       status: 'published',
-        title: item.title,
-        description: item.description,
-        alt: `${item.title} cover`,
-        source: coverSource,
-        tags: normalizeTags(item.tech),
-        collection: item.collection,
+      title: item.title,
+      description: item.description,
+      alt: `${item.title} cover`,
+      source: coverSource,
+      tags: normalizeTags(item.tech),
+      collection: item.collection,
       order: index + 1,
       date: item.date || CATALOG_DATE,
     };
@@ -206,7 +210,12 @@ async function stageStructuredAssets(legacyFiles) {
     for (const [index, legacyRelative] of entry.gallery.entries()) {
       const source = await stageLegacyAsset(
         legacyRelative,
-        buildImageDestination('experience', slug, `gallery-${index + 1}`, path.extname(legacyRelative)),
+        buildImageDestination(
+          'experience',
+          slug,
+          `gallery-${index + 1}`,
+          path.extname(legacyRelative),
+        ),
       );
       experienceRecords.push({
         id: `${slug}-gallery-${index + 1}`,
@@ -247,13 +256,25 @@ async function stageStructuredAssets(legacyFiles) {
   const usedLegacy = new Set(sourceMap.keys());
   for (const [legacyRelative] of legacyFiles) {
     if (usedLegacy.has(legacyRelative)) continue;
-    if (legacyRelative.startsWith('fonts/') || legacyRelative.startsWith('music/') || legacyRelative === 'test/echo.txt') {
+    if (
+      legacyRelative.startsWith('fonts/') ||
+      legacyRelative.startsWith('music/') ||
+      legacyRelative === 'test/echo.txt'
+    ) {
       continue;
     }
     const parsed = path.posix.parse(legacyRelative);
     await stageLegacyAsset(
       legacyRelative,
-      toPosix(path.join('realm', 'images', 'archive', ...CANONICAL_DATE, `${slugify(parsed.name)}${parsed.ext}`)),
+      toPosix(
+        path.join(
+          'realm',
+          'images',
+          'archive',
+          ...CANONICAL_DATE,
+          `${slugify(parsed.name)}${parsed.ext}`,
+        ),
+      ),
     );
   }
 
@@ -262,57 +283,77 @@ async function stageStructuredAssets(legacyFiles) {
     if (!sourcePath) {
       throw new Error(`Missing legacy audio file: music/${item.file}`);
     }
-    const destination = toPosix(path.join('realm', 'audio', ...CANONICAL_DATE, `${item.id}${path.extname(item.file)}`));
+    const destination = toPosix(
+      path.join('realm', 'audio', ...CANONICAL_DATE, `${item.id}${path.extname(item.file)}`),
+    );
     await copyFileStrict(sourcePath, path.join(PUBLIC_ROOT, ...destination.split('/')));
     sourceMap.set(`music/${item.file}`, makeSource(destination));
   }
 
-  await copyDirectoryContents(path.join(LEGACY_ROOT, 'fonts'), path.join(PUBLIC_ROOT, 'shared', 'fonts'));
+  await copyDirectoryContents(
+    path.join(LEGACY_ROOT, 'fonts'),
+    path.join(PUBLIC_ROOT, 'shared', 'fonts'),
+  );
   const cssPath = path.join(PUBLIC_ROOT, 'shared', 'fonts', 'google-fonts.css');
   const css = await readFile(cssPath, 'utf-8');
-  await writeFile(cssPath, css.replaceAll('https://cdn.arsvine.com/fonts/', 'https://cdn.arsvine.com/shared/fonts/'));
+  await writeFile(
+    cssPath,
+    css.replaceAll('https://cdn.arsvine.com/fonts/', 'https://cdn.arsvine.com/shared/fonts/'),
+  );
 
   const homeRecords = [
     worksRecords[0],
     worksRecords[1],
     lifeCollections[0]?.cover,
     lifeCollections.find((entry) => entry.cover.id === 'zhenjiang')?.cover,
-  ].filter(Boolean).map((entry, index) => ({
-    ...prefixRecordId(entry, 'home'),
-    collection: 'home-featured',
-    order: index + 1,
-  }));
+  ]
+    .filter(Boolean)
+    .map((entry, index) => ({
+      ...prefixRecordId(entry, 'home'),
+      collection: 'home-featured',
+      order: index + 1,
+    }));
 
   const collectionEntries = [
     {
       slug: 'web-projects',
       title: 'Web Projects',
       description: 'Project covers from the portfolio.',
-      items: worksRecords.filter((item) => item.collection === 'web-projects').map((item) => prefixRecordId(item, 'collection-web-projects')),
+      items: worksRecords
+        .filter((item) => item.collection === 'web-projects')
+        .map((item) => prefixRecordId(item, 'collection-web-projects')),
     },
     {
       slug: 'early-projects',
       title: 'Early Projects',
       description: 'Archived learning-era project visuals.',
-      items: worksRecords.filter((item) => item.collection === 'early-projects').map((item) => prefixRecordId(item, 'collection-early-projects')),
+      items: worksRecords
+        .filter((item) => item.collection === 'early-projects')
+        .map((item) => prefixRecordId(item, 'collection-early-projects')),
     },
     {
       slug: 'life-games',
       title: 'Life Games',
       description: 'Game-related gallery images.',
-      items: lifeGalleryRecords.filter((item) => item.collection === 'life-games').map((item) => prefixRecordId(item, 'collection-life-games')),
+      items: lifeGalleryRecords
+        .filter((item) => item.collection === 'life-games')
+        .map((item) => prefixRecordId(item, 'collection-life-games')),
     },
     {
       slug: 'life-travel',
       title: 'Travel',
       description: 'Travel gallery images.',
-      items: lifeGalleryRecords.filter((item) => item.collection === 'life-travel').map((item) => prefixRecordId(item, 'collection-life-travel')),
+      items: lifeGalleryRecords
+        .filter((item) => item.collection === 'life-travel')
+        .map((item) => prefixRecordId(item, 'collection-life-travel')),
     },
     {
       slug: 'life-other',
       title: 'Other Interests',
       description: 'Other interest gallery images.',
-      items: lifeGalleryRecords.filter((item) => item.collection === 'life-other').map((item) => prefixRecordId(item, 'collection-life-other')),
+      items: lifeGalleryRecords
+        .filter((item) => item.collection === 'life-other')
+        .map((item) => prefixRecordId(item, 'collection-life-other')),
     },
     {
       slug: 'experience',
@@ -323,9 +364,7 @@ async function stageStructuredAssets(legacyFiles) {
   ];
 
   const collections = {
-    collections: [
-      ...collectionEntries,
-    ],
+    collections: [...collectionEntries],
   };
 
   const audioRecords = AUDIO_ITEMS.map((item, index) => ({
@@ -333,7 +372,11 @@ async function stageStructuredAssets(legacyFiles) {
     status: 'published',
     title: item.title,
     artist: item.artist,
-    source: makeSource(toPosix(path.join('realm', 'audio', ...CANONICAL_DATE, `${item.id}${path.extname(item.file)}`))),
+    source: makeSource(
+      toPosix(
+        path.join('realm', 'audio', ...CANONICAL_DATE, `${item.id}${path.extname(item.file)}`),
+      ),
+    ),
     order: index + 1,
     date: CATALOG_DATE,
   }));
@@ -367,12 +410,30 @@ async function main() {
   const legacyFiles = await buildLegacyIndex(LEGACY_ROOT);
   const generated = await stageStructuredAssets(legacyFiles);
 
-  await writeFile(path.join(META_ROOT, 'home.json'), `${JSON.stringify(generated.homeRecords, null, 2)}\n`);
-  await writeFile(path.join(META_ROOT, 'works.json'), `${JSON.stringify(generated.worksRecords, null, 2)}\n`);
-  await writeFile(path.join(META_ROOT, 'collections.json'), `${JSON.stringify(generated.collections, null, 2)}\n`);
-  await writeFile(path.join(META_ROOT, 'links.json'), `${JSON.stringify(generated.linkRecords, null, 2)}\n`);
-  await writeFile(path.join(META_ROOT, 'audio.json'), `${JSON.stringify(generated.audioRecords, null, 2)}\n`);
-  await writeFile(path.join(META_ROOT, 'legacy-asset-sources.json'), `${JSON.stringify(generated.legacyAssetSources, null, 2)}\n`);
+  await writeFile(
+    path.join(META_ROOT, 'home.json'),
+    `${JSON.stringify(generated.homeRecords, null, 2)}\n`,
+  );
+  await writeFile(
+    path.join(META_ROOT, 'works.json'),
+    `${JSON.stringify(generated.worksRecords, null, 2)}\n`,
+  );
+  await writeFile(
+    path.join(META_ROOT, 'collections.json'),
+    `${JSON.stringify(generated.collections, null, 2)}\n`,
+  );
+  await writeFile(
+    path.join(META_ROOT, 'links.json'),
+    `${JSON.stringify(generated.linkRecords, null, 2)}\n`,
+  );
+  await writeFile(
+    path.join(META_ROOT, 'audio.json'),
+    `${JSON.stringify(generated.audioRecords, null, 2)}\n`,
+  );
+  await writeFile(
+    path.join(META_ROOT, 'legacy-asset-sources.json'),
+    `${JSON.stringify(generated.legacyAssetSources, null, 2)}\n`,
+  );
 
   console.log('[prepare-cos-workspace] prepared public-root and catalog metadata');
 }

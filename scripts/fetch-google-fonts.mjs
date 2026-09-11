@@ -88,11 +88,7 @@ async function readGoogleFontsUrl() {
 
 // "Noto Sans SC" → "noto-sans-sc"
 function familyToSlug(family) {
-  return family
-    .replace(/['"]/g, '')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-');
+  return family.replace(/['"]/g, '').trim().toLowerCase().replace(/\s+/g, '-');
 }
 
 // Extract enough metadata from a single @font-face block to name the local file.
@@ -204,9 +200,13 @@ async function main() {
     rewrites.set(parsed.url, cdnUrl);
     tasks.push({ ...parsed, destPath, cdnUrl });
   }
-  console.log(`[fonts] After dedup: ${tasks.length} unique woff2 files (from ${blocks.length} @font-face blocks)`);
+  console.log(
+    `[fonts] After dedup: ${tasks.length} unique woff2 files (from ${blocks.length} @font-face blocks)`,
+  );
 
-  console.log(`[fonts] Downloading ${tasks.length} woff2 files (concurrency=${DOWNLOAD_CONCURRENCY})...`);
+  console.log(
+    `[fonts] Downloading ${tasks.length} woff2 files (concurrency=${DOWNLOAD_CONCURRENCY})...`,
+  );
   let totalBytes = 0;
   let done = 0;
   await pool(tasks, DOWNLOAD_CONCURRENCY, async (t) => {
@@ -265,7 +265,9 @@ async function main() {
   console.log('    Firefox 会拒绝渲染字体，繁体/低频字 fallback 到系统字体。');
   console.log('');
   console.log('Verify with:');
-  console.log('  curl -I -H "Referer: https://arsvine.com/" https://cdn.arsvine.com/shared/fonts/google-fonts.css');
+  console.log(
+    '  curl -I -H "Referer: https://arsvine.com/" https://cdn.arsvine.com/shared/fonts/google-fonts.css',
+  );
   console.log('  → Content-Type / Cache-Control 各只出现一次');
 }
 

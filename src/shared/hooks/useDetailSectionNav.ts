@@ -65,9 +65,12 @@ export function useDetailSectionNav({ rootRef, depsKey }: UseDetailSectionNavOpt
     };
   }, [depsKey, rootRef]);
 
-  const bindSectionRef = useCallback((id: string) => (element: HTMLElement | null) => {
-    sectionRefs.current[id] = element;
-  }, []);
+  const bindSectionRef = useCallback(
+    (id: string) => (element: HTMLElement | null) => {
+      sectionRefs.current[id] = element;
+    },
+    [],
+  );
 
   const scrollToSection = useCallback((id: string) => {
     const section = sectionRefs.current[id];

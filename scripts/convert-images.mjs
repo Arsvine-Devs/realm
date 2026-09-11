@@ -34,7 +34,16 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-const SUPPORTED_INPUT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.avif', '.gif', '.tiff', '.tif']);
+const SUPPORTED_INPUT = new Set([
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.webp',
+  '.avif',
+  '.gif',
+  '.tiff',
+  '.tif',
+]);
 const SUPPORTED_OUTPUT = new Set(['webp', 'jpg', 'png', 'avif']);
 
 const FORMAT_DEFAULTS = {
@@ -63,7 +72,9 @@ function parseArgs(argv) {
   if (args.length > 0 && !args[0].startsWith('-')) {
     const candidate = args.shift().toLowerCase();
     if (!SUPPORTED_OUTPUT.has(candidate)) {
-      console.error(`Unknown format: ${candidate}. Use one of: ${[...SUPPORTED_OUTPUT].join(', ')}`);
+      console.error(
+        `Unknown format: ${candidate}. Use one of: ${[...SUPPORTED_OUTPUT].join(', ')}`,
+      );
       process.exit(2);
     }
     opts.format = candidate;
@@ -72,14 +83,31 @@ function parseArgs(argv) {
   while (args.length > 0) {
     const a = args.shift();
     switch (a) {
-      case '--src': opts.src = path.resolve(args.shift()); break;
-      case '--out': opts.out = path.resolve(args.shift()); break;
-      case '--quality': opts.quality = parseInt(args.shift(), 10); break;
-      case '--recursive': opts.recursive = true; break;
-      case '--no-recursive': opts.recursive = false; break;
-      case '--overwrite': opts.overwrite = true; break;
-      case '--keep-smaller': opts.keepSmaller = true; break;
-      case '--help': case '-h': opts.help = true; break;
+      case '--src':
+        opts.src = path.resolve(args.shift());
+        break;
+      case '--out':
+        opts.out = path.resolve(args.shift());
+        break;
+      case '--quality':
+        opts.quality = parseInt(args.shift(), 10);
+        break;
+      case '--recursive':
+        opts.recursive = true;
+        break;
+      case '--no-recursive':
+        opts.recursive = false;
+        break;
+      case '--overwrite':
+        opts.overwrite = true;
+        break;
+      case '--keep-smaller':
+        opts.keepSmaller = true;
+        break;
+      case '--help':
+      case '-h':
+        opts.help = true;
+        break;
       default:
         if (!opts._extra) opts._extra = [];
         opts._extra.push(a);
@@ -125,7 +153,7 @@ async function walk(dir, { recursive }) {
   for (const ent of entries) {
     const full = path.join(dir, ent.name);
     if (ent.isDirectory()) {
-      if (recursive) out.push(...await walk(full, { recursive }));
+      if (recursive) out.push(...(await walk(full, { recursive })));
       continue;
     }
     if (ent.isFile() && SUPPORTED_INPUT.has(path.extname(ent.name).toLowerCase())) {
@@ -140,10 +168,14 @@ function buildPipeline(input, format, quality) {
   if (quality != null && Number.isFinite(quality)) opts.quality = quality;
   const pipeline = sharp(input);
   switch (format) {
-    case 'webp': return pipeline.webp(opts);
-    case 'jpg': return pipeline.jpeg(opts);
-    case 'png': return pipeline.png(opts);
-    case 'avif': return pipeline.avif(opts);
+    case 'webp':
+      return pipeline.webp(opts);
+    case 'jpg':
+      return pipeline.jpeg(opts);
+    case 'png':
+      return pipeline.png(opts);
+    case 'avif':
+      return pipeline.avif(opts);
   }
 }
 
@@ -159,15 +191,24 @@ function pct(before, after) {
   return (d >= 0 ? '-' : '+') + Math.abs(d).toFixed(1) + '%';
 }
 
-function padEnd(s, n) { return s.length >= n ? s : s + ' '.repeat(n - s.length); }
-function padStart(s, n) { return s.length >= n ? s : ' '.repeat(n - s.length) + s; }
+function padEnd(s, n) {
+  return s.length >= n ? s : s + ' '.repeat(n - s.length);
+}
+function padStart(s, n) {
+  return s.length >= n ? s : ' '.repeat(n - s.length) + s;
+}
 
 async function main() {
   const opts = parseArgs(process.argv);
-  if (opts.help) { printHelp(); return; }
+  if (opts.help) {
+    printHelp();
+    return;
+  }
 
   if (!SUPPORTED_OUTPUT.has(opts.format)) {
-    console.error(`Unsupported format: ${opts.format}. Use one of: ${[...SUPPORTED_OUTPUT].join(', ')}`);
+    console.error(
+      `Unsupported format: ${opts.format}. Use one of: ${[...SUPPORTED_OUTPUT].join(', ')}`,
+    );
     process.exit(2);
   }
   if (!existsSync(opts.src)) {
@@ -178,7 +219,7 @@ async function main() {
 
   const files = await walk(opts.src, { recursive: opts.recursive });
   // Exclude anything already inside <out>
-  const filtered = files.filter(f => !f.startsWith(opts.out + path.sep) && f !== opts.out);
+  const filtered = files.filter((f) => !f.startsWith(opts.out + path.sep) && f !== opts.out);
 
   if (filtered.length === 0) {
     console.log(`No images found under ${opts.src}`);
@@ -195,7 +236,11 @@ async function main() {
   console.log();
 
   const rows = [];
-  let totalBefore = 0, totalAfter = 0, ok = 0, skipped = 0, failed = 0;
+  let totalBefore = 0,
+    totalAfter = 0,
+    ok = 0,
+    skipped = 0,
+    failed = 0;
 
   for (const src of filtered) {
     const rel = path.relative(opts.src, src);
@@ -210,17 +255,27 @@ async function main() {
     await mkdir(path.dirname(dst), { recursive: true });
 
     let beforeSize = 0;
-    try { beforeSize = (await stat(src)).size; } catch { }
+    try {
+      beforeSize = (await stat(src)).size;
+    } catch {}
     totalBefore += beforeSize;
 
     if (!opts.overwrite) {
       try {
         await access(dst);
-        rows.push({ rel, dstRel, before: beforeSize, after: (await stat(dst)).size, note: 'skip (exists)' });
+        rows.push({
+          rel,
+          dstRel,
+          before: beforeSize,
+          after: (await stat(dst)).size,
+          note: 'skip (exists)',
+        });
         skipped++;
         totalAfter += (await stat(dst)).size;
         continue;
-      } catch {/* doesn't exist, proceed */ }
+      } catch {
+        /* doesn't exist, proceed */
+      }
     }
 
     try {
@@ -244,37 +299,50 @@ async function main() {
   }
 
   // Render table
-  const w1 = Math.max(8, ...rows.map(r => r.rel.length));
-  const w2 = Math.max(8, ...rows.map(r => r.dstRel.length));
-  const w3 = Math.max(8, ...rows.map(r => fmtBytes(r.before).length));
-  const w4 = Math.max(8, ...rows.map(r => fmtBytes(r.after).length));
+  const w1 = Math.max(8, ...rows.map((r) => r.rel.length));
+  const w2 = Math.max(8, ...rows.map((r) => r.dstRel.length));
+  const w3 = Math.max(8, ...rows.map((r) => fmtBytes(r.before).length));
+  const w4 = Math.max(8, ...rows.map((r) => fmtBytes(r.after).length));
   const w5 = 8;
 
   const header =
-    padEnd('source', w1) + '  ' +
-    padEnd('output', w2) + '  ' +
-    padStart('before', w3) + '  ' +
-    padStart('after', w4) + '  ' +
-    padStart('delta', w5) + '  notes';
+    padEnd('source', w1) +
+    '  ' +
+    padEnd('output', w2) +
+    '  ' +
+    padStart('before', w3) +
+    '  ' +
+    padStart('after', w4) +
+    '  ' +
+    padStart('delta', w5) +
+    '  notes';
   console.log(header);
   console.log('-'.repeat(header.length));
 
   for (const r of rows) {
     console.log(
-      padEnd(r.rel, w1) + '  ' +
-      padEnd(r.dstRel, w2) + '  ' +
-      padStart(fmtBytes(r.before), w3) + '  ' +
-      padStart(fmtBytes(r.after), w4) + '  ' +
-      padStart(pct(r.before, r.after), w5) + '  ' +
-      r.note
+      padEnd(r.rel, w1) +
+        '  ' +
+        padEnd(r.dstRel, w2) +
+        '  ' +
+        padStart(fmtBytes(r.before), w3) +
+        '  ' +
+        padStart(fmtBytes(r.after), w4) +
+        '  ' +
+        padStart(pct(r.before, r.after), w5) +
+        '  ' +
+        r.note,
     );
   }
   console.log('-'.repeat(header.length));
 
   const sumLine =
-    padEnd(`TOTAL (${rows.length} files)`, w1 + w2 + 2) + '  ' +
-    padStart(fmtBytes(totalBefore), w3) + '  ' +
-    padStart(fmtBytes(totalAfter), w4) + '  ' +
+    padEnd(`TOTAL (${rows.length} files)`, w1 + w2 + 2) +
+    '  ' +
+    padStart(fmtBytes(totalBefore), w3) +
+    '  ' +
+    padStart(fmtBytes(totalAfter), w4) +
+    '  ' +
     padStart(pct(totalBefore, totalAfter), w5);
   console.log(sumLine);
   console.log();
@@ -282,4 +350,7 @@ async function main() {
   if (failed > 0) process.exit(1);
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

@@ -105,9 +105,8 @@ describe('typing effect hooks', () => {
 
   it('boots Env telemetry after one second and resets it when text becomes hidden', () => {
     const { result, rerender } = renderHook(
-      ({ textVisible, routeEnabled }: { textVisible: boolean; routeEnabled: boolean }) => (
-        useEnvParamsTypingEffect(textVisible, routeEnabled)
-      ),
+      ({ textVisible, routeEnabled }: { textVisible: boolean; routeEnabled: boolean }) =>
+        useEnvParamsTypingEffect(textVisible, routeEnabled),
       { initialProps: { textVisible: true, routeEnabled: true } },
     );
 

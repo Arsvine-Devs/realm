@@ -34,21 +34,21 @@
 
 ## 专题索引
 
-| 文档 | 权威范围 |
-|---|---|
-| [`GETTING_STARTED.md`](./GETTING_STARTED.md) | 首次安装和启动 |
-| [`DEVELOPMENT.md`](./DEVELOPMENT.md) | 日常开发工作流和目录约定 |
-| [`ARCHITECTURE.md`](./ARCHITECTURE.md) | 系统组成、运行边界和数据流 |
-| [`ROUTING_AND_I18N.md`](./ROUTING_AND_I18N.md) | 路由、locale、导航与页面状态 |
-| [`CONTENT_AND_MDX.md`](./CONTENT_AND_MDX.md) | 博客、推文、MDX、内容 locale |
-| [`SECURITY.md`](./SECURITY.md) | 认证、授权、Cookie、限流和输入安全 |
-| [`ASSETS.md`](./ASSETS.md) | COS、Catalog、媒体与字体 |
-| [`PERFORMANCE.md`](./PERFORMANCE.md) | 性能 tier、能力开关、采样和降级 |
-| [`TESTING_AND_QUALITY.md`](./TESTING_AND_QUALITY.md) | 自动化检查与人工验收 |
-| [`OPERATIONS.md`](./OPERATIONS.md) | 部署、ISR、监控、烟雾测试和恢复 |
-| [`CONFIGURATION.md`](./CONFIGURATION.md) | 环境变量、配置文件和默认值 |
-| [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md) | 故障现象、检查方法和修复方向 |
-| [`GOTCHAS.md`](./GOTCHAS.md) | 历史回归与不可破坏约束 |
+| 文档                                                 | 权威范围                           |
+| ---------------------------------------------------- | ---------------------------------- |
+| [`GETTING_STARTED.md`](./GETTING_STARTED.md)         | 首次安装和启动                     |
+| [`DEVELOPMENT.md`](./DEVELOPMENT.md)                 | 日常开发工作流和目录约定           |
+| [`ARCHITECTURE.md`](./ARCHITECTURE.md)               | 系统组成、运行边界和数据流         |
+| [`ROUTING_AND_I18N.md`](./ROUTING_AND_I18N.md)       | 路由、locale、导航与页面状态       |
+| [`CONTENT_AND_MDX.md`](./CONTENT_AND_MDX.md)         | 博客、推文、MDX、内容 locale       |
+| [`SECURITY.md`](./SECURITY.md)                       | 认证、授权、Cookie、限流和输入安全 |
+| [`ASSETS.md`](./ASSETS.md)                           | COS、Catalog、媒体与字体           |
+| [`PERFORMANCE.md`](./PERFORMANCE.md)                 | 性能 tier、能力开关、采样和降级    |
+| [`TESTING_AND_QUALITY.md`](./TESTING_AND_QUALITY.md) | 自动化检查与人工验收               |
+| [`OPERATIONS.md`](./OPERATIONS.md)                   | 部署、ISR、监控、烟雾测试和恢复    |
+| [`CONFIGURATION.md`](./CONFIGURATION.md)             | 环境变量、配置文件和默认值         |
+| [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md)         | 故障现象、检查方法和修复方向       |
+| [`GOTCHAS.md`](./GOTCHAS.md)                         | 历史回归与不可破坏约束             |
 
 ## 开发者快速命令
 

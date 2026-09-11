@@ -20,18 +20,13 @@ const playlist: MusicTrack[] = [
 ];
 
 function MusicPlayerStateHarness() {
-  const {
-    audioRef,
-    currentTrack,
-    handleNext,
-    handlePrev,
-    isPlaying,
-    selectTrack,
-    syncPlayState,
-  } = useMusicPlayerState({ playlist });
+  const { audioRef, currentTrack, handleNext, handlePrev, isPlaying, selectTrack, syncPlayState } =
+    useMusicPlayerState({ playlist });
 
   return (
     <div>
+      {/* The fixture models the media API only and contains no user-facing content. */}
+      {/* oxlint-disable-next-line jsx-a11y/media-has-caption -- this test fixture has no media track. */}
       <audio ref={audioRef} data-testid="audio" />
       <div data-testid="current-track">{currentTrack.title}</div>
       <div data-testid="playing-state">{String(isPlaying)}</div>
@@ -117,11 +112,14 @@ describe('useMusicPlayerState audio loading', () => {
   });
 
   it('allows a user selection to replace the restored track id', () => {
-    window.sessionStorage.setItem('arsvine:music-player', JSON.stringify({
-      currentTrackIndex: 1,
-      currentTime: 42,
-      trackId: 'track-two',
-    }));
+    window.sessionStorage.setItem(
+      'arsvine:music-player',
+      JSON.stringify({
+        currentTrackIndex: 1,
+        currentTime: 42,
+        trackId: 'track-two',
+      }),
+    );
 
     render(<MusicPlayerStateHarness />);
 
@@ -134,10 +132,13 @@ describe('useMusicPlayerState audio loading', () => {
   });
 
   it('allows previous and next to replace the restored track id', () => {
-    window.sessionStorage.setItem('arsvine:music-player', JSON.stringify({
-      currentTrackIndex: 1,
-      trackId: 'track-two',
-    }));
+    window.sessionStorage.setItem(
+      'arsvine:music-player',
+      JSON.stringify({
+        currentTrackIndex: 1,
+        trackId: 'track-two',
+      }),
+    );
 
     render(<MusicPlayerStateHarness />);
 
@@ -149,10 +150,13 @@ describe('useMusicPlayerState audio loading', () => {
   });
 
   it('falls back to the persisted index when the persisted track id is stale', () => {
-    window.sessionStorage.setItem('arsvine:music-player', JSON.stringify({
-      currentTrackIndex: 1,
-      trackId: 'removed-track',
-    }));
+    window.sessionStorage.setItem(
+      'arsvine:music-player',
+      JSON.stringify({
+        currentTrackIndex: 1,
+        trackId: 'removed-track',
+      }),
+    );
 
     render(<MusicPlayerStateHarness />);
 
@@ -178,27 +182,35 @@ describe('useMusicPlayerState audio loading', () => {
   });
 
   it('does not overwrite a persisted resume position before an audio source is loaded', () => {
-    window.sessionStorage.setItem('arsvine:music-player', JSON.stringify({
-      currentTrackIndex: 1,
-      currentTime: 42,
-      trackId: 'track-two',
-    }));
+    window.sessionStorage.setItem(
+      'arsvine:music-player',
+      JSON.stringify({
+        currentTrackIndex: 1,
+        currentTime: 42,
+        trackId: 'track-two',
+      }),
+    );
 
     render(<MusicPlayerStateHarness />);
 
-    expect(JSON.parse(window.sessionStorage.getItem('arsvine:music-player') ?? '{}')).toMatchObject({
-      currentTime: 42,
-      trackId: 'track-two',
-    });
+    expect(JSON.parse(window.sessionStorage.getItem('arsvine:music-player') ?? '{}')).toMatchObject(
+      {
+        currentTime: 42,
+        trackId: 'track-two',
+      },
+    );
     expect((screen.getByTestId('audio') as HTMLAudioElement).getAttribute('src')).toBeNull();
   });
 
   it('ignores a stale play rejection after a newer track starts playing', async () => {
     let rejectFirstPlay: ((reason?: unknown) => void) | undefined;
     playMock
-      .mockImplementationOnce(() => new Promise<void>((_resolve, reject) => {
-        rejectFirstPlay = reject;
-      }))
+      .mockImplementationOnce(
+        () =>
+          new Promise<void>((_resolve, reject) => {
+            rejectFirstPlay = reject;
+          }),
+      )
       .mockResolvedValue(undefined);
     render(<MusicPlayerStateHarness />);
 

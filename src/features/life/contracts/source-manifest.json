@@ -27,7 +27,10 @@
     "collection": "life-games",
     "date": "2026-07-09",
     "cover": "covers/death-stranding-cover.jpg",
-    "gallery": ["gallery/death-stranding-screenshot-1.jpg", "gallery/death-stranding-screenshot-2.jpg"]
+    "gallery": [
+      "gallery/death-stranding-screenshot-1.jpg",
+      "gallery/death-stranding-screenshot-2.jpg"
+    ]
   },
   {
     "id": "zhenjiang",
@@ -37,7 +40,13 @@
     "collection": "life-travel",
     "date": "2026-07-09",
     "cover": "covers/zhenjiang-cover.jpg",
-    "gallery": ["gallery/zhenjiang-gallery-1.jpg", "gallery/zhenjiang-gallery-2.jpg", "gallery/zhenjiang-gallery-3.webp", "gallery/zhenjiang-gallery-4.webp", "gallery/zhenjiang-gallery-5.webp"]
+    "gallery": [
+      "gallery/zhenjiang-gallery-1.jpg",
+      "gallery/zhenjiang-gallery-2.jpg",
+      "gallery/zhenjiang-gallery-3.webp",
+      "gallery/zhenjiang-gallery-4.webp",
+      "gallery/zhenjiang-gallery-5.webp"
+    ]
   },
   {
     "id": "game-dev",

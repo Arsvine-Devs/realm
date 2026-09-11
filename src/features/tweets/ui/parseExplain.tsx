@@ -13,8 +13,7 @@ import Explain from '../../blog/ui/mdx/Explain';
  */
 
 export type TweetTextSegment =
-  | { type: 'text'; value: string }
-  | { type: 'explain'; note: string; children: string };
+  { type: 'text'; value: string } | { type: 'explain'; note: string; children: string };
 
 // 严格子集：只识别 <Explain note="..."> ... </Explain>。
 // note 必须是双引号；children 是惰性匹配的纯文本（含换行）。
@@ -81,9 +80,7 @@ export function getTweetPlainText(segments: TweetTextSegment[]): string {
  * 把 segments 渲染为 React 节点。打字机结束后挂载这棵树，
  * Explain 触发器上的 reveal 动画自动播放。
  */
-export function renderTweetSegments(
-  segments: TweetTextSegment[],
-): React.ReactNode {
+export function renderTweetSegments(segments: TweetTextSegment[]): React.ReactNode {
   if (segments.length === 0) return null;
   return (
     <>

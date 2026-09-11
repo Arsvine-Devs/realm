@@ -5,8 +5,7 @@ type RevalidationAuthOptions = {
 };
 
 type RevalidationAuthResult =
-  | { ok: true; body: Record<string, unknown> }
-  | { ok: false; response: Response };
+  { ok: true; body: Record<string, unknown> } | { ok: false; response: Response };
 
 export async function authenticateRevalidation(
   request: Request,
@@ -15,7 +14,7 @@ export async function authenticateRevalidation(
   const body = request.method === 'POST' ? await readJsonObject(request) : {};
   const bodySecret = typeof body.secret === 'string' ? body.secret : '';
   const querySecret = options.allowQuerySecret
-    ? new URL(request.url).searchParams.get('secret') ?? ''
+    ? (new URL(request.url).searchParams.get('secret') ?? '')
     : '';
   const provided = bodySecret || querySecret;
   const expected = process.env.REVALIDATE_SECRET?.trim() ?? '';

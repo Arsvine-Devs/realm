@@ -35,7 +35,10 @@ function isHostnameMatch(hostname: string, expected: string) {
 }
 
 export function getSafeExternalLinkVariant(url: URL): SafeExternalLinkVariant {
-  if (isHostnameMatch(url.hostname, 'www.bilibili.com') || isHostnameMatch(url.hostname, 'bilibili.com')) {
+  if (
+    isHostnameMatch(url.hostname, 'www.bilibili.com') ||
+    isHostnameMatch(url.hostname, 'bilibili.com')
+  ) {
     return 'bilibili';
   }
 

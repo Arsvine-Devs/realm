@@ -6,9 +6,18 @@ import useAdaptivePerformance from '@/features/hud/model/useAdaptivePerformance'
 
 const matchesByQuery: Map<string, boolean> = new Map();
 const listenersByQuery: Map<string, Set<(event: MediaQueryListEvent) => void>> = new Map();
-const originalConnectionDescriptor = Object.getOwnPropertyDescriptor(window.navigator, 'connection');
-const originalDeviceMemoryDescriptor = Object.getOwnPropertyDescriptor(window.navigator, 'deviceMemory');
-const originalHardwareConcurrencyDescriptor = Object.getOwnPropertyDescriptor(window.navigator, 'hardwareConcurrency');
+const originalConnectionDescriptor = Object.getOwnPropertyDescriptor(
+  window.navigator,
+  'connection',
+);
+const originalDeviceMemoryDescriptor = Object.getOwnPropertyDescriptor(
+  window.navigator,
+  'deviceMemory',
+);
+const originalHardwareConcurrencyDescriptor = Object.getOwnPropertyDescriptor(
+  window.navigator,
+  'hardwareConcurrency',
+);
 
 let nextRafId = 0;
 let rafCallbacks: Map<number, FrameRequestCallback>;
@@ -48,7 +57,10 @@ function fireMediaQueryChange(query: string) {
   }
 }
 
-function setNavigatorProperty(key: 'connection' | 'deviceMemory' | 'hardwareConcurrency', value: unknown) {
+function setNavigatorProperty(
+  key: 'connection' | 'deviceMemory' | 'hardwareConcurrency',
+  value: unknown,
+) {
   Object.defineProperty(window.navigator, key, {
     configurable: true,
     value,
@@ -68,7 +80,8 @@ function restoreNavigatorProperty(
 }
 
 function flushNextAnimationFrame(timestamp: number) {
-  const nextEntry = rafCallbacks.entries().next().value as [number, FrameRequestCallback] | undefined;
+  const nextEntry = rafCallbacks.entries().next().value as
+    [number, FrameRequestCallback] | undefined;
   if (!nextEntry) {
     throw new Error('No queued animation frame callback to flush.');
   }
@@ -132,7 +145,8 @@ afterEach(() => {
 
 describe('useAdaptivePerformance', () => {
   it('does not double-apply a poor sample window under StrictMode', () => {
-    const wrapper = ({ children }: { children: ReactNode }) => createElement(StrictMode, null, children);
+    const wrapper = ({ children }: { children: ReactNode }) =>
+      createElement(StrictMode, null, children);
     const { result } = renderHook(() => useAdaptivePerformance(true), { wrapper });
 
     flushPoorWindow();

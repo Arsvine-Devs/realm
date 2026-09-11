@@ -28,7 +28,14 @@ interface ActivationLeverProps {
   ariaLabel?: string;
 }
 
-const ActivationLever = ({ onActivate, isActive, iconType, isAnimated, cursorLabel, ariaLabel }: ActivationLeverProps) => {
+const ActivationLever = ({
+  onActivate,
+  isActive,
+  iconType,
+  isAnimated,
+  cursorLabel,
+  ariaLabel,
+}: ActivationLeverProps) => {
   const handleLeverClick = () => {
     onActivate();
   };
@@ -52,39 +59,24 @@ const ActivationLever = ({ onActivate, isActive, iconType, isAnimated, cursorLab
     >
       <svg viewBox="0 0 50 90" className={styles.leverSvg}>
         {/* 底座/插槽 */}
-        <rect 
-          x="15" y="5" 
-          width="20" height="70" 
-          className={styles.base}
-        />
+        <rect x="15" y="5" width="20" height="70" className={styles.base} />
         {/* 底座内的插槽线 */}
-        <line 
-           x1="25" y1="15" 
-           x2="25" y2="65" 
-           className={styles.slotLine} 
-        />
+        <line x1="25" y1="15" x2="25" y2="65" className={styles.slotLine} />
 
         {/* 控制杆手柄 (编组以便将来需要时更容易制作动画) */}
         <g transform={`translate(0, ${handleY - 15})`}>
-            <line 
-              x1="10" y1="15" 
-              x2="40" y2="15" 
-              className={styles.handleTop} 
-            />
-            <line 
-              x1="25" y1="15" 
-              x2="25" y2="35"
-              className={styles.handleShaft}
-            />
+          <line x1="10" y1="15" x2="40" y2="15" className={styles.handleTop} />
+          <line x1="25" y1="15" x2="25" y2="35" className={styles.handleShaft} />
         </g>
 
         {/* 指示灯 */}
-        <circle 
-          cx="25" cy="70" 
-          r="3.5" 
+        <circle
+          cx="25"
+          cy="70"
+          r="3.5"
           className={`${styles.indicatorLight} ${isActive ? styles.on : styles.off}`}
         />
-        
+
         {/* --- 修改: 渲染图标 --- */}
         {IconComponent}
       </svg>
@@ -92,4 +84,4 @@ const ActivationLever = ({ onActivate, isActive, iconType, isAnimated, cursorLab
   );
 };
 
-export default ActivationLever; 
+export default ActivationLever;

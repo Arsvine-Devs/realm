@@ -1,5 +1,9 @@
 import type { ExperienceItem } from '@/shared/types';
-import { findSourceItem, galleryReferences, sourceManifests } from '@/features/assets/contracts/source-manifest';
+import {
+  findSourceItem,
+  galleryReferences,
+  sourceManifests,
+} from '@/features/assets/contracts/source-manifest';
 
 const highschoolSource = findSourceItem(sourceManifests.experience, 'highschool');
 const universitySource = findSourceItem(sourceManifests.experience, 'university');

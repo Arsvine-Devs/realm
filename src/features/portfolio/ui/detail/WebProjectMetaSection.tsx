@@ -22,11 +22,7 @@ export default function WebProjectMetaSection({
   highlightRevealIndices,
 }: WebProjectMetaSectionProps) {
   return (
-    <section
-      className={styles.metaSection}
-      ref={sectionRef}
-      data-nav-id="meta"
-    >
+    <section className={styles.metaSection} ref={sectionRef} data-nav-id="meta">
       <h2 className={styles.sectionHeader}>{tDetail('projectMeta')}</h2>
       <div className={styles.metaGrid}>
         {project.year && (
@@ -44,7 +40,9 @@ export default function WebProjectMetaSection({
         {project.status && (
           <div className={styles.metaBlock}>
             <span className={styles.metaLabel}>{tDetail('status')}</span>
-            <span className={`${styles.metaValue} ${styles.statusBadge}`}>{project.status.toUpperCase()}</span>
+            <span className={`${styles.metaValue} ${styles.statusBadge}`}>
+              {project.status.toUpperCase()}
+            </span>
           </div>
         )}
       </div>
@@ -52,7 +50,9 @@ export default function WebProjectMetaSection({
       {project.tech.length > 0 && (
         <div className={styles.techRow}>
           {project.tech.map((tag) => (
-            <span key={tag} className={styles.techPill}>{tag}</span>
+            <span key={tag} className={styles.techPill}>
+              {tag}
+            </span>
           ))}
         </div>
       )}

@@ -47,14 +47,7 @@ export function verifyTotp(opts: {
   window?: number;
   nowMs?: number;
 }) {
-  const {
-    token,
-    secretBase32,
-    period = 30,
-    digits = 6,
-    window = 1,
-    nowMs = Date.now(),
-  } = opts;
+  const { token, secretBase32, period = 30, digits = 6, window = 1, nowMs = Date.now() } = opts;
 
   if (!/^\d+$/.test(token) || token.length !== digits) return false;
 
@@ -68,10 +61,7 @@ export function verifyTotp(opts: {
 
   for (let offset = -window; offset <= window; offset += 1) {
     const generated = Buffer.from(hotp(secret, step + BigInt(offset), digits));
-    if (
-      generated.length === expected.length &&
-      timingSafeEqual(generated, expected)
-    ) {
+    if (generated.length === expected.length && timingSafeEqual(generated, expected)) {
       return true;
     }
   }

@@ -6,7 +6,9 @@
   gap: 1rem;
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  transition:
+    opacity 0.3s ease-out,
+    transform 0.3s ease-out;
   border-bottom: 1px solid var(--ark-border);
   padding-bottom: 15px;
 }
@@ -19,7 +21,12 @@
   font-family: var(--font-hud);
   font-size: var(--fs-base);
   cursor: none;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s, padding-left 0.3s ease-out, padding-right 0.3s ease-out;
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    border-color 0.3s,
+    padding-left 0.3s ease-out,
+    padding-right 0.3s ease-out;
   text-transform: uppercase;
   letter-spacing: 1px;
   opacity: 0.7;
@@ -52,7 +59,10 @@
   position: relative;
   opacity: 1;
   transform: translateX(0);
-  transition: height 0.3s ease, opacity 0.5s ease-out, transform 0.5s ease-out;
+  transition:
+    height 0.3s ease,
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
 }
 
 .gameGrid,
@@ -106,7 +116,9 @@
   top: 0;
   left: 0;
   padding-top: 60px;
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
   transform: translateX(100%);
   opacity: 0;
   pointer-events: none;
@@ -169,7 +181,10 @@
   padding: 12px 15px;
   border-radius: 0;
   text-align: center;
-  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -203,7 +218,10 @@
   text-align: left;
   cursor: none;
   opacity: 0.6;
-  transition: opacity 0.3s, color 0.3s, border-color 0.3s;
+  transition:
+    opacity 0.3s,
+    color 0.3s,
+    border-color 0.3s;
 
   &:hover {
     color: var(--ark-primary);
@@ -237,7 +255,8 @@
   margin-top: 0;
   overflow: hidden;
   opacity: 0;
-  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.4s ease,
     margin-top 0.4s ease;
 
@@ -303,7 +322,6 @@
   }
 }
 
-
 .inverted {
   .lifeTabButton {
     border-color: transparent;
@@ -329,5 +347,4 @@
   .lifeTabContent p {
     color: var(--ark-text);
   }
-
 }

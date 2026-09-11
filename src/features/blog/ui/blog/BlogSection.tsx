@@ -31,8 +31,10 @@ export default function BlogSection({
           <div
             key={post.slug}
             className={`${cardStyles.card}${post.pinned ? ` ${cardStyles.pinned}` : ''}`}
+            /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- this SPA card keeps block layout while exposing link semantics and keyboard activation. */
             role="link"
             tabIndex={0}
+            aria-label={post.title}
             data-cursor-no-magnetic
             onClick={() => handleBlogItemClick(post)}
             onPointerDown={(event) => {
@@ -46,14 +48,15 @@ export default function BlogSection({
             }}
           >
             <div className={cardStyles.cardInner}>
-              <span className={cardStyles.cardIndex}>
-                {String(i + 1).padStart(2, '0')}
-              </span>
+              <span className={cardStyles.cardIndex}>{String(i + 1).padStart(2, '0')}</span>
               <div className={cardStyles.cardContent}>
                 <div className={cardStyles.cardHeader}>
                   <h4 className={cardStyles.cardTitle}>
-                    {post.title}{post.pinned && (
-                      <span className={cardStyles.cardPinnedBadge} aria-label={t('pinned')}>{t('pinned')}</span>
+                    {post.title}
+                    {post.pinned && (
+                      <span className={cardStyles.cardPinnedBadge} aria-label={t('pinned')}>
+                        {t('pinned')}
+                      </span>
                     )}
                     {post.access.mode === 'totp' && (
                       <span className={cardStyles.cardPinnedBadge} aria-label={t('protected')}>
@@ -64,17 +67,23 @@ export default function BlogSection({
                   {post.date && <span className={cardStyles.cardDate}>{post.date}</span>}
                 </div>
                 {post.excerpt ? <p className={cardStyles.cardExcerpt}>{post.excerpt}</p> : null}
-                {(post.tags.length > 0 || post.readingMinutes > 0) ? (
+                {post.tags.length > 0 || post.readingMinutes > 0 ? (
                   <div className={cardStyles.cardFooter}>
                     {post.tags.length > 0 ? (
                       <div className={cardStyles.cardTags}>
                         {post.tags.map((tag) => (
-                          <span key={tag} className={cardStyles.cardTag}>{tag}</span>
+                          <span key={tag} className={cardStyles.cardTag}>
+                            {tag}
+                          </span>
                         ))}
                       </div>
-                    ) : <span />}
+                    ) : (
+                      <span />
+                    )}
                     {post.readingMinutes > 0 ? (
-                      <span className={cardStyles.cardReadingTime}>{formatReadingTime(post.readingMinutes, locale)}</span>
+                      <span className={cardStyles.cardReadingTime}>
+                        {formatReadingTime(post.readingMinutes, locale)}
+                      </span>
                     ) : null}
                   </div>
                 ) : null}

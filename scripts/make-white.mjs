@@ -8,11 +8,14 @@ async function makeWhitePng(inputPath) {
   const ch = info.channels;
   for (let i = 0; i < raw.length; i += ch) {
     if (raw[i + 3] > 0) {
-      raw[i] = 255; raw[i + 1] = 255; raw[i + 2] = 255;
+      raw[i] = 255;
+      raw[i + 1] = 255;
+      raw[i + 2] = 255;
     }
   }
   return sharp(raw, { raw: { width: info.width, height: info.height, channels: ch } })
-    .png().toBuffer();
+    .png()
+    .toBuffer();
 }
 
 async function makeWhiteIco(inputPath, outputPath) {
@@ -32,15 +35,20 @@ async function makeWhiteIco(inputPath, outputPath) {
   let totalDataSize = 0;
   for (const entry of entries) {
     const pngBuf = await sharp(buf.subarray(entry.dataOffset, entry.dataOffset + entry.dataSize))
-      .raw().ensureAlpha().toBuffer();
+      .raw()
+      .ensureAlpha()
+      .toBuffer();
     const ch = 4;
     for (let j = 0; j < pngBuf.length; j += ch) {
       if (pngBuf[j + 3] > 0) {
-        pngBuf[j] = 255; pngBuf[j + 1] = 255; pngBuf[j + 2] = 255;
+        pngBuf[j] = 255;
+        pngBuf[j + 1] = 255;
+        pngBuf[j + 2] = 255;
       }
     }
     const png = await sharp(pngBuf, { raw: { width: entry.w, height: entry.h, channels: 4 } })
-      .png().toBuffer();
+      .png()
+      .toBuffer();
     pngBuffers.push(png);
     totalDataSize += png.length;
   }

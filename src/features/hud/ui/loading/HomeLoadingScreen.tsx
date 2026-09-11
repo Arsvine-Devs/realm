@@ -23,12 +23,14 @@ const HomeLoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
   const [visible, setVisible] = useState(isInitialBootSequencePending);
   const [bootReducedMode, setBootReducedMode] = useState(false);
   const [loadingUiReady, setLoadingUiReady] = useState(false);
-  const { progress, logLines, showSplitLines, loading } = useLoadingSystem(loadingUiReady && !bootReducedMode);
+  const { progress, logLines, showSplitLines, loading } = useLoadingSystem(
+    loadingUiReady && !bootReducedMode,
+  );
   const { isMobile } = useResponsive();
   const reducedMotion = useReducedMotion();
   const { allowDecorativeMotion } = useHudPerformance();
   const reducedVisualMode = reducedMotion || !allowDecorativeMotion || bootReducedMode;
-  
+
   const onCompleteRef = useRef(onComplete);
   const completionNotifiedRef = useRef(false);
   useEffect(() => {
@@ -72,9 +74,7 @@ const HomeLoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
 
     const timelines: gsap.core.Timeline[] = [];
 
-    const logoTransform = isMobile
-      ? { yPercent: -50 }
-      : { xPercent: -50, yPercent: -50 };
+    const logoTransform = isMobile ? { yPercent: -50 } : { xPercent: -50, yPercent: -50 };
     const loadingTargets = collectGsapTargets([wastelandBgRef.current, loadingScreenRef.current]);
 
     // --- Reduced motion: show everything immediately ---
@@ -83,7 +83,8 @@ const HomeLoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
         gsap.set(loadingTargets, { opacity: 1 });
       }
       if (hudRef.current?.container) gsap.set(hudRef.current.container, { opacity: 1 });
-      if (logoRef.current?.container) gsap.set(logoRef.current.container, { opacity: 1, scaleY: 1, ...logoTransform });
+      if (logoRef.current?.container)
+        gsap.set(logoRef.current.container, { opacity: 1, scaleY: 1, ...logoTransform });
       if (consoleRef.current?.container) gsap.set(consoleRef.current.container, { opacity: 1 });
       if (progressAreaRef.current) {
         gsap.set(progressAreaRef.current, { opacity: 1, y: 0 });
@@ -101,29 +102,47 @@ const HomeLoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
       gsap.set(loadingTargets, { opacity: 0 });
     }
     if (hudRef.current?.container) gsap.set(hudRef.current.container, { opacity: 0 });
-    if (logoRef.current?.container) gsap.set(logoRef.current.container, { opacity: 1, scaleY: 0, transformOrigin: 'center center', ...logoTransform });
+    if (logoRef.current?.container)
+      gsap.set(logoRef.current.container, {
+        opacity: 1,
+        scaleY: 0,
+        transformOrigin: 'center center',
+        ...logoTransform,
+      });
     if (consoleRef.current?.container) gsap.set(consoleRef.current.container, { opacity: 0 });
     if (progressAreaRef.current) {
       gsap.set(progressAreaRef.current, { opacity: 0, y: 15 });
     }
 
     entranceTl
-      .to([wastelandBgRef.current, loadingScreenRef.current], { opacity: 1, duration: 0.5, ease: 'power1.out' }, 0)
+      .to(
+        [wastelandBgRef.current, loadingScreenRef.current],
+        { opacity: 1, duration: 0.5, ease: 'power1.out' },
+        0,
+      )
       .to(logoRef.current?.container || null, { scaleY: 1, duration: 0.6, ease: 'power2.out' }, 0.2)
       .to(hudRef.current?.container || null, { opacity: 1, duration: 1.0, ease: 'power1.out' }, 0.3)
-      .call(() => {
-        // Call Logo component animation method
-        logoRef.current?.animateIn(0.5);
-        // Call HUD animations
-        hudRef.current?.initAnimations();
-      }, [], 0.5)
-      .to(logoRef.current?.container || null, { opacity: 0.15, duration: 1.0, ease: 'power2.inOut' }, 3.5)
+      .call(
+        () => {
+          // Call Logo component animation method
+          logoRef.current?.animateIn(0.5);
+          // Call HUD animations
+          hudRef.current?.initAnimations();
+        },
+        [],
+        0.5,
+      )
+      .to(
+        logoRef.current?.container || null,
+        { opacity: 0.15, duration: 1.0, ease: 'power2.inOut' },
+        3.5,
+      )
       .to(consoleRef.current?.container || null, { opacity: 1, duration: 0.7, ease: 'none' }, 3.5)
       .to(progressAreaRef.current, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 3.5)
       .call(() => setLoadingUiReady(true), [], 4.0); // Start real loading after logo dims and console appears
 
     return () => {
-      timelines.forEach(tl => tl.kill());
+      timelines.forEach((tl) => tl.kill());
     };
   }, [bootReducedMode, completeBootSequence, isMobile, reducedVisualMode, visible]);
 
@@ -152,27 +171,46 @@ const HomeLoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
       onComplete: () => setVisible(false),
     });
 
-    exitTl.fromTo(loadingTargets,
+    exitTl.fromTo(
+      loadingTargets,
       { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' },
-      { clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)', duration: wipeDur, ease: 'power2.inOut' },
+      {
+        clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
+        duration: wipeDur,
+        ease: 'power2.inOut',
+      },
       0,
     );
 
-    exitTl.to(loadingTargets, {
-      opacity: 0, duration: wipeDur + 0.3, ease: 'power2.inOut',
-    }, 0);
+    exitTl.to(
+      loadingTargets,
+      {
+        opacity: 0,
+        duration: wipeDur + 0.3,
+        ease: 'power2.inOut',
+      },
+      0,
+    );
 
     // Make HUD, logo, and console disappear slightly faster (more compact)
-    if (hudRef.current?.container) exitTl.to(hudRef.current.container, { opacity: 0, duration: subDur * 0.7 }, 0);
-    if (logoRef.current?.container) exitTl.to(logoRef.current.container, { opacity: 0, duration: subDur * 0.7 }, 0);
-    if (consoleRef.current?.container) exitTl.to(consoleRef.current.container, { opacity: 0, duration: subDur * 0.7 }, 0);
-    if (progressAreaRef.current) exitTl.to(progressAreaRef.current, { opacity: 0, duration: subDur * 0.7 }, 0);
-    if (hudRef.current?.hudElements) exitTl.to(hudRef.current.hudElements, { opacity: 0, duration: subDur * 0.7 }, 0);
+    if (hudRef.current?.container)
+      exitTl.to(hudRef.current.container, { opacity: 0, duration: subDur * 0.7 }, 0);
+    if (logoRef.current?.container)
+      exitTl.to(logoRef.current.container, { opacity: 0, duration: subDur * 0.7 }, 0);
+    if (consoleRef.current?.container)
+      exitTl.to(consoleRef.current.container, { opacity: 0, duration: subDur * 0.7 }, 0);
+    if (progressAreaRef.current)
+      exitTl.to(progressAreaRef.current, { opacity: 0, duration: subDur * 0.7 }, 0);
+    if (hudRef.current?.hudElements)
+      exitTl.to(hudRef.current.hudElements, { opacity: 0, duration: subDur * 0.7 }, 0);
 
     const extraElements = splitRef.current?.getElements() || [];
-    if (extraElements.length > 0) exitTl.to(extraElements, { opacity: 0, duration: subDur * 0.7 }, 0);
+    if (extraElements.length > 0)
+      exitTl.to(extraElements, { opacity: 0, duration: subDur * 0.7 }, 0);
 
-    return () => { exitTl.kill(); };
+    return () => {
+      exitTl.kill();
+    };
   }, [completeBootSequence, loading, reducedVisualMode]);
 
   return visible ? (
@@ -191,17 +229,28 @@ const HomeLoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
           <TerminalConsole ref={consoleRef} logLines={logLines} />
         </div>
 
-        <div ref={progressAreaRef} className={styles.progress_area} style={{ opacity: 0, transform: 'translateY(15px)' }}>
+        <div
+          ref={progressAreaRef}
+          className={styles.progress_area}
+          style={{ opacity: 0, transform: 'translateY(15px)' }}
+        >
           <div className={styles.text_progress_container}>
             <div className={styles.text_progress_base}>
               <span className={styles.progress_prefix}>&gt; SYSTEM INITIALIZING... [</span>
               <span className={styles.progress_bar_chars}>{PROGRESS_BAR_CHARS}</span>
-              <span className={styles.progress_suffix}>] {Math.floor(progress).toString().padStart(3, ' ')}%</span>
+              <span className={styles.progress_suffix}>
+                ] {Math.floor(progress).toString().padStart(3, ' ')}%
+              </span>
             </div>
-            <div className={styles.text_progress_fill} style={{ clipPath: `inset(0 ${100 - progress}% 0 0)` }}>
+            <div
+              className={styles.text_progress_fill}
+              style={{ clipPath: `inset(0 ${100 - progress}% 0 0)` }}
+            >
               <span className={styles.progress_prefix}>&gt; SYSTEM INITIALIZING... [</span>
               <span className={styles.progress_bar_chars}>{PROGRESS_BAR_CHARS}</span>
-              <span className={styles.progress_suffix}>] {Math.floor(progress).toString().padStart(3, ' ')}%</span>
+              <span className={styles.progress_suffix}>
+                ] {Math.floor(progress).toString().padStart(3, ' ')}%
+              </span>
             </div>
           </div>
         </div>

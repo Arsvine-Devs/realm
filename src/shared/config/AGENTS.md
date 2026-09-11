@@ -53,9 +53,9 @@ data/
 ```ts
 import { cover, gallery, post, avatar } from '../../lib/cdn';
 
-cover('projects/foo.webp')          // → cdn.arsvine.com/covers/projects/foo.webp
-gallery('life/games/001.jpg')       // → cdn.arsvine.com/gallery/life/games/001.jpg
-post('2026/blog-image.png')         // → cdn.arsvine.com/posts/2026/blog-image.png
+cover('projects/foo.webp'); // → cdn.arsvine.com/covers/projects/foo.webp
+gallery('life/games/001.jpg'); // → cdn.arsvine.com/gallery/life/games/001.jpg
+post('2026/blog-image.png'); // → cdn.arsvine.com/posts/2026/blog-image.png
 ```
 
 Catalog helper 返回稳定逻辑引用，由 SSG/ISR 通过私有 catalog 解析为带 hash 的 COS object key。缺少 catalog 时不应把附加媒体复制到 `public/` 作为生产 fallback。

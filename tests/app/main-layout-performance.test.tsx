@@ -186,11 +186,13 @@ describe('MainLayout adaptive performance gates', () => {
   });
 
   it('skips optional desktop effects and enables fallback charging in reduced mode', () => {
-    useAppMock.mockReturnValue(buildAppState({
-      allowAmbientWebGL: false,
-      allowInteractiveWebGL: false,
-      allowCustomCursor: false,
-    }));
+    useAppMock.mockReturnValue(
+      buildAppState({
+        allowAmbientWebGL: false,
+        allowInteractiveWebGL: false,
+        allowCustomCursor: false,
+      }),
+    );
 
     render(
       <MainLayout>
@@ -201,10 +203,12 @@ describe('MainLayout adaptive performance gates', () => {
     expect(screen.queryByTestId('custom-cursor')).toBeNull();
     expect(screen.queryByTestId('rain-effect')).toBeNull();
     expect(screen.queryByTestId('tesseract-experience')).toBeNull();
-    expect(recordMobileTesseractChargeCall).toHaveBeenCalledWith(expect.objectContaining({
-      shouldUseAutoChargeFallback: true,
-      isTesseractActivated: true,
-    }));
+    expect(recordMobileTesseractChargeCall).toHaveBeenCalledWith(
+      expect.objectContaining({
+        shouldUseAutoChargeFallback: true,
+        isTesseractActivated: true,
+      }),
+    );
   });
 
   it('renders optional desktop effects when full mode allows them', () => {
@@ -221,9 +225,11 @@ describe('MainLayout adaptive performance gates', () => {
     expect(screen.getByTestId('custom-cursor')).toBeTruthy();
     expect(screen.getByTestId('rain-effect')).toBeTruthy();
     expect(screen.getByTestId('tesseract-experience')).toBeTruthy();
-    expect(recordMobileTesseractChargeCall).toHaveBeenCalledWith(expect.objectContaining({
-      shouldUseAutoChargeFallback: false,
-    }));
+    expect(recordMobileTesseractChargeCall).toHaveBeenCalledWith(
+      expect.objectContaining({
+        shouldUseAutoChargeFallback: false,
+      }),
+    );
   });
 
   it.each([
@@ -248,10 +254,12 @@ describe('MainLayout adaptive performance gates', () => {
     expect(screen.queryByTestId('rain-effect')).toBeNull();
     expect(screen.queryByTestId('tesseract-experience')).toBeNull();
     expect(screen.getByTestId('custom-cursor')).toBeTruthy();
-    expect(recordMobileTesseractChargeCall).toHaveBeenLastCalledWith(expect.objectContaining({
-      shouldUseAutoChargeFallback: true,
-      isTesseractActivated: true,
-    }));
+    expect(recordMobileTesseractChargeCall).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        shouldUseAutoChargeFallback: true,
+        isTesseractActivated: true,
+      }),
+    );
 
     rerender(
       <MainLayout>
@@ -283,9 +291,11 @@ describe('MainLayout adaptive performance gates', () => {
     });
 
     expect(screen.getByTestId('tesseract-experience')).toBeTruthy();
-    expect(recordLeftPanelProps).toHaveBeenLastCalledWith(expect.objectContaining({
-      isStandalone: false,
-    }));
+    expect(recordLeftPanelProps).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        isStandalone: false,
+      }),
+    );
   });
 
   it('keeps the Tesseract mounted but paused on a valid standalone detail route', () => {
@@ -307,9 +317,13 @@ describe('MainLayout adaptive performance gates', () => {
     });
 
     expect(screen.getByTestId('tesseract-experience')).toBeTruthy();
-    expect(recordTesseractProps).toHaveBeenLastCalledWith(expect.objectContaining({ paused: true }));
-    expect(recordLeftPanelProps).toHaveBeenLastCalledWith(expect.objectContaining({
-      isStandalone: true,
-    }));
+    expect(recordTesseractProps).toHaveBeenLastCalledWith(
+      expect.objectContaining({ paused: true }),
+    );
+    expect(recordLeftPanelProps).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        isStandalone: true,
+      }),
+    );
   });
 });

@@ -34,7 +34,10 @@ describe('app route layout', () => {
     }
 
     for (const route of retiredAliases) {
-      expect(existsSync(path.join(appDir, route)), `Retired route must stay deleted: ${route}`).toBe(false);
+      expect(
+        existsSync(path.join(appDir, route)),
+        `Retired route must stay deleted: ${route}`,
+      ).toBe(false);
     }
   });
 });

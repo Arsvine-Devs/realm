@@ -26,8 +26,12 @@
 }
 
 @keyframes heroKenBurns {
-  0%   { scale: 1.15; }
-  100% { scale: 1.0; }
+  0% {
+    scale: 1.15;
+  }
+  100% {
+    scale: 1;
+  }
 }
 
 .heroScanlines {
@@ -73,7 +77,9 @@
   // 接近白色 + 高不透明度，配合下方 text-shadow，可读性在深/浅背景下都稳定。
   color: rgba(235, 235, 235, 0.95);
   // 黑色描边阴影：浅色封面图（雪地、纸张、浅墙）下显效；深色背景上几乎不可见，无副作用。
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 18px rgba(0, 0, 0, 0.35);
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.55),
+    0 0 18px rgba(0, 0, 0, 0.35);
   letter-spacing: clamp(2px, 0.5vw, 6px); // 稍微减小间距，防止中文字符散架
   text-transform: uppercase;
   margin: 0;

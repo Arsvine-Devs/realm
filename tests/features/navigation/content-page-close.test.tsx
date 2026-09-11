@@ -16,7 +16,12 @@ vi.mock('@/features/navigation/model/NavigationRuntime', () => ({
   useNavigationRuntime: () => ({ prefetch: prefetchMock }),
 }));
 vi.mock('@/features/portfolio/ui/WorksSection', () => ({
-  default: ({ webProjects, gameProjects, handleWorkItemClick, handleWorkItemIntent }: {
+  default: ({
+    webProjects,
+    gameProjects,
+    handleWorkItemClick,
+    handleWorkItemIntent,
+  }: {
     webProjects: Array<{ id: number; title: string }>;
     gameProjects: Array<{ id: number; title: string }>;
     handleWorkItemClick: (item: unknown) => void;
@@ -25,13 +30,18 @@ vi.mock('@/features/portfolio/ui/WorksSection', () => ({
     <>
       <button onClick={() => handleWorkItemClick(gameProjects[0])}>open work</button>
       <button onPointerDown={() => handleWorkItemIntent(webProjects[0])}>prefetch web</button>
-      <button onPointerDown={() => handleWorkItemIntent(gameProjects[0])}>prefetch inline game</button>
+      <button onPointerDown={() => handleWorkItemIntent(gameProjects[0])}>
+        prefetch inline game
+      </button>
     </>
   ),
 }));
 vi.mock('@/features/experience/ui/ExperienceSection', () => ({ default: () => null }));
 vi.mock('@/features/blog/ui/blog/BlogSection', () => ({
-  default: ({ posts, handleBlogItemIntent }: {
+  default: ({
+    posts,
+    handleBlogItemIntent,
+  }: {
     posts: Array<{ slug: string }>;
     handleBlogItemIntent: (post: unknown) => void;
   }) => (
@@ -42,7 +52,10 @@ vi.mock('@/features/blog/ui/blog/BlogSection', () => ({
   ),
 }));
 vi.mock('@/features/life/ui/LifeSection', () => ({
-  default: ({ gameData, handleLifeItemIntent }: {
+  default: ({
+    gameData,
+    handleLifeItemIntent,
+  }: {
     gameData: Array<{ id: string }>;
     handleLifeItemIntent: (item: unknown) => void;
   }) => <button onPointerDown={() => handleLifeItemIntent(gameData[0])}>prefetch life</button>,
@@ -80,22 +93,24 @@ describe('ContentPage detail closing', () => {
       imageUrl: '',
       galleryImages: [],
     };
-    const { container } = render(<ContentPage
-      locale="en"
-      messages={{}}
-      blogPosts={[]}
-      webProjects={[]}
-      gameProjects={[gameProject]}
-      earlyProjects={[]}
-      experienceData={[]}
-      gameData={[]}
-      travelData={[]}
-      otherData={[]}
-      alsoPlayGames={[]}
-      artPlaceholderText=""
-      skillCategories={[]}
-      pageDescription=""
-    />);
+    const { container } = render(
+      <ContentPage
+        locale="en"
+        messages={{}}
+        blogPosts={[]}
+        webProjects={[]}
+        gameProjects={[gameProject]}
+        earlyProjects={[]}
+        experienceData={[]}
+        gameData={[]}
+        travelData={[]}
+        otherData={[]}
+        alsoPlayGames={[]}
+        artPlaceholderText=""
+        skillCategories={[]}
+        pageDescription=""
+      />,
+    );
 
     fireEvent.click(screen.getByRole('button', { name: 'open work' }));
     expect(screen.getByText('Game One detail')).toBeTruthy();
@@ -109,22 +124,24 @@ describe('ContentPage detail closing', () => {
   });
 
   it('clears the back override when the detail page unmounts', () => {
-    const { unmount } = render(<ContentPage
-      locale="en"
-      messages={{}}
-      blogPosts={[]}
-      webProjects={[]}
-      gameProjects={[]}
-      earlyProjects={[]}
-      experienceData={[]}
-      gameData={[]}
-      travelData={[]}
-      otherData={[]}
-      alsoPlayGames={[]}
-      artPlaceholderText=""
-      skillCategories={[]}
-      pageDescription=""
-    />);
+    const { unmount } = render(
+      <ContentPage
+        locale="en"
+        messages={{}}
+        blogPosts={[]}
+        webProjects={[]}
+        gameProjects={[]}
+        earlyProjects={[]}
+        experienceData={[]}
+        gameData={[]}
+        travelData={[]}
+        otherData={[]}
+        alsoPlayGames={[]}
+        artPlaceholderText=""
+        skillCategories={[]}
+        pageDescription=""
+      />,
+    );
 
     unmount();
     expect(setBackOverrideMock).toHaveBeenLastCalledWith(null);
@@ -146,41 +163,65 @@ describe('ContentPage detail closing', () => {
       id: 3,
       title: 'Inline Game',
     };
-    render(<ContentPage
-      locale="en"
-      messages={{}}
-      blogPosts={[
-        {
-          slug: 'public-post', title: 'Public', date: '', excerpt: '', tags: [],
-          readingMinutes: 1, access: { mode: 'public' },
-        },
-        {
-          slug: 'protected-post', title: 'Protected', date: '', excerpt: '', tags: [],
-          readingMinutes: 1, access: { mode: 'totp', group: 'test' },
-        },
-      ]}
-      webProjects={[webProject]}
-      gameProjects={[gameProject]}
-      earlyProjects={[]}
-      experienceData={[]}
-      gameData={[{
-        id: 'life-one', title: 'Life One', description: '', tech: [], imageUrl: '',
-        galleryImages: [],
-      }]}
-      travelData={[]}
-      otherData={[]}
-      alsoPlayGames={[]}
-      artPlaceholderText=""
-      skillCategories={[]}
-      pageDescription=""
-    />);
+    render(
+      <ContentPage
+        locale="en"
+        messages={{}}
+        blogPosts={[
+          {
+            slug: 'public-post',
+            title: 'Public',
+            date: '',
+            excerpt: '',
+            tags: [],
+            readingMinutes: 1,
+            access: { mode: 'public' },
+          },
+          {
+            slug: 'protected-post',
+            title: 'Protected',
+            date: '',
+            excerpt: '',
+            tags: [],
+            readingMinutes: 1,
+            access: { mode: 'totp', group: 'test' },
+          },
+        ]}
+        webProjects={[webProject]}
+        gameProjects={[gameProject]}
+        earlyProjects={[]}
+        experienceData={[]}
+        gameData={[
+          {
+            id: 'life-one',
+            title: 'Life One',
+            description: '',
+            tech: [],
+            imageUrl: '',
+            galleryImages: [],
+          },
+        ]}
+        travelData={[]}
+        otherData={[]}
+        alsoPlayGames={[]}
+        artPlaceholderText=""
+        skillCategories={[]}
+        pageDescription=""
+      />,
+    );
 
     expect(prefetchMock).not.toHaveBeenCalled();
     fireEvent.pointerDown(screen.getByRole('button', { name: 'prefetch web' }), { button: 0 });
-    fireEvent.pointerDown(screen.getByRole('button', { name: 'prefetch inline game' }), { button: 0 });
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'prefetch inline game' }), {
+      button: 0,
+    });
     fireEvent.pointerDown(screen.getByRole('button', { name: 'prefetch life' }), { button: 0 });
-    fireEvent.pointerDown(screen.getByRole('button', { name: 'prefetch public blog' }), { button: 0 });
-    fireEvent.pointerDown(screen.getByRole('button', { name: 'prefetch protected blog' }), { button: 0 });
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'prefetch public blog' }), {
+      button: 0,
+    });
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'prefetch protected blog' }), {
+      button: 0,
+    });
 
     expect(prefetchMock.mock.calls.map(([url]) => url)).toEqual([
       '/en/web/2',

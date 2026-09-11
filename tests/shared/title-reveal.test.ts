@@ -8,7 +8,13 @@ const { contextMock, revertMock, setMock, timelineMock, toMock } = vi.hoisted(()
     callback();
     return { revert };
   });
-  return { contextMock: context, revertMock: revert, setMock: vi.fn(), timelineMock: timeline, toMock: to };
+  return {
+    contextMock: context,
+    revertMock: revert,
+    setMock: vi.fn(),
+    timelineMock: timeline,
+    toMock: to,
+  };
 });
 
 vi.mock('gsap', () => ({

@@ -8,34 +8,34 @@
 
 ### 内容仓库 + 鉴权
 
-| 文件 | 职责 |
-|---|---|
-| `content/github.ts` | GitHub Contents API 客户端（`Accept: application/vnd.github.raw`）+ 60s in-process 缓存 |
-| `content/types.ts` | `ContentBlogIndex`、`ContentPostAccess`、`TotpGroupConfig` 等共享类型 |
+| 文件                      | 职责                                                                                                            |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `content/github.ts`       | GitHub Contents API 客户端（`Accept: application/vnd.github.raw`）+ 60s in-process 缓存                         |
+| `content/types.ts`        | `ContentBlogIndex`、`ContentPostAccess`、`TotpGroupConfig` 等共享类型                                           |
 | `content/access-grant.ts` | HMAC-签名授权 cookie：`createAccessGrant` / `verifyAccessGrant` / `createAccessGrantCookie`（HttpOnly, 1h TTL） |
-| `content/access-api.ts` | `/api/protected-verify` / `/api/grant-check` 的 response 类型 |
-| `content/totp.ts` | RFC 6238 TOTP 校验，支持 previous secret window（密钥轮换期内宽限） |
-| `content/rate-limit.ts` | in-process + Upstash 限流，由 `/api/protected-verify` 按 (client-ip, group) 调用 |
+| `content/access-api.ts`   | `/api/protected-verify` / `/api/grant-check` 的 response 类型                                                   |
+| `content/totp.ts`         | RFC 6238 TOTP 校验，支持 previous secret window（密钥轮换期内宽限）                                             |
+| `content/rate-limit.ts`   | in-process + Upstash 限流，由 `/api/protected-verify` 按 (client-ip, group) 调用                                |
 
 ### 资源 / 区域 / 文档
 
-| 文件 | 职责 |
-|---|---|
-| `cdn.ts` | `cover()` / `gallery()` / `post()` / `avatar()` / `music()` / `font()` helper -- 拼成 `cdn.arsvine.com` URL，未配置 CDN 时返回相对路径 |
-| `region-visibility.ts` | 基于访客所在地的 UI 微调（X / Bilibili 等被屏蔽地区隐藏外链）。**仅 UI**，不参与权限决策 |
-| `document-bootstrap.ts` | 根布局注入的内联脚本：首次绘制前从 storage 读 power state / theme，避免无主题闪烁 |
-| `ui-timings.ts` | 跨组件共享的动画时长常量（如 `CONTENT_DETAIL_EXIT_DELAY_MS`） |
+| 文件                    | 职责                                                                                                       |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `cdn.ts`                | `cover()` / `gallery()` / `post()` / `avatar()` / `music()` helper -- 生成稳定 Catalog 引用与 CDN 资产 URL |
+| `region-visibility.ts`  | 基于访客所在地的 UI 微调（X / Bilibili 等被屏蔽地区隐藏外链）。**仅 UI**，不参与权限决策                   |
+| `document-bootstrap.ts` | 根布局注入的内联脚本：首次绘制前从 storage 读 power state / theme，避免无主题闪烁                          |
+| `ui-timings.ts`         | 跨组件共享的动画时长常量（如 `CONTENT_DETAIL_EXIT_DELAY_MS`）                                              |
 
 ### 纯函数工具
 
-| 文件 | 职责 |
-|---|---|
-| `hash.ts` | 内容锚点 hash 工具 |
-| `safe-external-href.ts` | `getSafeExternalHref` -- 仅放行 http/https，防 `javascript:`/`data:` XSS |
-| `title-reveal.ts` | 标题逐字 reveal 动画（gsap.context 包裹） |
-| `cursor-targets.ts` | 自定义光标目标注册契约（navigation content ↔ hud cursor overlay） |
-| `hud-typing-visibility.ts` | HUD 打字 overlay 可见性跨树契约（navigation ↔ hud ↔ app shell） |
-| `locale-resolution.ts` | `NEXT_LOCALE cookie > Accept-Language > zh-CN` 解析 |
+| 文件                                             | 职责                                                                                                         |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `hash.ts`                                        | 内容锚点 hash 工具                                                                                           |
+| `safe-external-href.ts`                          | `getSafeExternalHref` -- 仅放行 http/https，防 `javascript:`/`data:` XSS                                     |
+| `title-reveal.ts`                                | 标题逐字 reveal 动画（gsap.context 包裹）                                                                    |
+| `cursor-targets.ts`                              | 自定义光标目标注册契约（navigation content ↔ hud cursor overlay）                                            |
+| `hud-typing-visibility.ts`                       | HUD 打字 overlay 可见性跨树契约（navigation ↔ hud ↔ app shell）                                              |
+| `locale-resolution.ts`                           | `NEXT_LOCALE cookie > Accept-Language > zh-CN` 解析                                                          |
 | `performance-tiers.ts` / `performance-policy.ts` | 自适应性能分层常量与初始策略；`document-bootstrap.ts` 与 `features/hud/model/useAdaptivePerformance.ts` 共享 |
 
 > HUD 专属模块已迁出本目录：4D 投影几何（`tesseract-geometry`）、env 遥测文本（`env-telemetry-artifact`）、打字效果（`typing-effect`）、rAF lerp 工具（`raf-lerp`）、WebGL context loss（`webgl-context-loss`）均在 `features/hud/model/`。自适应性能分层（`performance-tiers` / `performance-policy`）因被 `document-bootstrap.ts` 共享，保留在本目录。博客系统在 `features/blog/`，推文在 `features/tweets/`，i18n 静态 registry 在 `src/app/i18n/data.ts`。
