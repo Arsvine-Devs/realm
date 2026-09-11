@@ -8,6 +8,6 @@ minimumReleaseAge: 1440
 overrides:
   brace-expansion@1: 1.1.16
   postcss: 8.5.18
-  sharp: 0.35.3
+  sharp: 0.35.4
   three-mesh-bvh: ^0.8.3
 patchedDependencies: { '@react-three/fiber@9.6.1': patches/@react-three__fiber@9.6.1.patch }
