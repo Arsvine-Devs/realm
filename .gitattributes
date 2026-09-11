@@ -1,0 +1,40 @@
+# Keep repository text files stable across operating systems.
+* text=auto eol=lf
+
+# Formats that should remain text even when content is atypical.
+*.css text eol=lf
+*.csv text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.mdx text eol=lf
+*.patch text eol=lf
+*.scss text eol=lf
+*.svg text eol=lf
+*.toml text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Binary assets must never be line-ending normalized.
+*.7z binary
+*.avif binary
+*.bin binary
+*.bmp binary
+*.eot binary
+*.gif binary
+*.ico binary
+*.jpeg binary
+*.jpg binary
+*.mp3 binary
+*.mp4 binary
+*.otf binary
+*.pdf binary
+*.png binary
+*.ttf binary
+*.wav binary
+*.webm binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.zip binary
