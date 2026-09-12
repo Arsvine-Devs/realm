@@ -34,7 +34,8 @@ param(
     [switch]$Remove,
     [switch]$HostsOnly,
     [ValidateSet('Add', 'Remove')]
-    [string]$ElevatedHostsAction
+    [string]$ElevatedHostsAction,
+    [string]$ElevatedHostsLogPath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -60,6 +61,24 @@ $script:CleanupRan = $false
 $script:FailureReported = $false
 $script:LocationPushed = $false
 
+function Write-ElevatedDiagnostic {
+    param([Parameter(Mandatory = $true)] [string]$Message)
+
+    if ([string]::IsNullOrWhiteSpace($ElevatedHostsLogPath)) {
+        return
+    }
+
+    try {
+        [System.IO.File]::AppendAllText(
+            $ElevatedHostsLogPath,
+            $Message + [Environment]::NewLine,
+            [System.Text.Encoding]::UTF8
+        )
+    } catch {
+        # Diagnostic reporting must never mask the original launcher failure.
+    }
+}
+
 function Write-LauncherFailure {
     param([Parameter(Mandatory = $true)] [System.Management.Automation.ErrorRecord]$ErrorRecord)
 
@@ -68,6 +87,14 @@ function Write-LauncherFailure {
     } else {
         $PSCommandPath
     }
+
+    Write-ElevatedDiagnostic -Message (@(
+            "Stage: $script:CurrentStage"
+            "Error: $($ErrorRecord.Exception.Message)"
+            "Location: $location"
+            "Identity: $([Security.Principal.WindowsIdentity]::GetCurrent().Name)"
+            "IsAdministrator: $isAdministrator"
+        ) -join [Environment]::NewLine)
 
     Write-Host ''
     Write-Host 'Local dev launcher failed.' -ForegroundColor Red
@@ -105,21 +132,34 @@ function Invoke-ElevatedHostsAction {
     $script:CurrentStage = "elevating hosts $Action action"
     Write-Host "Elevating to Administrator for hosts update..." -ForegroundColor Yellow
     $shell = if (Get-Command pwsh.exe -ErrorAction SilentlyContinue) { 'pwsh.exe' } else { 'powershell.exe' }
+    $diagnosticPath = Join-Path ([System.IO.Path]::GetTempPath()) (
+        "arsvine-realm-hosts-$([guid]::NewGuid().ToString('N')).log"
+    )
     $argList = @(
+        '-NoProfile',
         '-ExecutionPolicy', 'Bypass',
         '-File', "`"$PSCommandPath`"",
-        '-ElevatedHostsAction', $Action
+        '-ElevatedHostsAction', $Action,
+        '-ElevatedHostsLogPath', "`"$diagnosticPath`""
     )
 
     try {
-        $proc = Start-Process $shell -ArgumentList $argList -Verb RunAs -PassThru -Wait
+        $proc = Start-Process $shell -ArgumentList $argList -Verb RunAs -WindowStyle Hidden -PassThru -Wait
         if ($proc.ExitCode -ne 0) {
+            if (Test-Path -LiteralPath $diagnosticPath) {
+                $diagnostic = (Get-Content -LiteralPath $diagnosticPath -Raw).Trim()
+                if ($diagnostic) {
+                    Write-Host "Elevated process diagnostic:`n$diagnostic" -ForegroundColor DarkYellow
+                }
+            }
             throw "Elevated hosts action exited with code $($proc.ExitCode)."
         }
     } catch {
         Write-Host "Failed to update hosts with elevation: $_" -ForegroundColor Red
         Read-Host "Press Enter to close"
         exit 1
+    } finally {
+        Remove-Item -LiteralPath $diagnosticPath -Force -ErrorAction SilentlyContinue
     }
 }
 
@@ -138,13 +178,43 @@ function Backup-HostsOnce {
     }
 }
 
+function Write-HostsLines {
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string[]]$Lines
+    )
+
+    # Some Windows installations keep hosts read-only as a local hardening
+    # measure. Preserve every original attribute, but make the file writable
+    # for the short interval required by the edit.
+    $originalAttributes = [System.IO.File]::GetAttributes($HostsPath)
+    $wasReadOnly = ($originalAttributes -band [System.IO.FileAttributes]::ReadOnly) -ne 0
+
+    try {
+        if ($wasReadOnly) {
+            $writableAttributes = [System.IO.FileAttributes](
+                [int]$originalAttributes -bxor [int][System.IO.FileAttributes]::ReadOnly
+            )
+            [System.IO.File]::SetAttributes($HostsPath, $writableAttributes)
+        }
+
+        [System.IO.File]::WriteAllLines($HostsPath, $Lines, [System.Text.Encoding]::ASCII)
+    }
+    finally {
+        if ($wasReadOnly) {
+            [System.IO.File]::SetAttributes($HostsPath, $originalAttributes)
+        }
+    }
+}
+
 function Add-HostsEntry {
     $script:CurrentStage = 'adding hosts entry'
     if (Test-HostsEntry) { return $false }   # already present, we did NOT add
     Backup-HostsOnce
     $lines = Get-Content $HostsPath
     $newLines = @($lines) + $Marker
-    [System.IO.File]::WriteAllLines($HostsPath, $newLines, [System.Text.Encoding]::ASCII)
+    Write-HostsLines -Lines $newLines
     $script:WeAddedHostsEntry = $true
     ipconfig /flushdns | Out-Null
     Write-Host "Added: $Marker" -ForegroundColor Green
@@ -160,7 +230,7 @@ function Remove-HostsEntry {
     Backup-HostsOnce
     $lines = Get-Content $HostsPath
     $newLines = $lines | Where-Object { $_ -notmatch $EntryRegex }
-    [System.IO.File]::WriteAllLines($HostsPath, $newLines, [System.Text.Encoding]::ASCII)
+    Write-HostsLines -Lines $newLines
     ipconfig /flushdns | Out-Null
     Write-Host "Removed $Hostname from hosts." -ForegroundColor Green
 }
@@ -330,6 +400,13 @@ function Invoke-DevHostCleanup {
 
 if ($ElevatedHostsAction) {
     $script:CurrentStage = "running elevated hosts $ElevatedHostsAction action"
+    Write-ElevatedDiagnostic -Message (@(
+            "Action: $ElevatedHostsAction"
+            "Identity: $([Security.Principal.WindowsIdentity]::GetCurrent().Name)"
+            "IsAdministrator: $isAdministrator"
+            "HostsPath: $HostsPath"
+            "HostsAttributes: $([System.IO.File]::GetAttributes($HostsPath))"
+        ) -join [Environment]::NewLine)
     if (-not $isAdministrator) {
         Write-Host "Elevated hosts action requires Administrator context." -ForegroundColor Red
         exit 1
