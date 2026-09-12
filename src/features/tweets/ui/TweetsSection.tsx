@@ -172,7 +172,13 @@ function TweetCard({ tweet, locale, contentStyle }: TweetCardProps) {
 
   // 解析 Explain 子集；打字机用 plain text 串避免逐字打出 `<` 标签源码，
   // 动画结束后再挂载含注解的节点树（reveal 下划线动画自动触发）。
-  const segments = useMemo(() => parseTweetSegments(targetText), [targetText]);
+  const segments = useMemo(
+    () =>
+      tweet.origin?.provider === 'x'
+        ? [{ type: 'text' as const, value: targetText }]
+        : parseTweetSegments(targetText),
+    [targetText, tweet.origin?.provider],
+  );
   const plainText = useMemo(() => getTweetPlainText(segments), [segments]);
   const segmentsHasExplain = useMemo(() => hasExplain(segments), [segments]);
   const { displayText, isAnimating } = useTweetTypewriter(plainText);
@@ -202,6 +208,16 @@ function TweetCard({ tweet, locale, contentStyle }: TweetCardProps) {
                 <span className={cardStyles.cardPinnedBadge} aria-label={t('pinned')}>
                   {t('pinned')}
                 </span>
+              ) : null}
+              {tweet.origin?.provider === 'x' ? (
+                <a
+                  className={styles.tweetSourceLink}
+                  href={tweet.origin.canonicalUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {t('viewOnX')}
+                </a>
               ) : null}
             </div>
             <span className={styles.tweetId}>{tweet.id}</span>

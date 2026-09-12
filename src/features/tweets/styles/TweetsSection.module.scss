@@ -146,6 +146,21 @@
   flex-shrink: 0;
 }
 
+.tweetSourceLink {
+  color: var(--ark-primary);
+  font-family: var(--font-hud);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.08em;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+.tweetSourceLink:hover,
+.tweetSourceLink:focus-visible {
+  color: var(--ark-text);
+}
+
 .tweetContent {
   margin: 0;
   white-space: pre-wrap;
