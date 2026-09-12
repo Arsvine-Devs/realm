@@ -4,6 +4,16 @@ export type TweetLang = 'zh-CN' | 'zh-TW' | 'en' | 'ja' | 'other';
 export type TweetTranslationPromptKey =
   'translate-to-zh-CN' | 'translate-to-zh-TW' | 'translate-to-en';
 
+export type TweetOrigin = {
+  provider: 'x';
+  externalId: string;
+  canonicalUrl: string;
+  authorId: string;
+  authorUsername: string;
+  importedAt: string;
+  syncedAt?: string;
+};
+
 export type TweetTranslation = {
   content: string;
   sourceLang: TweetLang;
@@ -23,6 +33,7 @@ export type TweetItem = {
   visibility?: 'public' | 'hidden' | 'private';
   pinned?: boolean;
   translations?: Partial<Record<Locale, TweetTranslation>>;
+  origin?: TweetOrigin;
 };
 
 export type TweetIndexItem = {

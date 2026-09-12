@@ -18,6 +18,29 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function isTweetOrigin(value: unknown): value is NonNullable<TweetItem['origin']> {
+  if (!isRecord(value)) return false;
+  if (value.provider !== 'x') return false;
+  if (typeof value.externalId !== 'string' || !/^\d{1,19}$/.test(value.externalId)) return false;
+  if (typeof value.authorId !== 'string' || !/^\d{1,19}$/.test(value.authorId)) return false;
+  if (
+    typeof value.authorUsername !== 'string' ||
+    !/^[A-Za-z0-9_]{1,15}$/.test(value.authorUsername)
+  )
+    return false;
+  if (typeof value.canonicalUrl !== 'string') return false;
+  try {
+    const url = new URL(value.canonicalUrl);
+    if (url.protocol !== 'https:' || !['x.com', 'twitter.com'].includes(url.hostname)) return false;
+  } catch {
+    return false;
+  }
+  return (
+    typeof value.importedAt === 'string' &&
+    (value.syncedAt === undefined || typeof value.syncedAt === 'string')
+  );
+}
+
 function isTweetIndex(value: unknown): value is TweetIndexItem[] {
   return (
     Array.isArray(value) &&
@@ -47,7 +70,8 @@ function isTweetList(value: unknown): value is TweetItem[] {
         (item.visibility === undefined ||
           item.visibility === 'public' ||
           item.visibility === 'hidden' ||
-          item.visibility === 'private'),
+          item.visibility === 'private') &&
+        (item.origin === undefined || isTweetOrigin(item.origin)),
     )
   );
 }

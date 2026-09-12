@@ -138,6 +138,7 @@
       "loadMore": "加载更多月份",
       "generatedAt": "缓存生成于：{value}",
       "pinned": "PINNED",
+      "viewOnX": "在 X 查看",
       "autoTranslatedFrom": "自动翻译自 {source}",
       "viewOriginal": "查看原文",
       "hideOriginal": "收起原文",
