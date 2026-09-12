@@ -12,7 +12,10 @@ import {
 } from 'react';
 
 import { useResponsive } from '@/shared/hooks/useMediaQuery';
-import type { ContentHashNavigationRequest } from './contentHashNavigation';
+import {
+  createContentHashNavigationRequest,
+  type ContentHashNavigationRequest,
+} from './contentHashNavigation';
 import { syncContentHashFromScroll } from './contentHashUrlSync';
 
 export type ContentHashAlignmentResult = 'aligned' | 'timeout' | 'cancelled';
@@ -21,7 +24,7 @@ interface LayoutAnchorsContextValue {
   registerScrollContainer: (element: HTMLDivElement | null) => void;
   getScrollContainer: () => HTMLDivElement | null;
   align: (request: string | ContentHashNavigationRequest) => Promise<ContentHashAlignmentResult>;
-  cancel: () => void;
+  cancel: (requestId?: string) => void;
   isPending: (hash: string) => boolean;
 }
 
@@ -31,13 +34,17 @@ export function LayoutAnchorsProvider({ children }: { children: ReactNode }) {
   const { isMobile } = useResponsive();
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(null);
-  const pendingHashRef = useRef<string | null>(null);
+  const pendingRequestRef = useRef<ContentHashNavigationRequest | null>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
 
-  const cancel = useCallback(() => {
+  const cancel = useCallback((requestId?: string) => {
+    if (requestId && pendingRequestRef.current?.requestId !== requestId) {
+      return;
+    }
+
     cleanupRef.current?.();
     cleanupRef.current = null;
-    pendingHashRef.current = null;
+    pendingRequestRef.current = null;
   }, []);
 
   useEffect(() => cancel, [cancel]);
@@ -49,17 +56,17 @@ export function LayoutAnchorsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const getScrollContainer = useCallback(() => scrollContainerRef.current, []);
-  const isPending = useCallback((hash: string) => pendingHashRef.current === hash, []);
+  const isPending = useCallback((hash: string) => pendingRequestRef.current?.hash === hash, []);
 
   useEffect(() => {
     if (!scrollContainer) return;
 
     let frameId = 0;
     const onScroll = () => {
-      if (frameId || pendingHashRef.current) return;
+      if (frameId || pendingRequestRef.current) return;
       frameId = window.requestAnimationFrame(() => {
         frameId = 0;
-        if (!pendingHashRef.current) syncContentHashFromScroll(scrollContainer);
+        if (!pendingRequestRef.current) syncContentHashFromScroll(scrollContainer);
       });
     };
 
@@ -73,8 +80,9 @@ export function LayoutAnchorsProvider({ children }: { children: ReactNode }) {
   const align = useCallback(
     (request: string | ContentHashNavigationRequest) => {
       cancel();
-      const target = typeof request === 'string' ? { hash: request, requestId: null } : request;
-      pendingHashRef.current = target.hash;
+      const target =
+        typeof request === 'string' ? createContentHashNavigationRequest(request) : request;
+      pendingRequestRef.current = target;
 
       return new Promise<ContentHashAlignmentResult>((resolve) => {
         let frameId = 0;
@@ -88,7 +96,9 @@ export function LayoutAnchorsProvider({ children }: { children: ReactNode }) {
           settled = true;
           if (frameId) window.cancelAnimationFrame(frameId);
           if (timeoutId) window.clearTimeout(timeoutId);
-          if (pendingHashRef.current === target.hash) pendingHashRef.current = null;
+          if (pendingRequestRef.current?.requestId === target.requestId) {
+            pendingRequestRef.current = null;
+          }
           if (cleanupRef.current === cleanup) cleanupRef.current = null;
           resolve(result);
         };
