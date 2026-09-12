@@ -1,0 +1,256 @@
+@use '../../../shared/styles/breakpoints';
+
+.spoiler {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  padding-inline: 0.14em;
+  color: var(--ark-text);
+  vertical-align: baseline;
+  transition: outline-color 0.2s ease;
+
+  &:focus-visible {
+    outline: 1px solid var(--ark-primary);
+    outline-offset: 3px;
+  }
+}
+
+.spoilerContent {
+  display: inline;
+  color: var(--ark-text);
+}
+
+.concealed {
+  outline-color: transparent;
+}
+
+.spoiler[data-spoiler-lines='pending'] .spoilerContent {
+  color: transparent;
+}
+
+.spoilerCover {
+  position: absolute;
+  z-index: 1;
+  border-radius: 1px;
+  pointer-events: none;
+  background-color: var(--black);
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.03) 0,
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  opacity: 1;
+  transform: scaleY(1);
+  transform-origin: center;
+  transition:
+    opacity 0.42s ease,
+    transform 0.42s ease;
+}
+
+.previewVisible,
+.revealed {
+  .spoilerCover {
+    opacity: 0;
+    transform: scaleY(0.82);
+  }
+}
+
+:global(.inverted) .spoilerCover {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.08) 0,
+    rgba(255, 255, 255, 0.08) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+}
+
+.dialogBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: spoilerDialogIn 0.24s ease-out;
+  opacity: 1;
+  transition: opacity 0.22s ease;
+}
+
+.dialogClosing {
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+}
+
+.dialogSurface {
+  position: relative;
+  inset: auto;
+  width: min(420px, 100%);
+  max-height: calc(100dvh - 48px);
+  margin: 0;
+  padding: 24px;
+  overflow-y: auto;
+  color: var(--ark-text);
+  background: rgba(13, 13, 13, 0.96);
+  border: 1px solid rgba(var(--ark-primary-rgb), 0.35);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(var(--white-rgb), 0.08);
+  animation: spoilerDialogSurfaceIn 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+}
+
+.dialogClosing .dialogSurface {
+  animation: none;
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+}
+
+.dialogMarker {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--ark-primary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  letter-spacing: 0.2em;
+  opacity: 0.82;
+}
+
+.dialogTitle {
+  margin: 0;
+  color: var(--ark-text);
+  font-family: var(--font-hud);
+  font-size: var(--fs-lg);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.dialogDescription {
+  margin: 12px 0 0;
+  color: var(--ark-text-secondary);
+  font-family: var(--font-reading);
+  font-size: var(--fs-body);
+  line-height: 1.8;
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.dialogButton {
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid var(--ark-border);
+  font-family: var(--font-hud);
+  font-size: var(--fs-caption);
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+
+  &:focus-visible {
+    outline: 1px solid var(--ark-primary);
+    outline-offset: 3px;
+  }
+}
+
+.keepButton {
+  color: var(--ark-text-secondary);
+  background: transparent;
+
+  &:hover {
+    color: var(--ark-text);
+    background: rgba(var(--ark-text-rgb), 0.08);
+    border-color: rgba(var(--ark-primary-rgb), 0.5);
+  }
+}
+
+.clearButton {
+  color: var(--ark-dark-blue);
+  background: var(--ark-primary);
+  border-color: var(--ark-primary);
+
+  &:hover {
+    color: var(--ark-dark-blue);
+    background: var(--ark-highlight);
+    border-color: var(--ark-highlight);
+  }
+}
+
+:global(.inverted) .dialogSurface {
+  background: rgba(240, 240, 240, 0.97);
+  border-color: rgba(var(--ark-primary-rgb), 0.5);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(var(--white-rgb), 0.7);
+}
+
+@keyframes spoilerDialogIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes spoilerDialogSurfaceIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spoiler,
+  .spoilerContent,
+  .spoilerCover,
+  .dialogButton {
+    transition-duration: 0.01ms;
+  }
+
+  .dialogBackdrop,
+  .dialogSurface {
+    animation: none;
+  }
+}
+
+@include breakpoints.mobile {
+  .dialogBackdrop {
+    place-items: end center;
+    padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .dialogSurface {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .dialogActions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dialogButton {
+    width: 100%;
+  }
+}

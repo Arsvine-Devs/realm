@@ -27,6 +27,15 @@
     "openTitle": "打开音乐播放器",
     "closeTitle": "关闭音乐播放器"
   },
+  "spoiler": {
+    "revealLabel": "显示被遮挡内容",
+    "revealedLabel": "已显示被遮挡内容",
+    "clickToReveal": "点击揭示文案",
+    "dialogTitle": "已显示多处遮挡内容",
+    "dialogDescription": "要显示本页所有被遮挡的内容吗？",
+    "keepVisible": "继续显示",
+    "revealAll": "全部揭示"
+  },
   "nav": {
     "top": "顶部",
     "content": "正文",

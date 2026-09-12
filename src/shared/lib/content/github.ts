@@ -145,7 +145,7 @@ function getBundledBlogInitDir() {
   return path.join(process.cwd(), 'content', 'blog', 'init');
 }
 
-async function readBundledFallbackContent(contentPath: string) {
+async function readBundledBlogInitContent(contentPath: string) {
   const normalizedPath = normalizeContentPath(contentPath);
   const prefix = 'blog/init/';
   if (!normalizedPath.startsWith(prefix) || !normalizedPath.endsWith('.mdx')) {
@@ -159,6 +159,12 @@ async function readBundledFallbackContent(contentPath: string) {
   } catch {
     return null;
   }
+}
+
+function shouldPreferBundledBlogInitContent() {
+  // Local development and tests must be able to exercise edits made in the
+  // checkout even when a configured remote content repository has the same file.
+  return process.env.NODE_ENV !== 'production';
 }
 
 async function getBundledFallbackBlogIndex(): Promise<ContentBlogIndex> {
@@ -212,8 +218,15 @@ async function getBundledFallbackBlogIndex(): Promise<ContentBlogIndex> {
 }
 
 export async function fetchGitHubContent(path: string): Promise<string> {
+  if (shouldPreferBundledBlogInitContent()) {
+    const localContent = await readBundledBlogInitContent(path);
+    if (localContent != null) {
+      return localContent;
+    }
+  }
+
   if (!hasContentRepoConfig()) {
-    const bundled = await readBundledFallbackContent(path);
+    const bundled = await readBundledBlogInitContent(path);
     if (bundled != null) {
       return bundled;
     }
@@ -239,7 +252,7 @@ export async function fetchGitHubContent(path: string): Promise<string> {
   }
 
   if (!response.ok) {
-    const bundled = await readBundledFallbackContent(path);
+    const bundled = await readBundledBlogInitContent(path);
     if (bundled != null) {
       return bundled;
     }

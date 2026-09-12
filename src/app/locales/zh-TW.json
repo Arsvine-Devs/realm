@@ -27,6 +27,15 @@
     "openTitle": "開啟音樂播放器",
     "closeTitle": "關閉音樂播放器"
   },
+  "spoiler": {
+    "revealLabel": "顯示被遮擋內容",
+    "revealedLabel": "已顯示被遮擋內容",
+    "clickToReveal": "點擊揭示文案",
+    "dialogTitle": "已顯示多處遮擋內容",
+    "dialogDescription": "要顯示本頁所有被遮擋的內容嗎？",
+    "keepVisible": "繼續顯示",
+    "revealAll": "全部揭示"
+  },
   "nav": {
     "top": "Top",
     "content": "Content",

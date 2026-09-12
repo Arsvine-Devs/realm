@@ -27,6 +27,15 @@
     "openTitle": "Open music player",
     "closeTitle": "Close music player"
   },
+  "spoiler": {
+    "revealLabel": "Reveal hidden content",
+    "revealedLabel": "Hidden content is visible",
+    "clickToReveal": "Click to reveal",
+    "dialogTitle": "Several hidden sections are visible",
+    "dialogDescription": "Reveal all hidden content on this page?",
+    "keepVisible": "Keep visible",
+    "revealAll": "Reveal all"
+  },
   "nav": {
     "top": "Top",
     "content": "Content",

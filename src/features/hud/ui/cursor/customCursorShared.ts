@@ -92,7 +92,8 @@ export function getCursorTargetBounds(
 }
 
 export function resolveCursorLabel(el: HTMLElement) {
-  return el.getAttribute('data-cursor-label') || el.getAttribute('aria-label') || '';
+  const explicitLabel = el.getAttribute('data-cursor-label');
+  return explicitLabel !== null ? explicitLabel : el.getAttribute('aria-label') || '';
 }
 
 export function findClosestInteractiveElement(

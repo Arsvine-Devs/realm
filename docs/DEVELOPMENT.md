@@ -60,7 +60,7 @@ pnpm vitest run -t "reading time"
 
 ```text
 config/                 小型运行配置，例如远程图片 host
-content/blog/init/      外部内容不可用时的内置博客 fallback
+content/blog/init/      本地开发/测试覆盖同名内容，生产环境的博客 fallback
 docs/                   项目维护文档
 patches/                pnpm dependency patch
 public/                 身份与启动关键静态文件

@@ -19,6 +19,7 @@ function clearContentEnv() {
 
 afterEach(() => {
   process.env = { ...ORIGINAL_ENV };
+  vi.unstubAllEnvs();
   vi.restoreAllMocks();
   vi.useRealTimers();
 });
@@ -69,6 +70,28 @@ describe('fetchGitHubContent', () => {
     expect(parsedUrl.searchParams.get('ref')).toBe('main');
     expect((init.headers as Record<string, string>).Accept).toBe('application/vnd.github.raw');
     expect((init.headers as Record<string, string>).Authorization).toBe('Bearer test-token');
+  });
+
+  it('prefers the bundled same-name init variant in local environments', async () => {
+    const fetchMock = vi.fn(async () => new Response('remote content', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    vi.stubEnv('NODE_ENV', 'test');
+    const { fetchGitHubContent } = await import('@/shared/lib/content/github');
+
+    const text = await fetchGitHubContent('blog/init/zh-CN.mdx');
+
+    expect(text).toContain('<Spoiler>');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps the remote same-name variant as the production source', async () => {
+    const fetchMock = vi.fn(async () => new Response('remote content', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    vi.stubEnv('NODE_ENV', 'production');
+    const { fetchGitHubContent } = await import('@/shared/lib/content/github');
+
+    await expect(fetchGitHubContent('blog/init/zh-CN.mdx')).resolves.toBe('remote content');
+    expect(fetchMock).toHaveBeenCalledOnce();
   });
 
   it('rejects dangerous paths before issuing fetch', async () => {

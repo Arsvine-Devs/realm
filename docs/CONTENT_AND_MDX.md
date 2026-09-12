@@ -17,6 +17,8 @@
 - 推文返回空状态；
 - 开发环境可用 `TWEETS_STRESS_TEST=1` 生成合成归档。
 
+开发环境和测试环境会优先读取仓库内与外部仓库同名的 `content/blog/init/<locale>.mdx`，用于验证本地内容修改；生产环境仍以外部内容仓库为主，外部仓库不可用或返回 404 时才使用内置内容。
+
 ## 结构化数据
 
 常见位置：
@@ -123,6 +125,7 @@ originLocale: zh-CN
 | -------------------------------------- | ----------------------------------------- |
 | `<Term note="...">word</Term>`         | 短词、专有名词或缩写的 ruby 注解          |
 | `<Explain note="...">phrase</Explain>` | 较长的 tooltip / mobile bottom sheet 说明 |
+| `<Spoiler>phrase</Spoiler>`            | 句内涂黑/剧透遮挡，悬停预览、点击固定显示 |
 | `<Lead>`                               | 开篇导语                                  |
 | `<Aside>`                              | 补充说明块                                |
 | `<Mark>`                               | section 标记                              |
@@ -134,7 +137,11 @@ originLocale: zh-CN
 这是一个 <Term note="作品集">Portfolio</Term>。
 
 <Explain note="移动端会显示为底部说明面板">需要补充解释的短语</Explain>
+
+<Spoiler>需要默认遮挡的剧透内容</Spoiler>
 ```
+
+`<Spoiler>` 仅用于句内内容。内容默认被涂黑，桌面端悬停或键盘聚焦时渐变显示，点击、Enter 或 Space 后在当前文章中保持显示。当前文章中第 3 个不同的遮挡内容被激活后，会询问是否“全部揭示”当前文章的遮挡内容；提示每次文章内容视图只出现一次。
 
 MDX link 允许安全的 `http:`、`https:`、`mailto:`、站内相对路径和 `#fragment`，拒绝 `javascript:`、`data:`、协议相对 URL 与反斜杠路径。
 

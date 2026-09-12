@@ -3,6 +3,7 @@ import styles from '../../styles/MDXContent.module.scss';
 import { getSafeMdxHref } from '@/features/blog/model/mdxHref';
 import Term from './Term';
 import Explain from './Explain';
+import Spoiler from './Spoiler';
 
 type MDXComponentsType = Record<string, React.ComponentType<any>>;
 
@@ -54,6 +55,7 @@ const MDXComponents: MDXComponentsType = {
   ),
   Term,
   Explain,
+  Spoiler,
 };
 
 export default MDXComponents;

@@ -54,6 +54,8 @@ NEXT_PUBLIC_CDN_BASE=https://cdn.arsvine.com
 
 没有 GitHub 内容仓库配置时，博客使用 `content/blog/init/` 的内置文章，推文页显示空状态。没有 COS 私有 Catalog 配置时，可选远程资产会按各模块的 fallback 行为处理。
 
+开发环境和本地测试会优先使用仓库内 `content/blog/init/<locale>.mdx` 的同名文件，即使 GitHub 内容仓库已配置，也可以直接验证本地文章修改；生产环境仍以 GitHub 内容仓库为主。
+
 完整变量说明见 [`CONFIGURATION.md`](./CONFIGURATION.md)。不要把服务端 secret 放入任何 `NEXT_PUBLIC_*` 变量。
 
 ## 启动开发服务器

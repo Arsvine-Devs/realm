@@ -4,6 +4,7 @@ import { startTransition, useState, useEffect, useRef, useCallback } from 'react
 import { useTranslations } from 'next-intl';
 import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote';
 import MDXComponents from '../mdx/MDXComponents';
+import { SpoilerProvider } from '../mdx/Spoiler';
 import LocaleFallbackBanner from '../../../../shared/ui/LocaleFallbackBanner';
 import { AnimatedTitleChars } from '../../../../shared/ui/AnimatedTitleChars';
 import useBlogPostState, {
@@ -379,7 +380,9 @@ function BlogDetailContent({
               </div>
             )}
             <div key={selectedContentLocale} ref={contentBodyRef} className={styles.contentBody}>
-              <MDXRemote {...mdxSource} components={MDXComponents} />
+              <SpoilerProvider>
+                <MDXRemote {...mdxSource} components={MDXComponents} />
+              </SpoilerProvider>
             </div>
           </>
         }
