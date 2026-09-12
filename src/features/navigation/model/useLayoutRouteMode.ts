@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getRouteTemplate } from './NavigationRuntime';
+import { classifyRoutePathname } from './contentHashNavigation';
 
 export interface LayoutRouteMode {
   isHome: boolean;
@@ -13,13 +13,10 @@ export default function useLayoutRouteMode(
   forceHomeSection: boolean,
 ): LayoutRouteMode {
   return useMemo(() => {
-    const routeTemplate = getRouteTemplate(pathname);
-    const isHome = routeTemplate === '/[locale]';
-    const isContentPage = routeTemplate === '/[locale]/content';
-    const isStandalone =
-      routeTemplate.startsWith('/[locale]/web/') ||
-      routeTemplate.startsWith('/[locale]/life/') ||
-      routeTemplate.startsWith('/[locale]/blog/');
+    const routeKind = classifyRoutePathname(pathname);
+    const isHome = routeKind === 'home';
+    const isContentPage = routeKind === 'content';
+    const isStandalone = routeKind === 'standalone';
 
     return {
       isHome,

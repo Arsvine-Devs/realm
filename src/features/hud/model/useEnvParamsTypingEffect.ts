@@ -12,7 +12,7 @@ export function useEnvParamsTypingEffect(
   textVisible: boolean,
   routeEnabled: boolean,
 ): EnvParamsTypingState {
-  const { asPath } = useNavigationRuntime();
+  const { currentUrl } = useNavigationRuntime();
   const [controller] = useState(() => new EnvTelemetryController());
   const snapshot = useSyncExternalStore(
     controller.subscribe,
@@ -35,7 +35,7 @@ export function useEnvParamsTypingEffect(
 
   useEffect(() => {
     controller.routeChanged();
-  }, [asPath, controller]);
+  }, [currentUrl, controller]);
 
   useEffect(() => {
     const handleVisibility = () => controller.visibilityChanged(document.hidden);

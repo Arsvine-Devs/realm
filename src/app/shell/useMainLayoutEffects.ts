@@ -32,27 +32,27 @@ export function useHudRouteVisibility(isStandalone: boolean) {
   }, [isStandalone]);
 }
 
-export function useCursorTargetInvalidation(asPath: string, mainVisible: boolean) {
+export function useCursorTargetInvalidation(currentUrl: string, mainVisible: boolean) {
   useEffect(() => {
     markCursorTargetsDirty();
-  }, [asPath]);
+  }, [currentUrl]);
 
   useEffect(() => {
     if (mainVisible) markCursorTargetsDirty();
   }, [mainVisible]);
 }
 
-export function useContentHashAlignment(pathname: string, asPath: string) {
+export function useContentHashAlignment(pathname: string, currentUrl: string) {
   const { align, cancel, isPending } = useLayoutAnchors();
 
   useEffect(() => {
     if (classifyRoutePathname(pathname) !== 'content') return;
-    // App Router's usePathname() excludes the fragment. Prefer the browser URL
-    // after a locale navigation, while retaining the Pages Router asPath fallback.
-    const hash = window.location.hash.slice(1) || asPath.split('#')[1];
+    // App Router's usePathname() excludes the fragment; the browser URL is the
+    // authoritative source for the current hash.
+    const hash = window.location.hash.slice(1);
     if (!hash || isPending(hash)) return;
     const request = createContentHashNavigationRequest(hash);
     void align(request);
     return () => cancel(request.requestId);
-  }, [align, asPath, cancel, isPending, pathname]);
+  }, [align, cancel, currentUrl, isPending, pathname]);
 }

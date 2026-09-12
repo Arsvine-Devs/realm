@@ -1,10 +1,9 @@
 import type { Locale } from '@/shared/contracts/locale';
 
-export type TweetLang = 'zh-CN' | 'zh-TW' | 'en' | 'ja' | 'other';
-export type TweetTranslationPromptKey =
-  'translate-to-zh-CN' | 'translate-to-zh-TW' | 'translate-to-en';
+type TweetLang = 'zh-CN' | 'zh-TW' | 'en' | 'ja' | 'other';
+type TweetTranslationPromptKey = 'translate-to-zh-CN' | 'translate-to-zh-TW' | 'translate-to-en';
 
-export type TweetOrigin = {
+type TweetOrigin = {
   provider: 'x';
   externalId: string;
   canonicalUrl: string;
@@ -14,7 +13,7 @@ export type TweetOrigin = {
   syncedAt?: string;
 };
 
-export type TweetTranslation = {
+type TweetTranslation = {
   content: string;
   sourceLang: TweetLang;
   translatedAt: string;

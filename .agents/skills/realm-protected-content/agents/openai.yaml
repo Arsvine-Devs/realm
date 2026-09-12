@@ -1,0 +1,3 @@
+interface:
+  display_name: 'Realm Protected Content'
+  short_description: 'Safely change protected blog access flows'

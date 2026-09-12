@@ -7,7 +7,7 @@ const useAppMock = vi.fn();
 vi.mock('@/features/navigation/model/NavigationRuntime', () => ({
   useNavigationRuntime: () => ({
     query: { locale: 'zh-CN' },
-    asPath: '/zh-CN',
+    currentUrl: '/zh-CN',
     pathname: '/zh-CN',
   }),
 }));
@@ -27,7 +27,7 @@ vi.mock('@/features/hud/model/HudProvider', () => ({
   useHudPerformance: () => useAppMock(),
 }));
 
-vi.mock('@/features/visitor-stats/public', () => ({
+vi.mock('@/features/visitor-stats/model/VisitorStatsProvider', () => ({
   useVisitorStats: () => useAppMock(),
 }));
 

@@ -29,8 +29,8 @@ export interface BlogVariantPayload {
   mdxSource: MDXRemoteSerializeResult;
 }
 
-export function getRequestedContentLocaleFromPath(asPath: string): BlogContentLocale | null {
-  const query = asPath.split('?')[1]?.split('#')[0];
+export function getRequestedContentLocaleFromPath(currentUrl: string): BlogContentLocale | null {
+  const query = currentUrl.split('?')[1]?.split('#')[0];
   if (!query) {
     return null;
   }

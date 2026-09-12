@@ -1,143 +1,62 @@
-# ARSVINE REALM
+<div align="center">
+  <h1>ARSVINE REALM</h1>
+  <p>
+    <a href="https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm/actions/workflows/ci.yml/badge.svg" /></a>
+    <a href="https://nodejs.org/"><img alt="Node.js 24.x" src="https://img.shields.io/badge/Node.js-24.x-339933?logo=node.js&logoColor=white" /></a>
+    <a href="https://nextjs.org/"><img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white" /></a>
+    <a href="https://arsvine.com"><img alt="Deployed on Vercel" src="https://img.shields.io/badge/deployed%20on-Vercel-000000?logo=vercel&logoColor=white" /></a>
+    <a href="./LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-2f855a.svg" /></a>
+  </p>
+  <p><em>A personal archive terminal for projects, writing, experiments, and the things still taking shape.</em></p>
+  <p><img alt="ARSVINE REALM preview" src="./docs/preview.png" /></p>
+  <p><strong>ARSVINE REALM</strong> is a post-apocalyptic HUD-themed portfolio and blog by <a href="https://github.com/ArsvineZhu">Arsvine Zhu</a>.</p>
+  <p>
+    <a href="https://arsvine.com">Visit the live site</a> ·
+    <a href="https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm">Browse the repository</a> ·
+    <a href="./docs/README.md">Read the documentation</a>
+  </p>
+</div>
 
-ARSVINE REALM 是一个以末日废土 HUD 为视觉语言的个人作品集与博客。它承载项目、经历、生活记录、博客、推文、友链和个人资料，并通过统一页面过渡、三语 UI、音乐播放器、WebGL 氛围效果和 TOTP 私密文章构成一个持续维护的个人网络空间。
+It combines a project archive, multilingual writing, life records, music, WebGL atmosphere, and a private-post access flow inside one living interface.
 
-![ARSVINE REALM 预览](./docs/preview.png)
+## What is inside
 
-## 项目状态
+- A five-column HUD home screen and responsive content hub.
+- Multilingual UI in `zh-CN`, `zh-TW`, and `en`, with additional blog content locales.
+- Portfolio, experience, life, friends, tweets, RSS, sitemap, and robots routes.
+- Smooth home/content/detail transitions with hash navigation and locale state retention.
+- Desktop Three.js atmosphere and interaction with adaptive performance capabilities.
+- A music player, custom cursor, spoiler controls, and accessible responsive interactions.
+- Runtime-gated TOTP posts whose protected body never enters unauthorized static output.
+- Versioned Tencent COS media Catalogs with immutable hashed objects and pointer-last publishing.
 
-| 项目            | 当前设置                                   |
-| --------------- | ------------------------------------------ |
-| 类型            | 个人站点，不是通用模板                     |
-| 生产平台        | Vercel                                     |
-| Runtime         | Node.js `24.x`                             |
-| Package manager | pnpm，版本见 `package.json#packageManager` |
-| UI locale       | `zh-CN`、`zh-TW`、`en`                     |
-| 公共路由        | `/<locale>/...`                            |
-| 内容源          | 仓库内 typed data + 私有 GitHub 内容仓库   |
-| 媒体            | Tencent COS + versioned Catalog            |
+## Built with
 
-## 主要能力
+`Next.js 16` · `React 19` · `TypeScript` · `SCSS Modules` · `next-intl` · `Three.js` · `React Three Fiber` · `GSAP` · `XState` · `MDX` · `Vitest`
 
-- 五列 HUD 风格首页与响应式 content hub。
-- 通过 `TransitionContext` 统一管理 home、content 和 detail 页面过渡。
-- `next-intl` 三语 UI，以及博客内可选 `ja`、`ru`、`fr` content locale。
-- App Router SSG/ISR 博客详情、动态 sitemap、RSS 和 robots。
-- 外部私有 GitHub 仓库提供博客和推文；不可用时有明确 fallback。
-- TOTP protected post，正文不会进入未授权 HTML 或 RSC payload。
-- 腾讯 COS 公共媒体、私有 Catalog、immutable hash object 与 pointer-last 发布。
-- Desktop Three.js 氛围与交互效果，移动端提供简化路径。
-- 七级自适应性能 tier，根据 frame pacing 逐步关闭高成本能力。
-- 音乐播放器、CustomCursor、hash navigation 和 locale 热切换状态保持。
-
-## 技术栈
-
-```text
-Next.js 16 App Router
-React 19 + TypeScript
-SCSS Modules
-next-intl 4
-Three.js + React Three Fiber + Cannon
-GSAP + Web Animations API
-XState
-next-mdx-remote
-Vitest + Testing Library
-```
-
-## 快速开始
+## Run it locally
 
 ```bash
 pnpm install --frozen-lockfile
-cp .env.example .env.local
 pnpm dev
 ```
 
-PowerShell 创建环境文件：
+PowerShell:
 
 ```powershell
 Copy-Item .env.example .env.local
 ```
 
-打开 `http://localhost:3000`。根路径会根据 `NEXT_LOCALE` Cookie、`Accept-Language` 和默认 `zh-CN` 重定向到 locale 前缀 URL。
+Open `http://localhost:3000`.
 
-完整安装说明见 [`docs/GETTING_STARTED.md`](./docs/GETTING_STARTED.md)。
+## Explore further
 
-## 常用命令
+- [Documentation index](./docs/README.md) — human-facing project and maintenance docs.
+- [Repository map](./INDEX.md) — major code, tooling, and documentation boundaries.
+- [AI workflow index](./docs/ai/INDEX.md) — repository skills, playbooks, and current invariants.
+- [Security policy](./SECURITY.md) — responsible disclosure and production safety boundaries.
+- [License](./LICENSE) — MIT for source code; original site content follows the policy shown in the site.
 
-```bash
-pnpm dev           # node server.js
-pnpm build         # next build
-pnpm start         # 自托管 production server
-pnpm lint          # Oxlint + ESLint 兼容规则
-pnpm typecheck     # TypeScript
-pnpm test          # Vitest
-pnpm format        # Prettier 自动格式化
-pnpm quality       # Knip + JSCPD 维护扫描
-pnpm check         # 格式 + 字体配置 + lint + typecheck + Knip + JSCPD + test + build
-```
+## Project status
 
-资产维护：
-
-```bash
-pnpm assets:prepare
-pnpm assets:build
-pnpm assets:publish -- --dry-run
-```
-
-真实 `assets:publish` 会写入远程 COS 并调用 revalidation，执行前必须阅读 [`docs/ASSETS.md`](./docs/ASSETS.md)。
-
-## 文档
-
-完整入口：[`docs/README.md`](./docs/README.md)
-
-| 任务         | 文档                                                      |
-| ------------ | --------------------------------------------------------- |
-| 首次安装     | [`GETTING_STARTED.md`](./docs/GETTING_STARTED.md)         |
-| 日常开发     | [`DEVELOPMENT.md`](./docs/DEVELOPMENT.md)                 |
-| 系统架构     | [`ARCHITECTURE.md`](./docs/ARCHITECTURE.md)               |
-| 路由与国际化 | [`ROUTING_AND_I18N.md`](./docs/ROUTING_AND_I18N.md)       |
-| 内容与 MDX   | [`CONTENT_AND_MDX.md`](./docs/CONTENT_AND_MDX.md)         |
-| 安全         | [`SECURITY.md`](./docs/SECURITY.md)                       |
-| 资产与 CDN   | [`ASSETS.md`](./docs/ASSETS.md)                           |
-| 性能         | [`PERFORMANCE.md`](./docs/PERFORMANCE.md)                 |
-| 测试         | [`TESTING_AND_QUALITY.md`](./docs/TESTING_AND_QUALITY.md) |
-| 部署运维     | [`OPERATIONS.md`](./docs/OPERATIONS.md)                   |
-| 配置参考     | [`CONFIGURATION.md`](./docs/CONFIGURATION.md)             |
-| 故障排查     | [`TROUBLESHOOTING.md`](./docs/TROUBLESHOOTING.md)         |
-| 历史回归     | [`GOTCHAS.md`](./docs/GOTCHAS.md)                         |
-
-## 项目结构
-
-```text
-config/              小型运行配置
-content/blog/init/    内置博客 fallback
-docs/                开发和运维文档
-patches/             pnpm dependency patch
-public/              身份与启动关键静态文件
-scripts/             资产、字体、图像和本地维护脚本
-src/app/             App Router、Route Handler、i18n、全局 shell
-src/features/        按领域组织的业务模块
-src/shared/          跨领域 contract、hook、UI、server helper
-tests/               app、feature、shared、repo、operations、scripts 测试
-server.js            本地开发与可选自托管入口
-```
-
-## 部署边界
-
-生产部署在 Vercel，使用标准 Next.js App Router 构建输出。Vercel 不运行 `server.js`。
-
-自托管流程：
-
-```bash
-pnpm build
-pnpm start
-```
-
-部署、环境变量、ISR 和 smoke test 见 [`docs/OPERATIONS.md`](./docs/OPERATIONS.md)。
-
-## License 与内容政策
-
-- 源代码：[`MIT License`](./LICENSE)
-- 原创文章、图片、笔记、设计和站点内容：CC BY-NC-ND 4.0
-
-站内 copyright 页面提供完整中英文说明。
+The site is actively evolving as a personal archive rather than a generic starter template. Changes are checked by the repository CI workflow on Ubuntu and Windows; the production deployment runs on Vercel.

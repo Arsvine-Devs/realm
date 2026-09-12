@@ -1,0 +1,3 @@
+interface:
+  display_name: 'Realm Assets Catalog'
+  short_description: 'Safely maintain the COS Catalog pipeline'

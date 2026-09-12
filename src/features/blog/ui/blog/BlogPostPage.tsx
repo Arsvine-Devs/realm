@@ -53,7 +53,7 @@ export default function BlogPostPage({
   access,
   isProtected,
 }: BlogPostPageProps) {
-  const { asPath } = useNavigationRuntime();
+  const { currentUrl } = useNavigationRuntime();
   const tCommon = useTranslations('common');
   const [hydrationReady, setHydrationReady] = useState(false);
 
@@ -80,7 +80,7 @@ export default function BlogPostPage({
     markAuthGranted,
     retryRequestedContentLocale,
   } = useBlogPostState({
-    routerAsPath: asPath,
+    currentUrl,
     locale,
     meta,
     mdxSource,

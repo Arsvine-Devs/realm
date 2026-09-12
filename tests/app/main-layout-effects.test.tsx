@@ -31,24 +31,15 @@ describe('useContentHashAlignment', () => {
     });
   });
 
-  it('retains the Pages Router asPath fallback', () => {
-    renderHook(() => useContentHashAlignment('/[locale]/content', '/en/content#blog'));
-
-    expect(align).toHaveBeenCalledWith({
-      hash: 'blog',
-      requestId: expect.stringMatching(/^content-hash-\d+$/),
-    });
-  });
-
   it('scopes cleanup to its own request when the route query changes', () => {
     window.history.replaceState({}, '', '/zh-CN/content#blog');
     const { rerender } = renderHook(
-      ({ asPath }) => useContentHashAlignment('/zh-CN/content', asPath),
-      { initialProps: { asPath: '/zh-CN/content?lang=zh-CN' } },
+      ({ currentUrl }) => useContentHashAlignment('/zh-CN/content', currentUrl),
+      { initialProps: { currentUrl: '/zh-CN/content?lang=zh-CN' } },
     );
 
     const request = align.mock.calls[0]?.[0] as { requestId: string };
-    rerender({ asPath: '/zh-CN/content' });
+    rerender({ currentUrl: '/zh-CN/content' });
 
     expect(cancel).toHaveBeenCalledWith(request.requestId);
   });

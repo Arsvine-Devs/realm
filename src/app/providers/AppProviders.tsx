@@ -7,7 +7,7 @@ import { SiteAssetsProvider } from '../../features/assets/model/SiteAssetsProvid
 import { TransitionProvider } from '../../features/navigation/model/TransitionProvider';
 import { LayoutAnchorsProvider } from '../../features/navigation/model/LayoutAnchorsContext';
 import { LocalePageStateProvider } from '@/features/navigation/model/LocalePageState';
-import { VisitorStatsProvider } from '@/features/visitor-stats/public';
+import { VisitorStatsProvider } from '@/features/visitor-stats/model/VisitorStatsProvider';
 
 interface AppProvidersProps {
   children: ReactNode;

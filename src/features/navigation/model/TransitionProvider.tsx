@@ -14,6 +14,7 @@ import {
 import { AnimationRunController } from './animationRunController';
 import { useLayoutAnchors } from './LayoutAnchorsContext';
 import { useNavigationRuntime } from './NavigationRuntime';
+import { resetTransitionSurface } from './transitionSurface';
 import { NAVIGATION_COMMIT_TIMEOUT_MS } from '@/shared/lib/ui-timings';
 
 interface TransitionContextValue {
@@ -81,13 +82,6 @@ const DIAG_COLLAPSE_OPTS: KeyframeAnimationOptions = {
   easing: 'ease-in',
   fill: 'forwards',
 };
-
-function resetTransitionSurface(wrapper: HTMLDivElement) {
-  wrapper.style.opacity = '';
-  wrapper.style.transform = '';
-  wrapper.style.clipPath = '';
-  wrapper.style.transition = '';
-}
 
 interface NavStrategyCtx {
   wrapper: HTMLDivElement;
@@ -219,7 +213,7 @@ const NAVIGATION_STRATEGIES: Record<
 };
 
 export function TransitionProvider({ children }: TransitionProviderProps) {
-  const { pathname, asPath, query, push } = useNavigationRuntime();
+  const { pathname, currentUrl, query, push } = useNavigationRuntime();
   const { retractColumns, expandColumns } = useHudAnimation();
   const { isMobile: hookIsMobile } = useResponsive();
   const reducedMotion = useReducedMotion();
@@ -407,11 +401,11 @@ export function TransitionProvider({ children }: TransitionProviderProps) {
   useEffect(() => {
     const onComplete = pendingCommitRef.current;
     if (!onComplete) {
-      if (isHomeUrl(asPath) && !runControllerRef.current.isRunning()) expandColumns();
+      if (isHomeUrl(currentUrl) && !runControllerRef.current.isRunning()) expandColumns();
       return;
     }
     onComplete();
-  }, [asPath, expandColumns]);
+  }, [currentUrl, expandColumns]);
 
   // 卸载时清理任何未完成的兜底 timer / transitionend 监听，避免在已 stale 的
   // wrapper / state 上触发副作用（"导航卡死 / 双闪烁"竞态来源之一）。

@@ -1,3 +1,5 @@
+import DetailLinkCard from '../../../../shared/ui/detail/DetailLinkCard';
+
 interface WebSignalLink {
   href: string;
   text: string;
@@ -23,15 +25,14 @@ export default function WebSignalLinksSection({
       <h2 className={styles.sectionHeader}>{title}</h2>
       <div className={styles.linksGrid}>
         {links.map((link) => (
-          <a
+          <DetailLinkCard
             key={link.href}
             href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.linkCard}
-          >
-            <div className={styles.linkIconWrap}>
-              {link.type === 'github' ? (
+            title={link.text}
+            subtitle={link.sub}
+            styles={styles}
+            icon={
+              link.type === 'github' ? (
                 <svg
                   className={styles.linkIcon}
                   viewBox="0 0 16 16"
@@ -65,13 +66,9 @@ export default function WebSignalLinksSection({
                     d="M10 6V8H5V19H16V14H18V20C18 20.5523 17.5523 21 17 21H4C3.44772 21 3 20.5523 3 20V7C3 6.44772 3.44772 6 4 6H10ZM21 3V11H19V6.413L11.2071 14.2071L9.79289 12.7929L17.585 5H13V3H21Z"
                   />
                 </svg>
-              )}
-            </div>
-            <div className={styles.linkInfo}>
-              <span className={styles.linkTitle}>{link.text}</span>
-              <span className={styles.linkSub}>{link.sub}</span>
-            </div>
-          </a>
+              )
+            }
+          />
         ))}
       </div>
     </section>

@@ -7,9 +7,7 @@
     "scripts/jpg-to-transparent-png.mjs",
     "scripts/make-white.mjs",
     "src/app/i18n/request.ts",
-    "src/features/*/public.ts",
   ],
-  // public.ts defines the documented feature API, even with no current caller.
   "project": [
     "src/**/*.{ts,tsx,js,scss,sass}",
     "scripts/**/*.{mjs,js}",

@@ -50,10 +50,9 @@ next-env.d.ts
 *.sublime-project
 *.sublime-workspace
 docs/dev/*
-docs/superpowers/*
 !docs/preview.png
 .codex*/
-.agents/
+.agents/local/
 .claude/
 
 # OS generated files

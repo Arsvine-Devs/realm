@@ -22,7 +22,7 @@ export { blogContentLocaleLabels };
 export type { BlogVariantPayload, BlogPostViewState };
 
 interface UseBlogPostStateOptions {
-  routerAsPath: string;
+  currentUrl: string;
   locale: Locale;
   meta: BlogPostMeta;
   mdxSource: BlogVariantPayload['mdxSource'] | null;
@@ -59,7 +59,7 @@ function writeContentLocaleQuery(nextContentLocale: BlogContentLocale) {
 }
 
 export default function useBlogPostState({
-  routerAsPath,
+  currentUrl,
   locale,
   meta,
   mdxSource,
@@ -77,7 +77,7 @@ export default function useBlogPostState({
     [actualContentLocale, availableContentLocales, locale],
   );
   const requestedContentLocale =
-    getRequestedContentLocaleFromPath(routerAsPath) ?? defaultContentLocale;
+    getRequestedContentLocaleFromPath(currentUrl) ?? defaultContentLocale;
   const requiresAuth = isProtected && access.mode !== 'public';
   const baseVariant = useMemo(() => (mdxSource ? { meta, mdxSource } : null), [mdxSource, meta]);
   const variants = useMemo(

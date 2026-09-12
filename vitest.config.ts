@@ -8,7 +8,38 @@ export default defineConfig({
     },
   },
   test: {
-    environment: 'jsdom',
-    include: ['**/*.test.{ts,tsx}'],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'node',
+          environment: 'node',
+          include: ['**/*.test.ts'],
+          exclude: [
+            '**/*.browser.test.ts',
+            '**/node_modules/**',
+            '**/.next/**',
+            '**/dist/**',
+            '**/cos-workspace/**',
+            '**/.agents/**',
+          ],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'dom',
+          environment: 'jsdom',
+          include: ['**/*.test.tsx', '**/*.browser.test.ts'],
+          exclude: [
+            '**/node_modules/**',
+            '**/.next/**',
+            '**/dist/**',
+            '**/cos-workspace/**',
+            '**/.agents/**',
+          ],
+        },
+      },
+    ],
   },
 });

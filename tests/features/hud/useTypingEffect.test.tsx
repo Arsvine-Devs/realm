@@ -15,7 +15,7 @@ const { translate } = vi.hoisted(() => {
 vi.mock('@/features/navigation/model/NavigationRuntime', () => ({
   useNavigationRuntime: () => ({
     pathname: '/zh-CN',
-    asPath: '/zh-CN',
+    currentUrl: '/zh-CN',
     query: { locale: 'zh-CN' },
   }),
 }));

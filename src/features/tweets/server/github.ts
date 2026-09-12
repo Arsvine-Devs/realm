@@ -256,8 +256,3 @@ export async function getTweetMonthGroupsPage(
     totalMonths: allGroups.length,
   };
 }
-
-export async function getTweets(): Promise<TweetItem[]> {
-  const groups = await getTweetMonthGroups();
-  return groups.flatMap((group) => group.tweets);
-}

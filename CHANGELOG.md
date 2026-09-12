@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.5] — 2026-09-12
+
+### Added
+
+- 发布音乐资源 `ADELPHOCLAST`，作者：铁痕电台-MSR / Crywolf / YMIR。
+- 重建人类文档、AI playbook 和仓库共享 Skills：`realm-maintenance-audit`、`realm-assets-catalog`、`realm-protected-content`。
+- 在资产 Skill 中加入 COST 原文、只读本地 Catalog verifier、dotenv runner、中断恢复规则和 pointer-last 发布检查。
+- 新增 `docs/INDEX.md`、`docs/README.md`、`docs/human/`、`docs/ai/`，并为 app、feature、shared、scripts、tests 等重要边界补充简明入口文档。
+- 新增统一的 revalidation 请求包装器、TOTP code form、详情页 link card 和 navigation transition surface helper。
+
+### Changed
+
+- 根 README 改为面向访客的展示页，加入居中 hero、CI、Node.js、Next.js、Vercel、License 徽章，并将维护信息移入文档。
+- Vitest 默认改用 Node 环境，DOM 测试进入独立 project；相关 `.ts` 测试改为 `*.browser.test.ts`，降低 Node-only 测试的 jsdom 成本。
+- 测试改为优先保护运行时、安全、构建和外部边界；删除 Pages Router、源码排版和迁移位置等历史契约测试，保留 protected RSC、TOTP、限流、Catalog、WebGL、导航和性能能力测试。
+- 删除无实际消费者的 feature `public.ts` barrel，改用真实组件、Provider 和 model 入口；保留 locale data、asset manifest 与 protected blog 的语义边界。
+- 统一 App Router route classification，移除旧 `asPath`、Pages Router template fallback 和重复的 route template 概念。
+- 将资产流程拆分为 `scripts/assets/`：legacy preparation、Catalog build、media/filesystem/catalog transform、COS publish 分别拥有清晰边界；visitor-stat CLI 共享轻量 dotenv loader。
+- `assets:prepare-legacy` 要求显式日期；Catalog 发布器现在先上传 immutable objects，再验证实际 key，最后切换双 pointer 并请求 revalidation，同时输出阶段进度、心跳和 `Retry-After` 诊断。
+- 共享 detail card 只统一布局，Work/Life inline detail 与 standalone detail、各 feature 的业务 link 映射继续保持独立。
+
+### Removed
+
+- 删除过时的嵌套 `AGENTS.md`、历史 superpowers design records、迁移型测试和无消费者 feature barrel。
+- `.agents/skills/` 改为仓库共享且可版本化；仅保留 `.agents/local/` 作为本地缓存边界。
+
+### Verification
+
+- Node/DOM 两个 Vitest project 共 96 个测试文件、418 个测试通过；`format:check`、维护检查、lint、typecheck、Knip、JSCPD 和 production build 全部通过。
+- 资产本地 manifest、public/private Catalog sections、pointer 文件和音频哈希产物均通过本地 verifier；Skill 均通过 `quick_validate.py`。
+
+<details>
+<summary>历史版本（2.0.3 及更早）</summary>
+
 ## [2.0.3] — 2026-07-25
 
 ### Fixed
@@ -54,7 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 自定义光标：修复注册机制与共享状态的竞态，统一光标切换动画。
   - 电力系统：持久化逻辑重构，增加测试覆盖，避免状态在刷新后丢失或不一致。
   - 路由过渡：修复内容页关闭时的过渡状态，移除冗余的 PagesNavigationRuntime。
-  - 受保护博客文章状态机：补充取消路径的边界处理，对应 `docs/GOTCHAS.md` 中的注意事项。
+  - 受保护博客文章状态机：补充取消路径的边界处理，对应 `docs/ai/GOTCHAS.md` 中的注意事项。
   - 音乐播放器：水合后恢复用户音乐选择，移动端自动弹出的保护逻辑加严。
   - GitHub 内容源：推文与内容加载容错增强，避免网络波动时整页崩溃。
   - 资源目录：catalog provider 回退路径修复。
@@ -65,7 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - 新增 15+ 个测试文件覆盖光标、电力系统、过渡、博客状态机、音乐播放器、激活拉杆、资源发布脚本等关键路径，测试总数从 ~280 增至 402。
-- `docs/GOTCHAS.md` 与 `docs/PERFORMANCE.md` 补充新的注意事项与性能调优记录。
+- `docs/ai/GOTCHAS.md` 与 `docs/human/PERFORMANCE.md` 补充新的注意事项与性能调优记录。
 
 ---
 
@@ -86,3 +120,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [2.0.2]: https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm/releases/tag/v2.0.0
+[2.0.5]: https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm/compare/v2.0.3...v2.0.5
+
+</details>

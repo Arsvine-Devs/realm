@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { assertRemoteObjectListed, redactCliSecrets } from '../../scripts/assets-publish.mjs';
+import { assertRemoteObjectListed, redactCliSecrets } from '../../scripts/assets/publish.mjs';
 
 describe('assets-publish helpers', () => {
   it('redacts every supported COS credential flag', () => {

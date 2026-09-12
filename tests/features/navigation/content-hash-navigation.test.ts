@@ -24,14 +24,7 @@ describe('getContentSectionHashFromUrl', () => {
 });
 
 describe('classifyRoutePathname', () => {
-  it('classifies home, content, standalone, and auxiliary templates', () => {
-    expect(classifyRoutePathname('/[locale]')).toBe('home');
-    expect(classifyRoutePathname('/[locale]/content')).toBe('content');
-    expect(classifyRoutePathname('/[locale]/life/[slug]')).toBe('standalone');
-    expect(classifyRoutePathname('/[locale]/friends')).toBe('auxiliary');
-  });
-
-  it('also classifies App Router pathname values', () => {
+  it('classifies App Router pathname values', () => {
     expect(classifyRoutePathname('/zh-CN')).toBe('home');
     expect(classifyRoutePathname('/zh-CN/content')).toBe('content');
     expect(classifyRoutePathname('/zh-CN/blog/init')).toBe('standalone');
@@ -41,26 +34,26 @@ describe('classifyRoutePathname', () => {
 
 describe('resolveContentHashTransitionMode', () => {
   it('treats home to content hash as cross-page', () => {
-    expect(resolveContentHashTransitionMode('/[locale]', '/en/content#life')).toBe('cross-page');
+    expect(resolveContentHashTransitionMode('/zh-CN', '/en/content#life')).toBe('cross-page');
   });
 
   it('treats auxiliary pages to content hash as cross-page', () => {
-    expect(resolveContentHashTransitionMode('/[locale]/friends', '/en/content#about')).toBe(
+    expect(resolveContentHashTransitionMode('/zh-CN/friends', '/en/content#about')).toBe(
       'cross-page',
     );
-    expect(resolveContentHashTransitionMode('/[locale]/friends', '/en/content#blog')).toBe(
+    expect(resolveContentHashTransitionMode('/zh-CN/friends', '/en/content#blog')).toBe(
       'cross-page',
     );
   });
 
   it('treats content to content hash as same-page', () => {
-    expect(resolveContentHashTransitionMode('/[locale]/content', '/en/content#life')).toBe(
+    expect(resolveContentHashTransitionMode('/zh-CN/content', '/en/content#life')).toBe(
       'same-page',
     );
   });
 
   it('ignores non-content-hash targets', () => {
-    expect(resolveContentHashTransitionMode('/[locale]/friends', '/en/blog/init')).toBe(
+    expect(resolveContentHashTransitionMode('/zh-CN/friends', '/en/blog/init')).toBe(
       'not-content-hash',
     );
   });
@@ -76,14 +69,6 @@ describe('createContentHashNavigationRequest', () => {
 
 describe('resolveNavigationTransitionPlan', () => {
   it.each([
-    ['/[locale]/content', '/en/content#life', false, 'samePageHash'],
-    ['/[locale]', '/en/content#life', false, 'homeForwardDesktop'],
-    ['/[locale]', '/en/content#life', true, 'homeForwardMobile'],
-    ['/[locale]/friends', '/en/content#life', false, 'crossPageHash'],
-    ['/[locale]/friends', '/en', false, 'returnHomeDesktop'],
-    ['/[locale]/friends', '/en', true, 'returnHomeMobile'],
-    ['/[locale]/friends', '/en/blog/init', false, 'blogDetailFade'],
-    ['/[locale]/friends', '/en/tweets', false, 'standardSlide'],
     ['/zh-CN/content', '/en/content#life', false, 'samePageHash'],
     ['/zh-CN', '/en/content#life', false, 'homeForwardDesktop'],
     ['/zh-CN', '/en/content#life', true, 'homeForwardMobile'],

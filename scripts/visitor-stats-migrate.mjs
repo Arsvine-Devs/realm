@@ -1,10 +1,9 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import dotenv from 'dotenv';
 import { neon } from '@neondatabase/serverless';
+import { loadProjectEnv } from './lib/load-env.mjs';
 
-dotenv.config({ path: path.join(process.cwd(), '.env.local') });
-dotenv.config({ path: path.join(process.cwd(), '.env') });
+loadProjectEnv();
 
 const databaseUrl = process.env.DATABASE_URL?.trim();
 if (!databaseUrl) {

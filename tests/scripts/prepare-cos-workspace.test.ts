@@ -18,7 +18,7 @@ async function writeEmpty(root: string, relativePath: string, content = '') {
   await writeFile(target, content);
 }
 
-describe('prepare-cos-workspace', () => {
+describe('prepare-legacy', () => {
   it('builds all manifest groups in an isolated workspace with an explicit date', async () => {
     const workspace = await mkdtemp(path.join(tmpdir(), 'arsvine-assets-'));
     tempRoots.push(workspace);
@@ -46,7 +46,7 @@ describe('prepare-cos-workspace', () => {
     const result = spawnSync(
       process.execPath,
       [
-        path.join(process.cwd(), 'scripts/prepare-cos-workspace.mjs'),
+        path.join(process.cwd(), 'scripts/assets/prepare-legacy.mjs'),
         '--workspace',
         workspace,
         '--date',

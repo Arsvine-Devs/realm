@@ -2,7 +2,10 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 
-import { useVisitorStats, VisitorStatsProvider } from '@/features/visitor-stats/public';
+import {
+  useVisitorStats,
+  VisitorStatsProvider,
+} from '@/features/visitor-stats/model/VisitorStatsProvider';
 
 function Consumer() {
   const stats = useVisitorStats();

@@ -36,7 +36,7 @@ const mdxSource = { compiledSource: 'test', frontmatter: {}, scope: {} };
 
 function buildProps(hydrationReady: boolean) {
   return {
-    routerAsPath: '/en/blog/init',
+    currentUrl: '/en/blog/init',
     locale: 'en' as const,
     meta,
     mdxSource,

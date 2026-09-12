@@ -1,97 +1,43 @@
-# AGENTS.md
+# ARSVINE REALM — AI entrypoint
 
-This file is the concise coding-agent entry point for **ARSVINE REALM**. Keep it short. Long explanations belong in the split documentation under `docs/`.
+ARSVINE REALM is a Next.js 16 App Router portfolio/blog site using React 19, TypeScript, SCSS Modules, Three.js, MDX, next-intl, Vitest, Tencent COS Catalog assets, and optional protected posts.
 
-## Read first
+## Authority and scope
 
-- [`README.md`](./README.md) — project overview.
-- [`docs/README.md`](./docs/README.md) — complete task-oriented documentation map.
-- [`docs/GETTING_STARTED.md`](./docs/GETTING_STARTED.md), [`docs/DEVELOPMENT.md`](./docs/DEVELOPMENT.md), and [`docs/TESTING_AND_QUALITY.md`](./docs/TESTING_AND_QUALITY.md) — setup, daily workflow, and verification.
-- [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md), [`docs/ROUTING_AND_I18N.md`](./docs/ROUTING_AND_I18N.md), and [`docs/CONTENT_AND_MDX.md`](./docs/CONTENT_AND_MDX.md) — system, navigation, locales, and content.
-- [`docs/SECURITY.md`](./docs/SECURITY.md) — protected posts, cookies, rate limiting, and input boundaries.
-- [`docs/OPERATIONS.md`](./docs/OPERATIONS.md), [`docs/ASSETS.md`](./docs/ASSETS.md), and [`docs/PERFORMANCE.md`](./docs/PERFORMANCE.md) — deployment, COS/Catalog, and adaptive performance.
-- [`docs/TROUBLESHOOTING.md`](./docs/TROUBLESHOOTING.md) and [`docs/GOTCHAS.md`](./docs/GOTCHAS.md) — diagnostics and historical regressions.
+- Read `docs/ai/INDEX.md` for AI task routing and `docs/INDEX.md` for human documentation.
+- Read the nearest scoped `AGENTS.md` before editing scripts, assets, protected blog code, or navigation.
+- Preserve required semantics and optimize expected total cost. Do not expand scope because a future use is imaginable.
+- Existing code, tests, migration notes, and generated output have no automatic preservation privilege. Keep them only when they protect a current contract or materially reduce recurring cost.
+- Local checks are local evidence. Do not claim external publication, production availability, cross-platform verification, or independent review from them.
 
-## Project snapshot
+## Hard boundaries
 
-ARSVINE REALM is a personal post-apocalyptic HUD-themed portfolio and blog site. It uses **Next.js 16 App Router**, React 19, TypeScript, SCSS Modules, Three.js, GSAP, MDX, `next-intl` 4, and Vitest. The production runtime target is Node.js `24.x`.
-
-The custom `server.js` is the local-development and optional self-hosted entry. Production runs on Vercel, which uses the standard Next.js App Router build output (Proxy + Route Handlers + Serverless Functions); `server.js` does **not** run in Vercel deployments. The `pnpm start` script is intended for self-hosted deployments (`pm2 start server.js` or similar).
-
-User-facing pages live under `/<locale>/...` with UI locales `zh-CN`, `zh-TW`, and `en`.
+1. Use App Router routes under `src/app/`; Vercel does not run `server.js`, while local development and optional self-hosting do.
+2. Internal navigation uses `useTransition().navigateTo()` or `switchLocale()`; do not bypass transition choreography with direct `router.push()`.
+3. Locale resolution is `NEXT_LOCALE` cookie, then `Accept-Language`, then `zh-CN`. Do not use IP geolocation for language or authorization.
+4. Keep locale data in the static registry. Do not reintroduce dynamic locale loading or the `reading-time` dependency.
+5. Protected post bodies must remain runtime-gated and absent from unauthorized static props/RSC payloads. Preserve the XState invoked-actor cancellation behavior.
+6. COS credentials are temporary process inputs only. Do not commit `cos-workspace/`, generated `dist/`, secrets, or generated API output. Remote publish, pointer switching, revalidation, database writes, and deployment require explicit user authorization.
 
 ## Commands
 
 ```bash
-pnpm dev        # node server.js
-pnpm build      # next build
-pnpm start      # cross-env NODE_ENV=production node server.js
-pnpm lint       # Oxlint + ESLint compatibility rules
-pnpm format     # Prettier; configuration in config/
-pnpm quality    # Knip + JSCPD maintenance scans
-pnpm check      # format, maintenance, lint, types, Knip, JSCPD, tests, build
-pnpm typecheck  # tsc --noEmit
-pnpm test       # vitest run
-```
-
-Run a single test:
-
-```bash
-pnpm vitest run path/to/file.test.ts
-pnpm vitest run -t "name pattern"
-```
-
-## Hard rules
-
-1. **Use App Router.** Routes are under `src/app/`.
-2. **Do not replace `server.js`.** It is the local-development and optional self-hosted entry; `pnpm dev` and `pnpm start` both go through it. Vercel deployments do not run `server.js`; they use the standard Next.js build output.
-3. **Use `useTransition().navigateTo()` for internal navigation.** Direct `router.push()` breaks page transition behavior.
-4. **Do not use IP-based language selection.** Locale resolution is `NEXT_LOCALE cookie > Accept-Language > zh-CN`.
-5. **Do not dynamically require locale data.** `src/app/i18n/data.ts` intentionally uses a static registry.
-6. **Do not reintroduce `reading-time`.** The in-house estimator handles CJK; whitespace-based packages do not.
-7. **Do not use `--font-display` for translated/user content.** `ZELDA Free` is Latin-only and breaks CJK/accented text.
-8. **Use `coscli` only with temporary environment-provided credentials.** Never persist COS keys in a CLI config or commit `cos-workspace/`.
-9. **Do not ship protected MDX in static props.** Protected posts must remain runtime-gated through the API and signed access cookie.
-10. **Preserve the protected-post XState actor cancellation fixes.** See `docs/GOTCHAS.md` before touching `src/features/blog/model/useBlogPostState.ts` or `src/features/blog/model/blogPostState.ts`.
-
-## Where to edit common things
-
-| Need                                                 | Edit first                                                                                |
-| ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Site metadata, SEO, fonts, social links              | `src/shared/config/site.ts`                                                               |
-| Music playlist / cloud audio catalog                 | `src/app/api/assets/audio`, `src/features/assets/server/catalog/`, `src/features/music/`  |
-| Projects / experience / life / skills / friend links | `src/features/<feature>/contracts/data/*.ts`                                              |
-| UI copy                                              | `src/app/locales/*.json`                                                                  |
-| Remote image domains                                 | `config/image-hosts.js`                                                                   |
-| Blog fallback post                                   | `content/blog/init/`                                                                      |
-| Runtime blog/tweet source                            | `.env.local` external GitHub content repo variables                                       |
-| Protected-post access                                | `ACCESS_GRANT_SECRET`, `TOTP_GROUPS_JSON`, access helpers under `src/shared/lib/content/` |
-| Route transitions                                    | `src/features/navigation/model/TransitionProvider.tsx`, route mode hooks                  |
-| Global HUD / left panel                              | `src/features/hud/`, `src/app/shell/MainLayout.tsx`                                       |
-| MDX rendering                                        | `src/features/blog/ui/mdx/`, `src/features/blog/styles/MDXContent.module.scss`            |
-
-## Validation expectation
-
-Before handing off non-trivial changes, run at least:
-
-```bash
+pnpm dev
 pnpm lint
 pnpm typecheck
 pnpm test
+pnpm build
+pnpm check
 ```
 
-For visual or interaction changes, also manually verify desktop and mobile layouts, route transitions, blog detail pages, protected-post gates, music-player behavior, hash navigation, and custom cursor states.
+Use the narrowest check that can falsify the current change, then run the full relevant gate before handoff. For visual or interaction changes, manually verify desktop/mobile layout, transitions, protected blog gates, music behavior, hash navigation, and cursor cleanup.
 
-## Common danger zones
+## High-risk routing
 
-Read [`docs/GOTCHAS.md`](./docs/GOTCHAS.md) before editing:
-
-- protected blog post auth state machine (`src/features/blog/model/useBlogPostState.ts`);
-- route loading overlay placement;
-- avatar reveal/parallax layer separation and performance-tier cleanup;
-- blog reveal animation and `<Explain>` tooltip stacking;
-- music player track-switch behavior;
-- mobile music-player auto-open guard;
-- `AnimatedTitleChars` uppercase behavior;
-- COS font headers;
-- Google Fonts variable-font deduplication.
+- General AI workflow: `docs/ai/PLAYBOOK.md` and `docs/ai/COOKBOOK.md`.
+- Current invariants: `docs/ai/GOTCHAS.md`.
+- Routes, environment variables, scripts, and ownership: `docs/ai/API-REF.md`.
+- Asset/COS work: `scripts/AGENTS.md`, `src/features/assets/AGENTS.md`, and `$realm-assets-catalog`.
+- Protected blog work: `src/features/blog/AGENTS.md` and `$realm-protected-content`.
+- Navigation work: `src/features/navigation/AGENTS.md`.
+- Whole-repository maintenance review: `$realm-maintenance-audit`.

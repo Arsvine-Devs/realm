@@ -1,0 +1,3 @@
+interface:
+  display_name: 'Realm Maintenance Audit'
+  short_description: 'Audit Realm maintenance cost and stale structure'

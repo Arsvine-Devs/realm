@@ -168,5 +168,3 @@ export function useLayoutAnchors() {
   if (!value) throw new Error('useLayoutAnchors must be used within LayoutAnchorsProvider');
   return value;
 }
-
-export default LayoutAnchorsContext;

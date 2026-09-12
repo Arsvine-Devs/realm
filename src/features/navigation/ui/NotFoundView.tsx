@@ -11,13 +11,13 @@ import { useRegisterNotFoundPresence } from '../model/notFoundPresence';
 
 export default function NotFoundView() {
   useRegisterNotFoundPresence();
-  const { asPath, query } = useNavigationRuntime();
+  const { currentUrl, query } = useNavigationRuntime();
   const { navigateTo } = useTransition();
-  const locale = resolveLocale(query.locale, asPath);
+  const locale = resolveLocale(query.locale, currentUrl);
   const t = useTranslations('pages.notFound');
   const requestedPath = useSyncExternalStore(
     () => () => {},
-    () => (asPath && asPath !== '/404' ? asPath : ''),
+    () => (currentUrl && currentUrl !== '/404' ? currentUrl : ''),
     () => '',
   );
 

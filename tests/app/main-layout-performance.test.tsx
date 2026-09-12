@@ -14,7 +14,7 @@ const recordRainProps = vi.fn();
 vi.mock('@/features/navigation/model/NavigationRuntime', () => ({
   useNavigationRuntime: () => ({
     pathname: '/zh-CN/content',
-    asPath: '/zh-CN/content',
+    currentUrl: '/zh-CN/content',
     query: { locale: 'zh-CN' },
     push: vi.fn(),
     prefetch: vi.fn(),
@@ -111,7 +111,7 @@ vi.mock('@/features/hud/ui/loading/HomeLoadingScreen', () => ({
   default: () => <div data-testid="home-loading-screen" />,
 }));
 
-vi.mock('@/features/music/public', () => ({
+vi.mock('@/features/music/ui/MusicPlayer', () => ({
   default: () => <div data-testid="music-player" />,
 }));
 

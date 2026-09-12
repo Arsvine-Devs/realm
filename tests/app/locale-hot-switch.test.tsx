@@ -28,7 +28,7 @@ vi.mock('@/app/shell/AppShell', () => ({
   default: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-vi.mock('@/features/telemetry/public', () => ({ default: () => null }));
+vi.mock('@/features/telemetry/ui/telemetry/TelemetryRoot', () => ({ default: () => null }));
 
 import LocaleClientProviders from '@/app/providers/LocaleClientProviders';
 

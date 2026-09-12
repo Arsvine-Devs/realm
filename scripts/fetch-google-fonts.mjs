@@ -246,7 +246,7 @@ async function main() {
   console.log(`[fonts] Families: ${manifest.families.join(', ')}`);
   console.log('================================================================');
   console.log('');
-  console.log('按 docs/ASSETS.md 使用临时环境凭据和 COSCLI 上传到 COS：');
+  console.log('按 docs/human/ASSETS.md 使用临时环境凭据和 COSCLI 上传到 COS：');
   console.log('');
   console.log('  1. 控制台 → 桶 arsvine-cdn → shared/fonts/ 目录');
   console.log('  2. 上传 public/_fonts-staging/google-fonts.css 和所有 woff2 子目录');

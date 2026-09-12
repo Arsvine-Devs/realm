@@ -124,7 +124,7 @@ describe('assets build script', () => {
 
     await execFileAsync(
       process.execPath,
-      ['scripts/assets-build.mjs', '--workspace', workspaceRoot, '--dist', distRoot],
+      ['scripts/assets/build.mjs', '--workspace', workspaceRoot, '--dist', distRoot],
       {
         cwd: process.cwd(),
       },

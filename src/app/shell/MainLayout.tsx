@@ -38,7 +38,7 @@ import {
 import { useLeftPanelNavigation, useTesseractDragFeedback } from './useMainLayoutNavigation';
 
 import HomeLoadingScreen from '../../features/hud/ui/loading/HomeLoadingScreen';
-import MusicPlayer from '../../features/music/public';
+import MusicPlayer from '../../features/music/ui/MusicPlayer';
 import GlobalHud from '../../features/hud/ui/layout/GlobalHud';
 import LeftPanel from '../../features/hud/ui/layout/LeftPanel';
 import RouteLoadingOverlay from '../../features/hud/ui/layout/RouteLoadingOverlay';
@@ -72,7 +72,7 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
-  const { pathname, asPath, query } = useNavigationRuntime();
+  const { pathname, currentUrl, query } = useNavigationRuntime();
   const tNav = useTranslations('mainNav');
   const tCommon = useTranslations('common');
   const tTweets = useTranslations('pages.tweets');
@@ -110,7 +110,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const { allowAmbientWebGL, allowInteractiveWebGL, allowCustomCursor } = useHudPerformance();
 
   // 当前 URL 的 locale，所有内部跳转都要带上前缀
-  const locale: Locale = resolveLocale(query.locale, asPath);
+  const locale: Locale = resolveLocale(query.locale, currentUrl);
 
   const { drawerOpen, navLinks, drawerToggleLabel, toggleDrawer, closeDrawer } =
     useDrawerNavigation({
@@ -201,8 +201,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
     routeLoadingState.kind === 'tweets' ? tTweets('loading') : tCommon('decoding');
 
   useHudRouteVisibility(effectiveStandalone);
-  useCursorTargetInvalidation(asPath, mainVisible);
-  useContentHashAlignment(pathname, asPath);
+  useCursorTargetInvalidation(currentUrl, mainVisible);
+  useContentHashAlignment(pathname, currentUrl);
 
   return (
     <div className={`${styles.container} ${isInverted ? styles.inverted : ''}`}>

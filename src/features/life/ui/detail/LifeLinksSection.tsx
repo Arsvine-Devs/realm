@@ -1,4 +1,5 @@
 import type { LifeItemLink } from '../../../../shared/types';
+import DetailLinkCard from '../../../../shared/ui/detail/DetailLinkCard';
 
 interface LifeLinksSectionProps {
   links: LifeItemLink[];
@@ -18,15 +19,14 @@ export default function LifeLinksSection({
       <h2 className={styles.sectionHeader}>{title}</h2>
       <div className={styles.linksGrid}>
         {links.map((link) => (
-          <a
+          <DetailLinkCard
             key={link.href}
             href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.linkCard}
-            aria-label={link.text}
-          >
-            <div className={styles.linkIconWrap}>
+            title={link.text}
+            subtitle={link.sub}
+            ariaLabel={link.text}
+            styles={styles}
+            icon={
               <svg
                 className={styles.linkIcon}
                 viewBox="0 0 24 24"
@@ -40,12 +40,8 @@ export default function LifeLinksSection({
                   />
                 </g>
               </svg>
-            </div>
-            <div className={styles.linkInfo}>
-              <span className={styles.linkTitle}>{link.text}</span>
-              <span className={styles.linkSub}>{link.sub}</span>
-            </div>
-          </a>
+            }
+          />
         ))}
       </div>
     </section>

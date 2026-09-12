@@ -1,4 +1,5 @@
-import { jsonResponse, readJsonObject, secureStringEqual } from './http';
+import { enforceRateLimit } from '@/shared/lib/content/rate-limit';
+import { getClientAddress, jsonResponse, readJsonObject, secureStringEqual } from './http';
 
 type RevalidationAuthOptions = {
   allowQuerySecret?: boolean;
@@ -7,7 +8,11 @@ type RevalidationAuthOptions = {
 type RevalidationAuthResult =
   { ok: true; body: Record<string, unknown> } | { ok: false; response: Response };
 
-export async function authenticateRevalidation(
+type RevalidationRequestOptions = RevalidationAuthOptions & {
+  limiterName: string;
+};
+
+async function authenticateRevalidation(
   request: Request,
   options: RevalidationAuthOptions = {},
 ): Promise<RevalidationAuthResult> {
@@ -27,4 +32,29 @@ export async function authenticateRevalidation(
   }
 
   return { ok: true, body };
+}
+
+export async function withRevalidationRequest(
+  request: Request,
+  options: RevalidationRequestOptions,
+  handler: (body: Record<string, unknown>) => Promise<Response> | Response,
+): Promise<Response> {
+  const limiter = await enforceRateLimit(
+    `${options.limiterName}:${getClientAddress(request)}`,
+    30,
+    60_000,
+  );
+  if (!limiter.ok) {
+    return jsonResponse(
+      { message: 'Too many requests' },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(Math.ceil(limiter.retryAfterMs / 1000)) },
+      },
+    );
+  }
+
+  const auth = await authenticateRevalidation(request, options);
+  if (!auth.ok) return auth.response;
+  return handler(auth.body);
 }

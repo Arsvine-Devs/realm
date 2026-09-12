@@ -1,6 +1,6 @@
 {
   "name": "arsvine-realm",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "packageManager": "pnpm@11.17.0",
   "scripts": {
     "dev": "node server.js",
@@ -14,9 +14,9 @@
     "quality": "pnpm check:unused && pnpm check:duplicates",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "assets:prepare": "node scripts/prepare-cos-workspace.mjs",
-    "assets:build": "node scripts/assets-build.mjs",
-    "assets:publish": "node scripts/assets-publish.mjs",
+    "assets:prepare-legacy": "node scripts/assets/prepare-legacy.mjs",
+    "assets:build": "node scripts/assets/build.mjs",
+    "assets:publish": "node scripts/assets/publish.mjs",
     "db:migrate": "node scripts/visitor-stats-migrate.mjs",
     "db:seed:visitor-stats": "node scripts/visitor-stats-seed.mjs",
     "env:sync": "node scripts/sync-env-files.mjs",

@@ -22,12 +22,12 @@ interface LanguageSwitcherProps {
 export default function LanguageSwitcher({
   currentLocale: currentLocaleProp,
 }: LanguageSwitcherProps) {
-  const { asPath, query } = useNavigationRuntime();
+  const { currentUrl, query } = useNavigationRuntime();
   const { switchLocale } = useTransition();
   const localeRequestRef = useRef(0);
-  const pathWithoutQuery = asPath.split('?')[0];
+  const pathWithoutQuery = currentUrl.split('?')[0];
   const currentLocale: Locale | undefined =
-    currentLocaleProp ?? (isLocale(query.locale) ? query.locale : getLocaleFromPath(asPath));
+    currentLocaleProp ?? (isLocale(query.locale) ? query.locale : getLocaleFromPath(currentUrl));
 
   const setLocale = useCallback(
     (nextLocale: Locale) => {
@@ -35,7 +35,7 @@ export default function LanguageSwitcher({
       const currentVisiblePath =
         typeof window !== 'undefined'
           ? `${window.location.pathname}${window.location.search}${window.location.hash}`
-          : asPath;
+          : currentUrl;
       const nextPath = currentLocale
         ? currentVisiblePath.replace(new RegExp(`^/${currentLocale}(?=/|$)`), `/${nextLocale}`)
         : `/${nextLocale}${pathWithoutQuery === '/' ? '' : pathWithoutQuery}`;
@@ -50,7 +50,7 @@ export default function LanguageSwitcher({
           console.error('[locale] navigation failed:', error);
         });
     },
-    [asPath, currentLocale, pathWithoutQuery, switchLocale],
+    [currentLocale, currentUrl, pathWithoutQuery, switchLocale],
   );
 
   return (

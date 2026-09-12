@@ -17,11 +17,11 @@ export function AppNavigationRuntime({ children }: { children: ReactNode }) {
     window.addEventListener('popstate', updateSearch);
     return () => window.removeEventListener('popstate', updateSearch);
   }, [pathname]);
-  const asPath = `${pathname}${search ? `?${search}` : ''}`;
+  const currentUrl = `${pathname}${search ? `?${search}` : ''}`;
   const value = useMemo(
     () => ({
       pathname,
-      asPath,
+      currentUrl,
       query: {
         ...Object.fromEntries(new URLSearchParams(search).entries()),
         ...Object.fromEntries(
@@ -38,7 +38,7 @@ export function AppNavigationRuntime({ children }: { children: ReactNode }) {
         router.prefetch(href);
       },
     }),
-    [asPath, params, pathname, router, search],
+    [currentUrl, params, pathname, router, search],
   );
 
   return <NavigationRuntimeProvider value={value}>{children}</NavigationRuntimeProvider>;

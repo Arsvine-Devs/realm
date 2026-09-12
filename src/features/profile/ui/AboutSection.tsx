@@ -7,7 +7,7 @@ import { defaultLocale, isLocale } from '@/shared/contracts/locale';
 import { useTransition } from '../../navigation/model/TransitionProvider';
 import { useHudPerformance, useHudStats } from '../../hud/model/HudProvider';
 import { useSiteAssets } from '../../assets/model/SiteAssetsProvider';
-import { useVisitorStats } from '@/features/visitor-stats/public';
+import { useVisitorStats } from '@/features/visitor-stats/model/VisitorStatsProvider';
 import useVisitorLanguageCode from '@/shared/hooks/useVisitorLanguageCode';
 import type { RefObject } from 'react';
 import { useNavigationRuntime } from '@/features/navigation/model/NavigationRuntime';
