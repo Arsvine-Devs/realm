@@ -30,6 +30,7 @@ flowchart LR
   API --> GH
   API --> CAT
   API --> REDIS[Upstash Redis optional]
+  API --> NEON[Neon visitor statistics]
   SC --> HTML[HTML and RSC payload]
   HTML --> SHELL[Stable client shell]
   SHELL --> HUD[HUD and navigation providers]
@@ -139,6 +140,7 @@ public.ts    可选公共入口
 | Route                                  | 方法 | 责任                                      |
 | -------------------------------------- | ---- | ----------------------------------------- |
 | `/api/hitokoto`                        | GET  | timeout/cached 第三方文本代理             |
+| `/api/visitor-stats`                   | POST | 生产主域名的去重访客统计                  |
 | `/api/grant-check`                     | GET  | 检查签名访问 Cookie                       |
 | `/api/protected-verify`                | POST | 校验 TOTP、限流、设置 Cookie              |
 | `/api/post-variant`                    | GET  | 按 locale 返回 MDX；protected 需要 grant  |

@@ -17,6 +17,8 @@
     "assets:prepare": "node scripts/prepare-cos-workspace.mjs",
     "assets:build": "node scripts/assets-build.mjs",
     "assets:publish": "node scripts/assets-publish.mjs",
+    "db:migrate": "node scripts/visitor-stats-migrate.mjs",
+    "db:seed:visitor-stats": "node scripts/visitor-stats-seed.mjs",
     "env:sync": "node scripts/sync-env-files.mjs",
     "maintenance:check": "node scripts/fetch-google-fonts.mjs --check-config",
     "check": "pnpm format:check && pnpm maintenance:check && pnpm lint && pnpm typecheck && pnpm quality && pnpm test && pnpm build"
@@ -30,6 +32,7 @@
     "node": "24.x"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "@react-three/cannon": "^6.6.0",
     "@react-three/fiber": "9.7.0",
     "@upstash/redis": "^1.38.4",

@@ -75,7 +75,8 @@
     },
     "about": {
       "systemUptime": "System Uptime",
-      "currentVisitDuration": "Current Visit Duration",
+      "totalVisitors": "Total Visitors",
+      "todayVisitors": "Today's Visitors",
       "visitorLanguage": "Visitor Language Code",
       "codeLicense": "Code licensed under MIT.",
       "contentLicense": "Content licensed under CC BY-NC-ND 4.0 unless otherwise stated.",

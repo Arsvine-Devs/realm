@@ -2,7 +2,7 @@
 
 [返回文档导航](./README.md)
 
-本文说明受保护文章、TOTP、签名 Cookie、限流、可信代理、GitHub 内容路径、外链和内部重定向的安全边界。
+本文说明受保护文章、TOTP、签名 Cookie、访客统计、限流、可信代理、GitHub 内容路径、外链和内部重定向的安全边界。
 
 ## 威胁模型
 
@@ -15,7 +15,8 @@
 - GitHub Contents API 路径穿越或请求任意 URL；
 - `javascript:` / `data:` 外链 XSS；
 - 未验证 slug 或 locale 进入内部导航；
-- revalidation endpoint 被未授权调用。
+- revalidation endpoint 被未授权调用；
+- 自动化请求通过访客统计接口污染累计人数。
 
 ## Protected post 流程
 
@@ -105,6 +106,26 @@ UPSTASH_REDIS_REST_TOKEN=...
 ```
 
 没有 Redis 或 Redis 失败时，系统 fail-open 到进程内 fixed-window `Map`，同时记录错误。该 fallback 不具备 serverless 多实例一致性。
+
+## 访客统计
+
+`POST /api/visitor-stats` 只在 production canonical host、同源浏览器请求和数据库配置完整时计数。统计单位是签名 HttpOnly Cookie 对应的匿名访客，不是页面请求量。
+
+Cookie 属性：
+
+```text
+Path=/
+HttpOnly
+SameSite=Lax
+Max-Age=31536000
+Secure
+```
+
+数据库只保存 `VISITOR_STATS_SECRET` 派生的 HMAC visitor key。原始 Cookie ID、IP、User-Agent 和 `x-vercel-ja4-digest` 不进入数据库；JA4/IP 组合只用于短期限流键。Cookie 被清除、使用无痕窗口或更换设备时，统计结果可能产生新的近似访客。
+
+明显的 bot、crawler、headless browser、脚本客户端和跨站请求在应用层被排除。Vercel Bot Protection/WAF 属于额外的部署层控制，不改变应用层统计口径。
+
+数据库缺失或不可用时，接口失败只影响 About 中的访客数字，不阻断站点；系统不使用进程内计数伪造生产数据。
 
 ## 客户端地址与可信代理
 

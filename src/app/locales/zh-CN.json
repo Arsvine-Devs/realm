@@ -75,7 +75,8 @@
     },
     "about": {
       "systemUptime": "系统在线时间",
-      "currentVisitDuration": "目前访问时长",
+      "totalVisitors": "总访客数",
+      "todayVisitors": "今日访客数",
       "visitorLanguage": "来访者语言代码",
       "codeLicense": "代码遵循 MIT 协议。",
       "contentLicense": "除特别声明外，所有内容遵循 CC BY-NC-ND 4.0 协议。",

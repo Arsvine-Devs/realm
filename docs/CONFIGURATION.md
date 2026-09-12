@@ -41,12 +41,13 @@
 
 ## 安全与 revalidation
 
-| 变量                  | 默认   | 用途                                |
-| --------------------- | ------ | ----------------------------------- |
-| `ACCESS_GRANT_SECRET` | 无     | 签名受保护文章访问 Cookie           |
-| `TOTP_GROUPS_JSON`    | 无     | TOTP group 配置 JSON                |
-| `REVALIDATE_SECRET`   | 无     | revalidation API 认证               |
-| `TRUST_PROXY`         | 未设置 | 自托管可信反向代理下允许读取转发 IP |
+| 变量                   | 默认   | 用途                                |
+| ---------------------- | ------ | ----------------------------------- |
+| `ACCESS_GRANT_SECRET`  | 无     | 签名受保护文章访问 Cookie           |
+| `TOTP_GROUPS_JSON`     | 无     | TOTP group 配置 JSON                |
+| `REVALIDATE_SECRET`    | 无     | revalidation API 认证               |
+| `TRUST_PROXY`          | 未设置 | 自托管可信反向代理下允许读取转发 IP |
+| `VISITOR_STATS_SECRET` | 无     | 访客统计 Cookie 签名与 HMAC 密钥    |
 
 示例仅用于说明结构，不要复用示例 secret：
 
@@ -64,6 +65,28 @@ Vercel 通过 `VERCEL=1` 自动启用其受管转发头策略。自托管环境�
 | `UPSTASH_REDIS_REST_TOKEN` | 无   | 分布式限流 Token    |
 
 缺少 Upstash 时，限流退回进程内 `Map`；适合本地和单实例验证，不适合多实例生产保证。
+
+## Neon visitor statistics
+
+| 变量           | 默认 | 用途                                               |
+| -------------- | ---- | -------------------------------------------------- |
+| `DATABASE_URL` | 无   | Vercel Marketplace Neon Postgres connection string |
+
+访客统计只在 production canonical host 且同时配置 `DATABASE_URL` 与 `VISITOR_STATS_SECRET` 时启用。数据库初始化使用仓库内的 migration：
+
+```bash
+pnpm db:migrate
+```
+
+统计库只保存 HMAC visitor key、每日去重关系和聚合计数，不保存原始 IP、User-Agent 或 JA4。
+
+如果需要把访客统计上线前的大致累计人数纳入总数，在 migration 完成后执行一次：
+
+```bash
+pnpm db:seed:visitor-stats -- --total 1234
+```
+
+`1234` 替换为估算的历史累计访客数。该命令使用固定的 `pre-visitor-stats` 基线名，重复执行不会重复增加；它只增加总访客数，不会增加今日访客数。
 
 ## Tencent COS
 

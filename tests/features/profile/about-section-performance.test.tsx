@@ -27,6 +27,10 @@ vi.mock('@/features/hud/model/HudProvider', () => ({
   useHudPerformance: () => useAppMock(),
 }));
 
+vi.mock('@/features/visitor-stats/public', () => ({
+  useVisitorStats: () => useAppMock(),
+}));
+
 vi.mock('@/shared/hooks/useVisitorLanguageCode', () => ({
   default: () => 'zh-CN',
 }));
@@ -42,7 +46,8 @@ describe('AboutSection adaptive performance', () => {
   beforeEach(() => {
     useAppMock.mockReturnValue({
       runtime: '001:00:00:00',
-      currentVisitDuration: '000:00:05:00',
+      totalVisitors: 42,
+      todayVisitors: 3,
       allowDecorativeMotion: true,
     });
   });
@@ -64,7 +69,8 @@ describe('AboutSection adaptive performance', () => {
   it('skips the noise layer in reduced mode', () => {
     useAppMock.mockReturnValue({
       runtime: '001:00:00:00',
-      currentVisitDuration: '000:00:05:00',
+      totalVisitors: 42,
+      todayVisitors: 3,
       allowDecorativeMotion: false,
     });
 

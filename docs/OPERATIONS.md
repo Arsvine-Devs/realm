@@ -53,7 +53,7 @@ NODE_ENV=production
 NEXT_PUBLIC_SITE_URL=https://arsvine.com
 ```
 
-实际功能还可能需要 GitHub、TOTP、Upstash、COS 和 revalidation 变量。完整矩阵见 [`CONFIGURATION.md`](./CONFIGURATION.md)。
+实际功能还可能需要 GitHub、TOTP、Upstash、COS、Neon 和 revalidation 变量。完整矩阵见 [`CONFIGURATION.md`](./CONFIGURATION.md)。
 
 部署环境中的 secret 不得暴露为 `NEXT_PUBLIC_*`。
 
@@ -73,6 +73,7 @@ git status --short
 - 没有把 `.env.local`、`cos-workspace/`、`dist/` 或私有媒体加入提交；
 - protected post 和 asset Catalog 依赖已准备；
 - 文档中的 migration/rollback 步骤已评审。
+- Neon production branch 已完成 visitor statistics migration。
 
 ## Revalidation API
 
@@ -128,6 +129,28 @@ Revalidation 每个 client 每分钟最多 30 次。响应可能包含 `paths`�
 
 Redis 失败时系统可用性优先，会退回本地 limiter；这不是多实例安全保证，应尽快恢复。
 
+## Neon visitor statistics
+
+通过 Vercel Marketplace 为 production project 集成 Neon，确认 `DATABASE_URL` 已注入，并在 Vercel production environment 配置稳定的 `VISITOR_STATS_SECRET`。首次发布前运行：
+
+```bash
+pnpm db:migrate
+pnpm db:seed:visitor-stats -- --total 1234
+```
+
+migration 是幂等的，创建 `arsvine_visitor_*` 表和累计计数初始行。若有上线前的历史访客估算值，在 migration 后执行一次基线命令；基线有唯一名称，重复执行不会重复增加。Preview、localhost 和非 canonical host 不写生产统计。
+
+访客统计故障排查顺序：
+
+1. 检查 `DATABASE_URL` 与 `VISITOR_STATS_SECRET` 是否存在于 production environment。
+2. 检查 Neon migration 是否已完成，以及 `arsvine_visitor_totals` 是否存在单例行。
+3. 如果基线尚未写入，执行 `pnpm db:seed:visitor-stats -- --total <估算人数>`。
+4. 检查 Vercel Function 日志中的 `[visitor-stats] persistence failed` 摘要。
+5. 用同一浏览器刷新，确认签名 Cookie 仍然存在且计数不重复增加。
+6. 仅在统计功能恢复后再检查 About UI；数据库故障不应阻断站点其它页面。
+
+Vercel Bot Protection 建议先以 Log 模式观察，再按误判情况决定是否启用 Challenge。它是平台层访问控制，应用层仍保留明显 bot User-Agent、同源和 JA4/IP 限流判断。
+
 ## COS 与 CDN
 
 运维关注：
@@ -175,6 +198,8 @@ curl -I https://arsvine.com/robots.txt
 - 音乐播放器不产生意外 autoplay/repeated download。
 - mobile HUD、hash offset、drawer 和 cursor fallback 正常。
 - telemetry 只在预期环境启用。
+- production canonical host 的首次有效浏览器访问会增加总访客和今日访客各一次；同 Cookie 刷新不增加。
+- Preview URL、明显 bot User-Agent 和跨站请求不会增加访客统计。
 
 ## 回滚
 

@@ -133,10 +133,9 @@ export function HudProvider({ children }: { children: ReactNode }) {
   const statsValue = useMemo<RealtimeStatsState>(
     () => ({
       currentTime: stats.currentTime,
-      currentVisitDuration: stats.currentVisitDuration,
       runtime: stats.runtime,
     }),
-    [stats.currentTime, stats.currentVisitDuration, stats.runtime],
+    [stats.currentTime, stats.runtime],
   );
   const typingValue = useMemo<HudTypingState>(
     () => ({

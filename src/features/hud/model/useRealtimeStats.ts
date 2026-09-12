@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import type { RealtimeStatsState } from '@/features/hud/contracts/state';
 
 const SYSTEM_LAUNCH_AT = new Date('2026-06-10T02:00:00+08:00').getTime();
@@ -24,18 +24,12 @@ export default function useRealtimeStats(): RealtimeStatsState {
   const [currentTime, setCurrentTime] = useState('00:00:00');
   // 初值固定为 0，避免 SSR / 首屏 hydration 时差异；mount 后立刻在 effect 里更新到真实值
   const [runtime, setRuntime] = useState('000:00:00:00');
-  const [currentVisitDuration, setCurrentVisitDuration] = useState('000:00:00:00');
 
-  const visitStartedAtRef = useRef<number>(0);
-
-  // Runtime / current-visit-duration tick (purely client-side)
+  // Website runtime tick (purely client-side)
   useEffect(() => {
-    visitStartedAtRef.current = Date.now();
-
     const tick = () => {
       const now = Date.now();
       setRuntime(formatRuntime(Math.max(0, now - SYSTEM_LAUNCH_AT)));
-      setCurrentVisitDuration(formatRuntime(Math.max(0, now - visitStartedAtRef.current)));
     };
 
     let intervalId: ReturnType<typeof setInterval> | undefined;
@@ -97,5 +91,5 @@ export default function useRealtimeStats(): RealtimeStatsState {
     };
   }, []);
 
-  return { currentTime, runtime, currentVisitDuration };
+  return { currentTime, runtime };
 }

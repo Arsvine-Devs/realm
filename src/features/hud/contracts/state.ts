@@ -34,7 +34,6 @@ export interface PowerSystemState {
 export interface RealtimeStatsState {
   currentTime: string;
   runtime: string;
-  currentVisitDuration: string;
 }
 
 export interface FateTypingState {

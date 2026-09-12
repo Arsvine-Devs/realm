@@ -54,7 +54,7 @@ vi.mock('@/features/hud/model/usePowerSystem', () => ({
   }),
 }));
 vi.mock('@/features/hud/model/useRealtimeStats', () => ({
-  default: () => ({ currentTime: '00:00', currentVisitDuration: '0', runtime: '0' }),
+  default: () => ({ currentTime: '00:00', runtime: '0' }),
 }));
 vi.mock('@/features/hud/model/useFateTypingEffect', () => ({
   useFateTypingEffect: () => ({ displayedFateText: '', isFateTypingActive: false }),

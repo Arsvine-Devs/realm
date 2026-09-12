@@ -7,6 +7,7 @@ import { defaultLocale, isLocale } from '@/shared/contracts/locale';
 import { useTransition } from '../../navigation/model/TransitionProvider';
 import { useHudPerformance, useHudStats } from '../../hud/model/HudProvider';
 import { useSiteAssets } from '../../assets/model/SiteAssetsProvider';
+import { useVisitorStats } from '@/features/visitor-stats/public';
 import useVisitorLanguageCode from '@/shared/hooks/useVisitorLanguageCode';
 import type { RefObject } from 'react';
 import { useNavigationRuntime } from '@/features/navigation/model/NavigationRuntime';
@@ -20,12 +21,15 @@ export default function AboutSection({ aboutSectionRef, aboutContentRef }: About
   const t = useTranslations('sections.about');
   const { query } = useNavigationRuntime();
   const { navigateTo } = useTransition();
-  const { runtime, currentVisitDuration } = useHudStats();
+  const { runtime } = useHudStats();
+  const { totalVisitors, todayVisitors } = useVisitorStats();
   const { allowDecorativeMotion } = useHudPerformance();
   const { getSiteAssetUrl } = useSiteAssets();
   const visitorLanguageCode = useVisitorLanguageCode();
   const queryLocale = query.locale;
   const locale = isLocale(queryLocale) ? queryLocale : defaultLocale;
+  const formatVisitorCount = (value: number | null) =>
+    value === null ? '--' : new Intl.NumberFormat(locale).format(value);
   const currentYear = new Date().getFullYear();
   const yearRange =
     currentYear > siteConfig.copyrightYearStart
@@ -45,8 +49,12 @@ export default function AboutSection({ aboutSectionRef, aboutContentRef }: About
             {t('systemUptime')}: <span className={styles.statValue}>{runtime}</span>
           </p>
           <p>
-            {t('currentVisitDuration')}:{' '}
-            <span className={styles.statValue}>{currentVisitDuration}</span>
+            {t('totalVisitors')}:{' '}
+            <span className={styles.statValue}>{formatVisitorCount(totalVisitors)}</span>
+          </p>
+          <p>
+            {t('todayVisitors')}:{' '}
+            <span className={styles.statValue}>{formatVisitorCount(todayVisitors)}</span>
           </p>
           <p>
             {t('visitorLanguage')}:{' '}

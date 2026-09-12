@@ -115,12 +115,26 @@ const SECTIONS = [
           'Trust forwarded client IP headers for rate-limited APIs behind a trusted self-hosted proxy. Vercel is detected automatically.',
         ],
       },
+      {
+        key: 'VISITOR_STATS_SECRET',
+        localDefault: '',
+        exampleValue: 'replace-with-a-random-long-string',
+        commentOutInExample: true,
+        comments: ['Server-side signing and HMAC secret for visitor statistics.'],
+      },
     ],
   },
   {
     id: 'infra',
     title: 'Infra',
     entries: [
+      {
+        key: 'DATABASE_URL',
+        localDefault: '',
+        exampleValue: 'postgresql://user:password@host/database?sslmode=require',
+        commentOutInExample: true,
+        comments: ['Neon Postgres connection string for durable visitor statistics.'],
+      },
       {
         key: 'UPSTASH_REDIS_REST_URL',
         localDefault: '""',
