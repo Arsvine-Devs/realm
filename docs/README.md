@@ -1,6 +1,10 @@
 # ARSVINE REALM documentation
 
+[返回项目主页](../README.md) · [返回仓库地图](../INDEX.md)
+
 This is the human-facing documentation landing page. Use [`INDEX.md`](./INDEX.md) for the maintained catalog and [`ai/INDEX.md`](./ai/INDEX.md) for AI workflows.
+
+AI editing rules for this directory live in [`AGENTS.md`](./AGENTS.md).
 
 ## Start here
 

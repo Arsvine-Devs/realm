@@ -1,5 +1,7 @@
 # Test layout
 
+[`Repository map`](../INDEX.md) · [`Maintainer guide`](../docs/human/MAINTAINER.md) · [`AI rules`](./AGENTS.md)
+
 Tests are grouped by responsibility:
 
 - `app/` — application shell, layouts, providers, and bootstrap behavior.

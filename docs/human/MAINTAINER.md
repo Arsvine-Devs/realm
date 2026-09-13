@@ -1,5 +1,7 @@
 # 维护者指南
 
+[返回文档索引](../INDEX.md)
+
 本文面向准备修改代码、内容、测试、脚本或部署配置的维护者。
 
 ## 日常流程
@@ -15,6 +17,7 @@
 
 ```bash
 pnpm format:check
+pnpm docs:check
 pnpm maintenance:check
 pnpm lint
 pnpm typecheck
@@ -37,6 +40,12 @@ pnpm vitest run -t "cancels a stale variant actor"
 - `src/shared/` 只存跨 feature 的稳定能力；单 feature 算法不要下沉。
 - `tests/` 按 app、features、shared、repo、operations、scripts 分组。
 - `scripts/assets/` 是资产 Catalog workflow；一次性图片、字体和 Windows 工具保持独立。
+
+## CI 与平台支持
+
+- `verify` 在 Ubuntu 上运行完整 `pnpm check`，是当前 master ruleset 要求的合并检查。
+- `verify-windows` 在 Windows 上运行 Node 24 的依赖安装和 production build，用于发现 Windows 构建回归；当前是 advisory check，不是 master 的 required status。
+- Windows 是受支持的开发/构建环境，但跨平台发布结论必须明确标注平台范围；Windows job 通过不等同于完整跨平台验证。
 
 ## 常见修改入口
 

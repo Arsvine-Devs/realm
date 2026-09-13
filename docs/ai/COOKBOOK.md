@@ -1,5 +1,7 @@
 # AI cookbook
 
+[AI workflow index](./INDEX.md) · [Human documentation catalog](../INDEX.md)
+
 ## Add or change a feature
 
 - Put route adaptation in `src/app/` and domain behavior in `src/features/<feature>/`.

@@ -27,10 +27,13 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm docs:check
 pnpm check
 ```
 
 Use the narrowest check that can falsify the current change, then run the full relevant gate before handoff. For visual or interaction changes, manually verify desktop/mobile layout, transitions, protected blog gates, music behavior, hash navigation, and cursor cleanup.
+
+Keep scope-specific hard constraints in scoped `AGENTS.md`, procedure and recovery workflows in Skills, current non-obvious traps in `docs/ai/GOTCHAS.md`, and human rationale in the relevant `docs/human/` document. Do not copy a complete procedure across these surfaces.
 
 ## High-risk routing
 

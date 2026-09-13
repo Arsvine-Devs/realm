@@ -1,5 +1,7 @@
 # Blog feature
 
+[`Feature domains`](../README.md) · [`Repository map`](../../../INDEX.md)
+
 The blog feature owns public and protected post metadata, runtime content loading, MDX rendering, locale variants, spoiler UI, and the protected access state machine.
 
 - Public route adaptation lives under `src/app/[locale]/blog/`.
