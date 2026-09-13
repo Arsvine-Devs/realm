@@ -1,6 +1,6 @@
 # AI workflow index
 
-This directory is the AI-facing operational layer. Human maintenance documentation starts at [`../INDEX.md`](../INDEX.md).
+This directory is the AI-facing operational layer. Return to the [`AI workflow index`](./INDEX.md), [`human documentation landing page`](../README.md), or [`human documentation catalog`](../INDEX.md) at any time.
 
 ## Read by task
 
@@ -8,9 +8,9 @@ This directory is the AI-facing operational layer. Human maintenance documentati
 - Common changes: [`COOKBOOK.md`](./COOKBOOK.md)
 - Current hard-to-see invariants: [`GOTCHAS.md`](./GOTCHAS.md)
 - Routes, environment, scripts, ownership: [`API-REF.md`](./API-REF.md)
-- Whole-repository COST review: `$realm-maintenance-audit`
-- Asset Catalog/COS work: `$realm-assets-catalog`
-- Protected blog work: `$realm-protected-content`
+- Whole-repository COST review: [`$realm-maintenance-audit`](../../.agents/skills/realm-maintenance-audit/SKILL.md)
+- Asset Catalog/COS work: [`$realm-assets-catalog`](../../.agents/skills/realm-assets-catalog/SKILL.md)
+- Protected blog work: [`$realm-protected-content`](../../.agents/skills/realm-protected-content/SKILL.md)
 
 ## Authority
 

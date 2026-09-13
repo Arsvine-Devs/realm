@@ -1,5 +1,7 @@
 # Navigation feature
 
+[`Feature domains`](../README.md) · [`Repository map`](../../../INDEX.md)
+
 The navigation feature owns route classification, transition choreography, hash alignment, locale switching, route loading presentation, and safe locale-independent page state.
 
 - Internal route changes go through `navigateTo()` or `switchLocale()`.

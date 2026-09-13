@@ -5,6 +5,8 @@ description: Audit ARSVINE REALM for COST-driven maintenance debt, overengineeri
 
 # Realm Maintenance Audit
 
+Repository AI routing: [`docs/ai/INDEX.md`](../../../docs/ai/INDEX.md). Human maintenance context: [`docs/human/MAINTAINER.md`](../../../docs/human/MAINTAINER.md).
+
 Use this skill for a read-only audit unless the user separately authorizes implementation. Read [the COST rubric](references/COST.en.md) before making structural judgments. Treat the repository's current behavior, tests, `AGENTS.md`, and `docs/ai/API-REF.md` as evidence; treat historical plans and generated output as non-authoritative.
 
 ## Audit method

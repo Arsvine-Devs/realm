@@ -5,6 +5,8 @@ description: Change or review ARSVINE REALM protected blog access, TOTP verifica
 
 # Realm Protected Content
 
+Repository AI routing: [`docs/ai/INDEX.md`](../../../docs/ai/INDEX.md). Human security context: [`docs/human/SECURITY.md`](../../../docs/human/SECURITY.md).
+
 Treat protected content as a security boundary, not a UI-only flow. Read the current protected-content documentation and the blog/navigation scoped instructions before editing.
 
 ## Invariants

@@ -1,5 +1,7 @@
 # AI playbook
 
+[AI workflow index](./INDEX.md) · [Human documentation catalog](../INDEX.md)
+
 ## Before editing
 
 1. Check `git status --short --branch`.

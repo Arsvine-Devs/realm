@@ -1,6 +1,6 @@
 # ARSVINE REALM 文档索引
 
-这里是面向人类维护者的文档入口。AI 工作流见 [`ai/INDEX.md`](./ai/INDEX.md)。
+这里是面向人类维护者的文档入口。返回 [`docs/README.md`](./README.md) 查看文档体系说明；返回 [`仓库地图`](../INDEX.md) 查看代码和工具入口。AI 工作流见 [`ai/INDEX.md`](./ai/INDEX.md)。
 
 ## 一般使用
 

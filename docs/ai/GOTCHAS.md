@@ -1,5 +1,7 @@
 # Current AI gotchas
 
+[AI workflow index](./INDEX.md) · [Human documentation catalog](../INDEX.md)
+
 Only active constraints belong here. Historical reasons are omitted unless they change a current implementation decision.
 
 ## Security and content

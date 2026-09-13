@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- 增加 `pnpm docs:check`，在维护门禁中验证 Markdown 本地链接、路径目标和索引↔页面双向导航。
+
+### Fixed
+
+- 修正架构文档中的 `/api/revalidate` method 漂移，并将 route method 表收敛到 AI API reference。
+- 修正图片脚本文档中不存在的 `.gitkeep` 说明。
+
+### Clarified
+
+- 记录 Windows CI 是 advisory build contract；master required checks 仍是 Ubuntu `verify` 与 Vercel。
+
 ## [2.0.5] — 2026-09-12
 
 ### Added
@@ -120,6 +135,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [2.0.2]: https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm/releases/tag/v2.0.0
-[2.0.5]: https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm/compare/v2.0.3...v2.0.5
 
 </details>
+
+[2.0.5]: https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm/compare/v2.0.3...v2.0.5
+[Unreleased]: https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm/compare/v2.0.5...HEAD

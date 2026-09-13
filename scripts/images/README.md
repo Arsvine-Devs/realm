@@ -1,5 +1,7 @@
 # scripts/images
 
+[`Scripts README`](../README.md) · [`Repository map`](../../INDEX.md)
+
 Drop image files here, then run:
 
 ```bash
@@ -11,4 +13,4 @@ node scripts/convert-images.mjs --help
 
 Source files are never modified; outputs go to `scripts/images/out/` (preserving subdirectory structure). Re-runs skip files whose output already exists — pass `--overwrite` to force re-encode.
 
-`scripts/images/out/` is gitignored. The `images/` directory itself stays committed via `.gitkeep`.
+`scripts/images/out/` is gitignored. The directory stays committed through its tracked `README.md` and `.gitignore`; there is no placeholder `.gitkeep` file.

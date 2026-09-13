@@ -136,21 +136,21 @@ styles/      feature styles
 
 ## API 边界
 
-| Route                                  | 方法 | 责任                                      |
-| -------------------------------------- | ---- | ----------------------------------------- |
-| `/api/hitokoto`                        | GET  | timeout/cached 第三方文本代理             |
-| `/api/visitor-stats`                   | POST | 生产主域名的去重访客统计                  |
-| `/api/grant-check`                     | GET  | 检查签名访问 Cookie                       |
-| `/api/protected-verify`                | POST | 校验 TOTP、限流、设置 Cookie              |
-| `/api/post-variant`                    | GET  | 按 locale 返回 MDX；protected 需要 grant  |
-| `/api/tweet-months`                    | GET  | 分页返回 tweet month group                |
-| `/api/assets/{audio,home,links,works}` | GET  | 读取当前 Catalog section                  |
-| `/api/assets/collections/[slug]`       | GET  | 分页读取 collection                       |
-| `/api/revalidate`                      | POST | 刷新 tweet 页面                           |
-| `/api/revalidate-content`              | POST | 刷新 content 与可选 blog slug             |
-| `/api/revalidate-assets`               | POST | 刷新 home/content/friends/detail 资产页面 |
+| Route                                  | 责任                                      |
+| -------------------------------------- | ----------------------------------------- |
+| `/api/hitokoto`                        | timeout/cached 第三方文本代理             |
+| `/api/visitor-stats`                   | 生产主域名的去重访客统计                  |
+| `/api/grant-check`                     | 检查签名访问 Cookie                       |
+| `/api/protected-verify`                | 校验 TOTP、限流、设置 Cookie              |
+| `/api/post-variant`                    | 按 locale 返回 MDX；protected 需要 grant  |
+| `/api/tweet-months`                    | 分页返回 tweet month group                |
+| `/api/assets/{audio,home,links,works}` | 读取当前 Catalog section                  |
+| `/api/assets/collections/[slug]`       | 分页读取 collection                       |
+| `/api/revalidate`                      | 刷新 tweet 页面                           |
+| `/api/revalidate-content`              | 刷新 content 与可选 blog slug             |
+| `/api/revalidate-assets`               | 刷新 home/content/friends/detail 资产页面 |
 
-Route 文件只适配 Web `Request` / `Response`；业务 handler 位于 feature/server。未导出的方法由 Next.js 返回 `405`。
+Route 文件只适配 Web `Request` / `Response`；业务 handler 位于 feature/server。当前 route method 的权威列表见 [`docs/ai/API-REF.md`](../ai/API-REF.md)，未导出的方法由 Next.js 返回 `405`。
 
 ## Styling 边界
 

@@ -1,5 +1,7 @@
 # AI API and ownership reference
 
+[AI workflow index](./INDEX.md) · [Human documentation catalog](../INDEX.md)
+
 ## Application boundaries
 
 | Area                                          | Owner                     |
@@ -13,17 +15,21 @@
 
 ## Important routes
 
-| Route                                  | Method          | Responsibility                             |
-| -------------------------------------- | --------------- | ------------------------------------------ |
-| `/api/grant-check`                     | GET             | Read signed protected-post grant           |
-| `/api/protected-verify`                | POST            | Verify TOTP, rate-limit, issue grant       |
-| `/api/post-variant`                    | GET             | Return authorized MDX variant              |
-| `/api/visitor-stats`                   | POST            | Record canonical visitor and return counts |
-| `/api/assets/{audio,home,links,works}` | GET             | Read public Catalog sections               |
-| `/api/assets/collections/[slug]`       | GET             | Read paginated collection assets           |
-| `/api/revalidate`                      | POST/legacy GET | Revalidate tweets                          |
-| `/api/revalidate-content`              | POST            | Revalidate content and optional blog slug  |
-| `/api/revalidate-assets`               | POST            | Revalidate asset-bearing pages             |
+This table is the canonical maintained list of current route methods. Human architecture and operations documents may explain responsibility or procedure, but should link here instead of maintaining a second method registry.
+
+| Route                                  | Method    | Responsibility                                   |
+| -------------------------------------- | --------- | ------------------------------------------------ |
+| `/api/hitokoto`                        | GET       | Return cached/timeout-safe third-party text      |
+| `/api/grant-check`                     | GET       | Read signed protected-post grant                 |
+| `/api/protected-verify`                | POST      | Verify TOTP, rate-limit, issue grant             |
+| `/api/post-variant`                    | GET       | Return authorized MDX variant                    |
+| `/api/tweet-months`                    | GET       | Return paginated tweet month groups              |
+| `/api/visitor-stats`                   | POST      | Record canonical visitor and return counts       |
+| `/api/assets/{audio,home,links,works}` | GET       | Read public Catalog sections                     |
+| `/api/assets/collections/[slug]`       | GET       | Read paginated collection assets                 |
+| `/api/revalidate`                      | GET, POST | Revalidate tweets; GET keeps legacy query secret |
+| `/api/revalidate-content`              | POST      | Revalidate content and optional blog slug        |
+| `/api/revalidate-assets`               | POST      | Revalidate asset-bearing pages                   |
 
 Route files adapt `Request`/`Response`; feature server modules own validation and domain work.
 
@@ -31,6 +37,7 @@ Route files adapt `Request`/`Response`; feature server modules own validation an
 
 ```bash
 pnpm format:check
+pnpm docs:check
 pnpm maintenance:check
 pnpm lint
 pnpm typecheck

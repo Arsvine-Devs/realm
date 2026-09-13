@@ -5,6 +5,8 @@ description: Prepare, build, verify, publish, or roll back ARSVINE REALM's COS C
 
 # Realm Assets Catalog
 
+Repository AI routing: [`docs/ai/INDEX.md`](../../../docs/ai/INDEX.md). Human procedure: [`docs/human/ASSETS.md`](../../../docs/human/ASSETS.md).
+
 Use the repository's `scripts/assets/` commands and current asset documentation as the implementation source of truth. Keep legacy preparation, local Catalog build, remote publish, and rollback as separate modes.
 
 ## Safety boundary

@@ -1,5 +1,7 @@
 # Asset Catalog feature
 
+[`Feature domains`](../README.md) · [`Repository map`](../../../INDEX.md)
+
 The assets feature resolves versioned COS Catalog data into application-facing records and optional site-shell assets.
 
 - Runtime code lives under `model/` and `server/`.
