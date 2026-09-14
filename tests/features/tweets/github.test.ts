@@ -1,42 +1,45 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { fetchGitHubJsonMock } = vi.hoisted(() => ({
-  fetchGitHubJsonMock: vi.fn(),
+const { fetchPublishedTweetIndexMock, fetchPublishedTweetMonthMock } = vi.hoisted(() => ({
+  fetchPublishedTweetIndexMock: vi.fn(),
+  fetchPublishedTweetMonthMock: vi.fn(),
 }));
 
-vi.mock('@/shared/lib/content/github', () => ({
-  fetchGitHubJson: fetchGitHubJsonMock,
+vi.mock('@/shared/lib/content/content-api', () => ({
+  fetchPublishedTweetIndex: fetchPublishedTweetIndexMock,
+  fetchPublishedTweetMonth: fetchPublishedTweetMonthMock,
 }));
 
 import { getTweetMonthGroups } from '@/features/tweets/server/github';
 
-describe('tweet GitHub source', () => {
+describe('published Content tweet source', () => {
   beforeEach(() => {
-    fetchGitHubJsonMock.mockReset();
+    fetchPublishedTweetIndexMock.mockReset();
+    fetchPublishedTweetMonthMock.mockReset();
   });
 
   it('keeps available months when one monthly document is temporarily unavailable', async () => {
-    fetchGitHubJsonMock.mockImplementation((path: string) => {
-      if (path === 'tweets/index.json') {
-        return Promise.resolve([
-          { month: '2026-07', path: 'tweets/2026-07.json' },
-          { month: '2026-06', path: 'tweets/2026-06.json' },
-        ]);
-      }
-
-      if (path === 'tweets/2026-07.json') {
-        return Promise.resolve([
-          {
-            id: 'available',
-            createdAt: '2026-07-01T00:00:00+08:00',
-            content: 'Available month',
-            visibility: 'public',
-          },
-        ]);
-      }
-
-      return Promise.reject(new Error('Failed to fetch tweets/2026-06.json: 502 Bad Gateway'));
+    fetchPublishedTweetIndexMock.mockResolvedValue({
+      months: [
+        { month: '2026-07', path: 'tweets/2026-07.json' },
+        { month: '2026-06', path: 'tweets/2026-06.json' },
+      ],
     });
+    fetchPublishedTweetMonthMock.mockImplementation((month: string) =>
+      month === '2026-07'
+        ? Promise.resolve({
+            month,
+            tweets: [
+              {
+                id: 'available',
+                createdAt: '2026-07-01T00:00:00+08:00',
+                content: 'Available month',
+                visibility: 'public',
+              },
+            ],
+          })
+        : Promise.reject(new Error('month unavailable')),
+    );
 
     await expect(getTweetMonthGroups()).resolves.toEqual([
       expect.objectContaining({
@@ -47,17 +50,18 @@ describe('tweet GitHub source', () => {
   });
 
   it('falls back to an empty list when the remote index shape is invalid', async () => {
-    fetchGitHubJsonMock.mockResolvedValue({ month: '2026-07' });
+    fetchPublishedTweetIndexMock.mockResolvedValue({ months: { month: '2026-07' } });
 
     await expect(getTweetMonthGroups()).resolves.toEqual([]);
   });
 
   it('keeps a valid X origin alongside the normalized tweet', async () => {
-    fetchGitHubJsonMock.mockImplementation((path: string) => {
-      if (path === 'tweets/index.json') {
-        return Promise.resolve([{ month: '2026-09', path: 'tweets/2026-09.json' }]);
-      }
-      return Promise.resolve([
+    fetchPublishedTweetIndexMock.mockResolvedValue({
+      months: [{ month: '2026-09', path: 'tweets/2026-09.json' }],
+    });
+    fetchPublishedTweetMonthMock.mockResolvedValue({
+      month: '2026-09',
+      tweets: [
         {
           id: '20260912-001',
           createdAt: '2026-09-12T00:00:00+08:00',
@@ -71,7 +75,7 @@ describe('tweet GitHub source', () => {
             importedAt: '2026-09-12T08:00:00+08:00',
           },
         },
-      ]);
+      ],
     });
 
     await expect(getTweetMonthGroups()).resolves.toEqual([
@@ -82,18 +86,19 @@ describe('tweet GitHub source', () => {
   });
 
   it('drops a monthly document with an invalid X origin shape', async () => {
-    fetchGitHubJsonMock.mockImplementation((path: string) => {
-      if (path === 'tweets/index.json') {
-        return Promise.resolve([{ month: '2026-09', path: 'tweets/2026-09.json' }]);
-      }
-      return Promise.resolve([
+    fetchPublishedTweetIndexMock.mockResolvedValue({
+      months: [{ month: '2026-09', path: 'tweets/2026-09.json' }],
+    });
+    fetchPublishedTweetMonthMock.mockResolvedValue({
+      month: '2026-09',
+      tweets: [
         {
           id: '20260912-001',
           createdAt: '2026-09-12T00:00:00+08:00',
           content: 'Invalid source',
           origin: { provider: 'x', externalId: 'not-a-post-id' },
         },
-      ]);
+      ],
     });
 
     await expect(getTweetMonthGroups()).resolves.toEqual([]);

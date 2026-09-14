@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { fetchGitHubContentMock, getContentBlogIndexMock } = vi.hoisted(() => ({
-  fetchGitHubContentMock: vi.fn(),
-  getContentBlogIndexMock: vi.fn(),
+const { fetchPublishedBlogIndexMock, fetchPublishedPostVariantMock } = vi.hoisted(() => ({
+  fetchPublishedBlogIndexMock: vi.fn(),
+  fetchPublishedPostVariantMock: vi.fn(),
 }));
 
-vi.mock('@/shared/lib/content/github', () => ({
-  fetchGitHubContent: fetchGitHubContentMock,
-  getContentBlogIndex: getContentBlogIndexMock,
+vi.mock('@/shared/lib/content/content-api', () => ({
+  fetchPublishedBlogIndex: fetchPublishedBlogIndexMock,
+  fetchPublishedPostVariant: fetchPublishedPostVariantMock,
 }));
 
 import {
@@ -19,8 +19,8 @@ import {
 } from '@/features/blog/server/blog';
 
 beforeEach(() => {
-  fetchGitHubContentMock.mockReset();
-  getContentBlogIndexMock.mockReset();
+  fetchPublishedBlogIndexMock.mockReset();
+  fetchPublishedPostVariantMock.mockReset();
 });
 
 describe('normalizeAccess', () => {
@@ -51,7 +51,7 @@ describe('normalizeAccess', () => {
 
 describe('getAllPostsForLocale', () => {
   it('prefers variant-localized tags for the requested locale', async () => {
-    getContentBlogIndexMock.mockResolvedValue({
+    fetchPublishedBlogIndexMock.mockResolvedValue({
       version: 1,
       updatedAt: '2026-06-17T00:00:00.000Z',
       posts: [
@@ -87,7 +87,7 @@ describe('getAllPostsForLocale', () => {
   });
 
   it('falls back to top-level tags when variant tags are missing', async () => {
-    getContentBlogIndexMock.mockResolvedValue({
+    fetchPublishedBlogIndexMock.mockResolvedValue({
       version: 1,
       updatedAt: '2026-06-17T00:00:00.000Z',
       posts: [
@@ -120,7 +120,7 @@ describe('getAllPostsForLocale', () => {
   });
 
   it('sanitizes protected posts in list-facing metadata', async () => {
-    getContentBlogIndexMock.mockResolvedValue({
+    fetchPublishedBlogIndexMock.mockResolvedValue({
       version: 1,
       updatedAt: '2026-06-17T00:00:00.000Z',
       posts: [
@@ -160,7 +160,7 @@ describe('getAllPostsForLocale', () => {
 
 describe('post variant metadata', () => {
   it('keeps shared metadata aligned while using the appropriate reading-time source', async () => {
-    getContentBlogIndexMock.mockResolvedValue({
+    fetchPublishedBlogIndexMock.mockResolvedValue({
       version: 1,
       updatedAt: '2026-06-17T00:00:00.000Z',
       posts: [
@@ -184,9 +184,15 @@ describe('post variant metadata', () => {
         },
       ],
     });
-    fetchGitHubContentMock.mockResolvedValue(
-      `---\ntitle: Ignored frontmatter title\n---\n${'word '.repeat(116)}`,
-    );
+    fetchPublishedPostVariantMock.mockResolvedValue({
+      title: 'Ignored frontmatter title',
+      excerpt: 'Entry excerpt',
+      date: '2026-05-12',
+      updatedAt: '2026-05-13T00:00:00.000Z',
+      tags: ['essay'],
+      originLocale: 'zh-CN',
+      bodyMdx: 'word '.repeat(116),
+    });
 
     const indexed = await getPostMetaBySlugAndLocale('metadata-paths', 'en');
     const loaded = await getPostBySlugAndContentLocale('metadata-paths', 'en');

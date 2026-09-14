@@ -37,10 +37,6 @@ function getBaseUrl() {
   return url.toString().replace(/\/$/, '');
 }
 
-export function hasContentServiceConfig() {
-  return Boolean(process.env.CONTENT_BASE_URL?.trim());
-}
-
 function getProtectedContentAuthConfig() {
   const tokenUrl = process.env.CONTENT_AUTH_TOKEN_URL?.trim();
   const clientId = process.env.CONTENT_AUTH_CLIENT_ID?.trim();

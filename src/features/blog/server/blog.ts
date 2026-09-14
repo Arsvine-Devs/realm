@@ -1,10 +1,8 @@
-import matter from 'gray-matter';
 import { defaultLocale, locales, isLocale, type Locale } from '@/shared/contracts/locale';
 import type { BlogPostMeta, TranslationStatus } from '../../../shared/types';
-import { fetchGitHubContent, getContentBlogIndex } from '@/shared/lib/content/github';
 import {
+  fetchPublishedBlogIndex,
   fetchPublishedPostVariant,
-  hasContentServiceConfig,
 } from '@/shared/lib/content/content-api';
 import type { ContentBlogIndexItem, ContentPostAccess } from '@/shared/lib/content/types';
 
@@ -54,33 +52,26 @@ function resolveOriginLocale(value: string | undefined): Locale | undefined {
   return value && isLocale(value) ? value : undefined;
 }
 
-function buildVariantPath(slug: string, locale: BlogContentLocale) {
-  return `blog/${slug}/${locale}.mdx`;
-}
-
 async function readVariantDocument(
   slug: string,
   locale: BlogContentLocale,
   protectedContent = false,
 ) {
-  if (hasContentServiceConfig()) {
-    const variant = await fetchPublishedPostVariant(slug, locale, {
-      protected: protectedContent,
-    });
-    return {
-      data: {
-        title: variant.title,
-        excerpt: variant.excerpt,
-        date: variant.date,
-        updated: variant.updatedAt,
-        tags: variant.tags,
-        access: variant.access,
-        originLocale: variant.originLocale,
-      },
-      content: variant.bodyMdx,
-    };
-  }
-  return matter(await fetchGitHubContent(buildVariantPath(slug, locale)));
+  const variant = await fetchPublishedPostVariant(slug, locale, {
+    protected: protectedContent,
+  });
+  return {
+    data: {
+      title: variant.title,
+      excerpt: variant.excerpt,
+      date: variant.date,
+      updated: variant.updatedAt,
+      tags: variant.tags,
+      access: variant.access,
+      originLocale: variant.originLocale,
+    },
+    content: variant.bodyMdx,
+  };
 }
 
 function getVariantForLocale(
@@ -206,7 +197,7 @@ function estimateReadingMinutes(content: string, locale: BlogContentLocale): num
 }
 
 async function getBlogIndexEntry(slug: string) {
-  const index = await getContentBlogIndex();
+  const index = await fetchPublishedBlogIndex();
   return index.posts.find((post) => post.slug === slug) ?? null;
 }
 
@@ -215,7 +206,7 @@ export async function getBlogPostEntry(slug: string) {
 }
 
 export async function getPostSlugs(): Promise<string[]> {
-  const index = await getContentBlogIndex();
+  const index = await fetchPublishedBlogIndex();
   return index.posts.map((post) => post.slug);
 }
 
@@ -299,7 +290,7 @@ export async function getPostBySlugAndLocale(slug: string, locale: Locale) {
 }
 
 export async function getAllPostsForLocale(locale: Locale): Promise<BlogPostMeta[]> {
-  const index = await getContentBlogIndex();
+  const index = await fetchPublishedBlogIndex();
   const metas = index.posts.map((entry) => {
     const actualLocale = getPreferredVariantLocale(entry, locale);
     return sanitizeProtectedPostMeta(getVariantMetaFromIndex(entry, actualLocale));

@@ -4,11 +4,9 @@ import type {
   TweetMonthGroup,
   TweetMonthGroupsPage,
 } from '../model/types';
-import { fetchGitHubJson } from '@/shared/lib/content/github';
 import {
   fetchPublishedTweetIndex,
   fetchPublishedTweetMonth,
-  hasContentServiceConfig,
 } from '@/shared/lib/content/content-api';
 
 const STRESS_TEST_ENABLED = process.env.TWEETS_STRESS_TEST === '1';
@@ -43,20 +41,6 @@ function isTweetOrigin(value: unknown): value is NonNullable<TweetItem['origin']
   return (
     typeof value.importedAt === 'string' &&
     (value.syncedAt === undefined || typeof value.syncedAt === 'string')
-  );
-}
-
-function isTweetIndex(value: unknown): value is TweetIndexItem[] {
-  return (
-    Array.isArray(value) &&
-    value.every(
-      (item) =>
-        isRecord(item) &&
-        typeof item.month === 'string' &&
-        typeof item.path === 'string' &&
-        (item.count === undefined || typeof item.count === 'number') &&
-        (item.updatedAt === undefined || typeof item.updatedAt === 'string'),
-    )
   );
 }
 
@@ -187,24 +171,9 @@ function buildStressMonthGroups(): TweetMonthGroup[] {
 }
 
 async function getTweetIndex(): Promise<TweetIndexItem[]> {
-  if (hasContentServiceConfig()) {
-    return (await fetchPublishedTweetIndex()).months;
-  }
-  let index: TweetIndexItem[];
-  try {
-    const data = await fetchGitHubJson<unknown>('tweets/index.json');
-    if (!isTweetIndex(data)) throw new Error('Invalid tweets/index.json shape');
-    index = data;
-  } catch (error) {
-    const message = error instanceof Error ? error.message : '';
-    // Fresh private repos may not have tweets/index.json yet; treat that as "no tweets".
-    if (message.includes('Failed to fetch tweets/index.json: 404')) {
-      return [];
-    }
-    throw error;
-  }
-
-  return index;
+  const data = await fetchPublishedTweetIndex();
+  if (!Array.isArray(data.months)) throw new Error('Invalid published tweet index shape');
+  return data.months;
 }
 
 export async function getTweetMonthGroups(): Promise<TweetMonthGroup[]> {
@@ -216,19 +185,14 @@ export async function getTweetMonthGroups(): Promise<TweetMonthGroup[]> {
   try {
     index = await getTweetIndex();
   } catch (error) {
-    // 上游（共享 content 仓库）不可达时：build 阶段若无 token / SSR 在 serverless
-    // 冷启动拉 GitHub 失败 / 限流 —— 都不应让整页 build 失败。降级为空月分组，
-    // tweets 页会渲染"暂无推文"。这与 blog index 的 404 / 未配置降级策略一致。
-    console.warn('[tweets/github] upstream unreachable, falling back to empty list:', error);
+    console.warn('[tweets/content] published release unavailable, returning empty month groups:', error);
     return [];
   }
 
   const monthlyTweets = await Promise.all(
     index.map(async (item): Promise<TweetMonthGroup | null> => {
       try {
-        const data = hasContentServiceConfig()
-          ? (await fetchPublishedTweetMonth(item.month)).tweets
-          : await fetchGitHubJson<unknown>(item.path);
+        const data = (await fetchPublishedTweetMonth(item.month)).tweets;
         if (!isTweetList(data)) throw new Error(`Invalid tweet document: ${item.path}`);
         const tweets = data;
         const visibleTweets = sortTweets(
@@ -245,7 +209,7 @@ export async function getTweetMonthGroups(): Promise<TweetMonthGroup[]> {
         // The index is a directory of independent monthly documents. A single
         // transient 5xx must not prevent ISR/static generation from rendering
         // every other available month.
-        console.warn(`[tweets/github] skipping unavailable month ${item.month}:`, error);
+        console.warn(`[tweets/content] skipping unavailable month ${item.month}:`, error);
         return null;
       }
     }),
