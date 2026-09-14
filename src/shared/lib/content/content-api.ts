@@ -58,13 +58,16 @@ async function getProtectedContentToken() {
 
   const { tokenUrl, clientId, clientSecret } = getProtectedContentAuthConfig();
   const resource = new URL(getBaseUrl()).origin;
+  const clientCredentials = Buffer.from(`${clientId}:${clientSecret}`, 'utf8').toString('base64');
   const response = await fetch(tokenUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Basic ${clientCredentials}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
     body: new URLSearchParams({
       grant_type: 'client_credentials',
-      client_id: clientId,
-      client_secret: clientSecret,
       scope: PROTECTED_SCOPE,
       resource,
     }),
