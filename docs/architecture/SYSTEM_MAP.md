@@ -24,7 +24,7 @@ flowchart TB
   MAIN --> PROXY[src/proxy.ts\nlocale + geo cookie]
   PROXY --> PAGES[Next App Router pages\nSSR / ISR / client shell]
   PAGES --> STATIC[Realm typed static data]
-  PAGES --> GHREAD[GitHub Contents API\nprivate Content read]
+  PAGES --> CONTENT[content.arsvine.com\npublished Content read]
   PAGES --> CATALOG[Private COS Catalog\nserver-side read]
   PAGES --> RDB[Neon Postgres\nvisitor statistics]
   PAGES --> RL[Upstash Redis\noptional distributed limits]
@@ -34,9 +34,10 @@ flowchart TB
   USER --> CDN
   CDN --> PUBCOS[Tencent COS public bucket\nimmutable media + public catalog]
 
-  ADMIN --> AUTH[Admin session + CSRF + WebAuthn/TOTP]
-  AUTH --> ADB[Neon Postgres\naccounts + workspaces + challenges]
-  ADMIN --> AGH[GitHub Contents API\ncontent writes and index rebuild]
+  ADMIN --> AUTH[auth.arsvine.com\nOIDC + WebAuthn/TOTP]
+  AUTH --> ADB[Auth PostgreSQL\nBetter Auth identities + sessions]
+  ADMIN --> API[api.arsvine.com\nControl Plane]
+  ADMIN --> AGH[GitHub compatibility\nmigration-only content writes]
   ADMIN --> REVALIDATE[Realm revalidation API\nshared secret]
   ADMIN --> XAPI[X API v2\noptional timeline source]
   ADMIN --> LLM[OpenAI-compatible translation endpoint\nper-workspace]
@@ -52,8 +53,10 @@ flowchart TB
 | 单元           | 仓库/入口                                               | 运行位置                                        | 主要责任                                                                                   | 当前状态                                                                                      |
 | -------------- | ------------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
 | Realm 主站     | `arsvine-realm`、`src/app/`、`src/proxy.ts`             | `arsvine.com`，当前为 Vercel                    | 首页、作品、经历、Life、博客展示、推文展示、RSS、sitemap、robots、受保护内容验证和资产读取 | `CURRENT`；公开请求本次被 Vercel Bot Protection challenge 拦截，不能据此评价页面可用性        |
-| Admin 管理台   | `arsvine-admin`、`app/`、`lib/`                         | `ctrl.arsvine.com`，Vercel 项目 `arsvine-admin` | 登录、成员、工作区配置、博客写入、推文写入、翻译、X 同步和 revalidate 调用                 | `CURRENT` + `LIVE`；CLI 确认 Node `24.x`、生产 deployment `READY`                             |
-| Content 内容面 | `arsvine-content`                                       | GitHub 私有仓库预期为 `main`                    | `blog/<slug>/<locale>.mdx`、`blog-index.json`、`tweets/index.json` 与月度推文 JSON         | `CURRENT`；本次浅克隆可读，匿名 GitHub REST 请求返回 404，私有性与 Token 权限未由后台独立确认 |
+| Admin 管理台   | `arsvine-admin`、`app/`、`lib/`                         | `console.arsvine.com`，Vercel 项目 `arsvine-admin` | OIDC BFF、成员/工作区 UI、迁移期兼容 authoring、翻译、X 同步和 revalidate 调用                 | `CURRENT` + `LIVE`；OIDC start/callback 路由已部署，生产 deployment `READY`                  |
+| Auth 身份面    | `arsvine-auth`、`apps/auth`                             | `auth.arsvine.com`                              | Better Auth identity、OIDC/OAuth、WebAuthn/Passkey、TOTP、owner/editor role                  | `CURRENT` + `LIVE`；Discovery/JWKS/health 可读，legacy identities 已导入                         |
+| API 控制面     | `arsvine-api`、`apps/api`                               | `api.arsvine.com`                               | JWT/JWKS resource verification 与 control-plane `/v1/me`                                    | `CURRENT` + `LIVE`；无 Token 请求正确拒绝，authoring extraction 仍在迁移中                      |
+| Content 内容面 | `arsvine-content`、`apps/content`                      | `content.arsvine.com`                           | 已发布 release、Blog/Tweet read API、protected internal variant                             | `CURRENT` + `LIVE`；8 篇 release、公开 protected 403、内部 scope 校验已验证                    |
 | Asset 资产面   | Realm `scripts/assets/*`、COS bucket、`cdn.arsvine.com` | 腾讯云 COS 源站 + EdgeOne/CDN 观测到的边缘层    | 原始媒体、哈希对象、私有 Catalog、公有 site catalog、字体、音频和图片分发                  | `CURRENT` + `LIVE`；公共 pointer 可读                                                         |
 | Realm 数据面   | `src/features/visitor-stats/`、`db/migrations/`         | Neon Postgres                                   | 匿名访客 HMAC key、总计数、日计数和基线                                                    | `CURRENT`；数据库项目/分支未知                                                                |
 | Admin 数据面   | `arsvine-admin/lib/db/`、`drizzle/`                     | Neon Postgres                                   | 用户、邀请、加密工作区配置、WebAuthn challenge/credential、账户事件                        | `CURRENT`；Vercel 连接独立 Neon resource，实际 database/branch 未读取                         |
@@ -85,15 +88,15 @@ Realm 的根入口是 `src/app/layout.tsx`，在 `[locale]` 之上保持全局 c
 | 数据类别                               | 当前所有者                                                       | 读取方式                                                          |
 | -------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------- |
 | 作品、经历、Life、技能、友链、站点配置 | Realm `src/features/*/contracts/` 与 `src/shared/config/site.ts` | 构建时/服务端静态 registry                                        |
-| 博客索引和 MDX 正文                    | Content 仓库                                                     | Realm 服务端通过 GitHub Contents API 读取                         |
-| 推文月索引与月度 JSON                  | Content 仓库                                                     | Realm 服务端通过 GitHub Contents API 读取，再按 `visibility` 过滤 |
+| 博客索引和 MDX 正文                    | Content release / COS objects                                   | Realm 服务端通过 `content.arsvine.com` 读取                         |
+| 推文月索引与月度 JSON                  | Content release / COS objects                                   | Realm 服务端通过 Content API 读取，再按 `visibility` 过滤           |
 | 图片、音频、字体和装饰对象             | COS public bucket                                                | 浏览器使用 `cdn.arsvine.com` 的 `objectKey`                       |
 | Catalog 元数据                         | COS private bucket                                               | Realm 服务端读取 `current.json` 后校验 versioned sections         |
 | 访客计数                               | Realm Neon 数据库                                                | `/api/visitor-stats` 使用匿名签名 Cookie 和 HMAC key              |
 
 ### 主要失效隔离
 
-- GitHub 内容不可达时，博客使用受控 bundled fallback，推文可以返回空状态；单个月份失败不会遮蔽其他月份。
+- Content release/API 不可达时，Realm 使用 Content client 错误边界；生产不再回退到 GitHub 内容读取。
 - Private Catalog 不可用时，资产 API 保留 `502` 与空 Catalog 的区别；页面使用 feature fallback。
 - Upstash 未配置或暂时不可达时，限流退回单进程 Map；这保持本地可用性，但不提供多实例一致性。
 - Hitokoto 失败时回退到预设文案；Telemetry 和 WebGL 失败不应阻断基础 UI。

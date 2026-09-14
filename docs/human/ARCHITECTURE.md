@@ -25,9 +25,9 @@ flowchart LR
   APP --> SC[Server Components and ISR]
   APP --> API[Route Handlers]
   SC --> DATA[Bundled typed data]
-  SC --> GH[Private GitHub content]
+  SC --> CONTENT[Published Content API]
   SC --> CAT[Private COS Catalog]
-  API --> GH
+  API --> CONTENT
   API --> CAT
   API --> REDIS[Upstash Redis optional]
   API --> NEON[Neon visitor statistics]
@@ -124,9 +124,11 @@ styles/      feature styles
 
 随构建进入应用，适合站点配置、作品、经历、Life、技能和友链。locale 数据通过静态 registry 选择。
 
-### Private GitHub content
+### Published Content service
 
-服务端读取 `blog-index.json`、MDX 与 tweet JSON。路径经过严格 repo-relative 校验。未配置时使用可控 fallback。
+生产服务端通过 `CONTENT_BASE_URL` 读取已发布 release 的 Blog/Tweet metadata、MDX variant 和 tweet month。公开 Content API 不返回受保护正文；Realm 在验证访客 TOTP grant 后使用 Auth client-credentials 和 `content:protected:read` scope 读取正文。
+
+GitHub 内容读取仅保留在迁移/回滚工具、本地开发兼容路径和 Console 迁移期写入路径中，不再是 Realm 生产内容来源。
 
 ### COS Catalog
 
@@ -171,7 +173,7 @@ WebGL module 必须允许 lazy load failure、context loss、pause 和能力关�
 
 ## Failure boundary
 
-- GitHub 内容缺失：博客 fallback、推文空状态。
+- Content release/API 不可用：博客和推文按 Content client 的错误边界处理；不得回退到生产 GitHub 内容读取。
 - public site manifest 失败：移除可选装饰，不阻断导航。
 - private Catalog 失败：API 返回明确 `502`，server loader 使用定义好的 fallback。
 - telemetry provider 失败：error boundary 隔离，不阻断站点。

@@ -2,22 +2,23 @@
 
 [返回文档索引](../INDEX.md)
 
-本文说明结构化站点数据、外部博客与推文仓库、MDX 组件、内容 locale、阅读时间和 fallback 行为。受保护内容的认证细节见 [`SECURITY.md`](./SECURITY.md)。
+本文说明结构化站点数据、已发布 Content release、MDX 组件、内容 locale、阅读时间和 fallback 行为。受保护内容的认证细节见 [`SECURITY.md`](./SECURITY.md)。
 
 ## 内容来源
 
-项目有两类内容源：
+项目有两类内容来源：
 
 1. 仓库内 TypeScript 数据：作品、经历、Life、技能、友链和站点配置。
-2. 外部私有 GitHub 内容仓库：博客正文、博客索引和推文归档。
+2. `content.arsvine.com` 发布读面：博客索引、已发布 MDX variant 和推文归档。
 
-外部仓库不可用时：
+Content release 不可用时：
 
-- 博客使用 `content/blog/init/`；
-- 推文返回空状态；
+- 公开内容请求按 Content client 的错误边界失败；
+- 不得在生产运行时恢复 GitHub 内容读取；
+- 本地开发和迁移工具可以使用 `content/blog/init/` 或 legacy GitHub 兼容路径。
 - 开发环境可用 `TWEETS_STRESS_TEST=1` 生成合成归档。
 
-开发环境和测试环境会优先读取仓库内与外部仓库同名的 `content/blog/init/<locale>.mdx`，用于验证本地内容修改；生产环境仍以外部内容仓库为主，外部仓库不可用或返回 404 时才使用内置内容。
+开发环境和测试环境可以优先读取仓库内 `content/blog/init/<locale>.mdx`，用于验证本地内容修改；生产环境以 Content release 为主。
 
 ## 结构化数据
 
@@ -42,7 +43,9 @@ en.ts
 
 `src/app/i18n/data.ts` 使用显式静态注册表。不要改成动态 `require()`。
 
-## 外部仓库结构
+## Legacy 内容仓库结构
+
+以下结构是迁移工具和历史 authoring 兼容面的输入格式，不是 Realm 生产读取协议。
 
 ```text
 blog-index.json

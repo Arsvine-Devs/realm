@@ -9,7 +9,7 @@
 当前系统对供应商的依赖强度不相同：
 
 - Vercel 同时承担多个运行时和平台能力，是当前最宽的耦合面。
-- GitHub 不是单纯源码托管，它是 Content 的生产存储和 Admin 的写入协议；它与业务数据格式绑定最深。
+- GitHub 不再是 Realm 生产 Content 来源；它目前只保留为迁移/回滚输入和 Console 的迁移期 authoring 兼容协议。
 - Neon 承担真正的持久状态，Realm 与 Admin 的表/职责分开，但是否同一 project 未知。
 - COS/EdgeOne 的媒体链路已经通过 `catalogKey`、immutable object 和 pointer-last 形成相对清晰的语义边界。
 - Upstash 只承担限流状态，X 和翻译只承担可选的输入/处理能力，迁移优先级较低；临时 quiz 也使用同一 Upstash resource，清理必须按 namespace 进行。
@@ -24,7 +24,9 @@
 | Vercel               | Realm/Admin 托管；临时 anti-fraud-quiz；历史 Docs/Lab/Realm Beta；Realm ISR/Functions/Proxy/Geo；Admin Cron；部分 Analytics/Speed Insights；主站生产访问层 challenge | 高                     | `CURRENT` + `LIVE` + `CLAIMED`                     | Node/VPS + 反向代理；替换 Cron、Geo、WAF、缓存/ISR、日志和 telemetry；平台时限、重试、并发语义需要重新实现                         |
 | Neon                 | Realm 访客统计；Admin 账户、邀请、workspace、WebAuthn 和事件                                                                                                         | 中高                   | `CURRENT` + `CLAIMED`；数据库 branch `UNKNOWN`     | 标准 PostgreSQL + 迁移/备份；替换 `@neondatabase/serverless`/`drizzle-orm/neon-http` 的连接适配；保留事务与并发约束                |
 | Upstash Redis        | Realm/Admin 多实例限流；历史 Realm Beta 关联；临时 anti-fraud-quiz 房间状态；`INCR` + `EXPIRE`/`PTTL`                                                                | 中                     | `CURRENT` + `CLAIMED`；共享 resource 已由 CLI 确认 | Redis/Valkey 自托管或其他 Redis-compatible service；必须决定 Redis 故障时继续 fail-open 还是切换策略；不得删除共享 resource        |
-| GitHub               | Content 仓库；Realm 私有读取；Admin 文件写入、删除、树扫描、sha 冲突控制和 commit history                                                                            | 高                     | `CURRENT`；内容仓库预期私有                        | 短期保留 GitHub 并替换托管即可；长期实现 `ContentRepository`/`CommitStore`，否则会把 GitHub Contents API 永久写进业务层            |
+| Auth / OIDC          | `auth.arsvine.com` Better Auth identity、OAuth/OIDC、JWKS、Passkey、TOTP 和 owner/editor role                       | 中高                   | `CURRENT` + `LIVE`；Discovery/JWKS/health 已验证     | 继续使用标准 OAuth/OIDC；迁移 Owner key 后删除 legacy Console auth                                             |
+| Content service       | `content.arsvine.com` 已发布 release read plane；COS immutable objects 与 pointer-last publication                  | 中                     | `CURRENT` + `LIVE`；release、公开保护边界和内部 scope 已验证 | API/Storage provider 可替换；保留 release schema、protected body isolation 和 rollback                         |
+| GitHub               | 迁移/回滚输入；Console 迁移期文件写入兼容面；Realm production 不读取                                         | 中                     | `MIGRATION`；生产 Realm GitHub env 已移除             | 完成 Core authoring/API/publish 后删除 GitHub write/read compatibility                                        |
 | Tencent COS          | 香港地域的公共媒体桶与私有 Catalog 桶；immutable media、private Catalog、public site catalog、字体和音频                                                             | 中高                   | `CURRENT` + `LIVE` + `CLAIMED`                     | S3/COS-compatible object store + `BlobStore`/Catalog pointer；需迁移对象、metadata、CORS、Referer、缓存和回滚版本                  |
 | Tencent EdgeOne      | `cdn.arsvine.com` 的 COS 直回源、边缘缓存、HTTPS、IPv6、WAF/频控和 Bot 处置；代码看到 `EO-Cache-Status`，不直接调用 EdgeOne API                                      | 低到中，主要是运维配置 | `LIVE` + `CLAIMED` + 源码注释                      | Nginx/Caddy/CDN/其他边缘层；保留 `objectKey` URL、immutable cache、CORS、TLS、WAF 和 custom-domain 行为                            |
 | Tencent DNSPod       | `arsvine.com` 权威 DNS、注册域名的解析记录和子域 CNAME 管理面                                                                                                        | 低                     | `LIVE` + `CLAIMED`，NS 为 `*.dnspod.net`           | 迁移 DNS zone 到其他托管 DNS；先降低 TTL、并行验证 CNAME/TLS，再切换；暂停记录、缓存和 Vercel 关联需分开核对                       |

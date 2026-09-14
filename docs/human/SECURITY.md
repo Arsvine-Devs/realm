@@ -2,7 +2,7 @@
 
 [返回文档索引](../INDEX.md)
 
-本文说明受保护文章、TOTP、签名 Cookie、访客统计、限流、可信代理、GitHub 内容路径、外链和内部重定向的安全边界。
+本文说明受保护文章、TOTP、签名 Cookie、访客统计、限流、可信代理、Content service、legacy GitHub 内容路径、外链和内部重定向的安全边界。
 
 ## 威胁模型
 
@@ -133,7 +133,9 @@ Secure
 - 自托管：只有可信反向代理会覆盖来访者 header 时才设置 `TRUST_PROXY=1`。
 - 直接暴露：不要设置 `TRUST_PROXY`，否则攻击者可能伪造 IP key。
 
-## GitHub 内容路径
+## Legacy GitHub 内容路径
+
+该校验只保护本地开发、迁移和 Console 兼容路径。Realm 生产读取使用 `content.arsvine.com`，不接受来自浏览器的 Content service token。
 
 传给 GitHub Contents API 的路径必须是 repo-relative：
 
@@ -144,6 +146,12 @@ Secure
 - 最终 URL 从固定 GitHub API base 构建。
 
 不要把用户字符串直接拼进 API URL。
+
+## Content service protected read
+
+生产 Realm 不向浏览器暴露 Content service token。访客 TOTP grant 只由 Realm 本地签名 Cookie 表示；服务端读取受保护正文时，使用 Auth client-credentials 取得带 `content:protected:read` scope、面向 `content.arsvine.com` resource 的短期 JWT。
+
+Content service 必须验证 JWT 签名/JWKS、issuer、audience/resource、有效期和 scope。匿名请求只能获得清理后的 metadata，公开 variant endpoint 对 protected post 返回 `PROTECTED_CONTENT`。
 
 ## 外链与 MDX 链接
 
