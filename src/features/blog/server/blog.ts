@@ -2,6 +2,10 @@ import matter from 'gray-matter';
 import { defaultLocale, locales, isLocale, type Locale } from '@/shared/contracts/locale';
 import type { BlogPostMeta, TranslationStatus } from '../../../shared/types';
 import { fetchGitHubContent, getContentBlogIndex } from '@/shared/lib/content/github';
+import {
+  fetchPublishedPostVariant,
+  hasContentServiceConfig,
+} from '@/shared/lib/content/content-api';
 import type { ContentBlogIndexItem, ContentPostAccess } from '@/shared/lib/content/types';
 
 const blogContentLocales = [...locales, 'ja', 'ru', 'fr'] as const;
@@ -52,6 +56,25 @@ function resolveOriginLocale(value: string | undefined): Locale | undefined {
 
 function buildVariantPath(slug: string, locale: BlogContentLocale) {
   return `blog/${slug}/${locale}.mdx`;
+}
+
+async function readVariantDocument(slug: string, locale: BlogContentLocale) {
+  if (hasContentServiceConfig()) {
+    const variant = await fetchPublishedPostVariant(slug, locale);
+    return {
+      data: {
+        title: variant.title,
+        excerpt: variant.excerpt,
+        date: variant.date,
+        updated: variant.updatedAt,
+        tags: variant.tags,
+        access: variant.access,
+        originLocale: variant.originLocale,
+      },
+      content: variant.bodyMdx,
+    };
+  }
+  return matter(await fetchGitHubContent(buildVariantPath(slug, locale)));
 }
 
 function getVariantForLocale(
@@ -209,8 +232,7 @@ export async function getPostBySlugAndContentLocale(slug: string, locale: BlogCo
     throw new Error(`No post variant found for slug: ${slug}, locale: ${locale}`);
   }
 
-  const file = await fetchGitHubContent(buildVariantPath(slug, locale));
-  const parsed = matter(file);
+  const parsed = await readVariantDocument(slug, locale);
   const meta = getVariantMeta(entry, locale, parsed.content);
 
   return {
@@ -252,8 +274,7 @@ export async function getPostBySlugAndLocale(slug: string, locale: Locale) {
     throw new Error(`No post found for slug: ${slug}`);
   }
 
-  const file = await fetchGitHubContent(buildVariantPath(slug, metaResult.actualContentLocale));
-  const parsed = matter(file);
+  const parsed = await readVariantDocument(slug, metaResult.actualContentLocale);
   const meta = getVariantMeta(entry, metaResult.actualContentLocale, parsed.content);
 
   return {

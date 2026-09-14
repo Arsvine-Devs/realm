@@ -5,6 +5,11 @@ import type {
   TweetMonthGroupsPage,
 } from '../model/types';
 import { fetchGitHubJson } from '@/shared/lib/content/github';
+import {
+  fetchPublishedTweetIndex,
+  fetchPublishedTweetMonth,
+  hasContentServiceConfig,
+} from '@/shared/lib/content/content-api';
 
 const STRESS_TEST_ENABLED = process.env.TWEETS_STRESS_TEST === '1';
 const STRESS_TEST_YEARS = parsePositiveInt(process.env.TWEETS_STRESS_YEARS, 6);
@@ -182,6 +187,9 @@ function buildStressMonthGroups(): TweetMonthGroup[] {
 }
 
 async function getTweetIndex(): Promise<TweetIndexItem[]> {
+  if (hasContentServiceConfig()) {
+    return (await fetchPublishedTweetIndex()).months;
+  }
   let index: TweetIndexItem[];
   try {
     const data = await fetchGitHubJson<unknown>('tweets/index.json');
@@ -218,7 +226,9 @@ export async function getTweetMonthGroups(): Promise<TweetMonthGroup[]> {
   const monthlyTweets = await Promise.all(
     index.map(async (item): Promise<TweetMonthGroup | null> => {
       try {
-        const data = await fetchGitHubJson<unknown>(item.path);
+        const data = hasContentServiceConfig()
+          ? (await fetchPublishedTweetMonth(item.month)).tweets
+          : await fetchGitHubJson<unknown>(item.path);
         if (!isTweetList(data)) throw new Error(`Invalid tweet document: ${item.path}`);
         const tweets = data;
         const visibleTweets = sortTweets(

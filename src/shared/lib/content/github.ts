@@ -2,6 +2,11 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import matter from 'gray-matter';
 import type { ContentBlogIndex } from './types';
+import {
+  fetchPublishedBlogIndex,
+  fetchPublishedPostVariant,
+  hasContentServiceConfig,
+} from './content-api';
 
 const OWNER = process.env.GITHUB_OWNER?.trim();
 const REPO = process.env.GITHUB_REPO?.trim();
@@ -218,6 +223,22 @@ async function getBundledFallbackBlogIndex(): Promise<ContentBlogIndex> {
 }
 
 export async function fetchGitHubContent(path: string): Promise<string> {
+  if (hasContentServiceConfig()) {
+    const variantMatch = /^blog\/([^/]+)\/([^/]+)\.mdx$/.exec(path);
+    if (variantMatch) {
+      const variant = await fetchPublishedPostVariant(variantMatch[1]!, variantMatch[2]!);
+      return [
+        '---',
+        `title: ${JSON.stringify(variant.title ?? '')}`,
+        `excerpt: ${JSON.stringify(variant.excerpt ?? '')}`,
+        `date: ${JSON.stringify(variant.date ?? '')}`,
+        '---',
+        variant.bodyMdx,
+      ].join('\n');
+    }
+    throw new Error(`Content service does not expose legacy path: ${path}`);
+  }
+
   if (shouldPreferBundledBlogInitContent()) {
     const localContent = await readBundledBlogInitContent(path);
     if (localContent != null) {
@@ -275,6 +296,11 @@ export async function fetchGitHubJson<T>(path: string): Promise<T> {
 export async function getContentBlogIndex(): Promise<ContentBlogIndex> {
   if (blogIndexCache && Date.now() - blogIndexCache.ts < BLOG_INDEX_TTL_MS) {
     return blogIndexCache.data;
+  }
+  if (hasContentServiceConfig()) {
+    const data = await fetchPublishedBlogIndex();
+    blogIndexCache = { data, ts: Date.now() };
+    return data;
   }
   try {
     const data = await fetchGitHubJson<unknown>('blog-index.json');

@@ -90,13 +90,15 @@ Upstash 官方将其 TypeScript client 定义为基于 HTTP/REST 的 Redis clien
 
 Vercel Marketplace 此前显示这一条 Upstash resource 同时连接 Realm、Realm Beta、Admin 和临时 `anti-fraud-quiz`；Realm Beta 项目现已不在当前 Vercel 项目清单中，资源本身未做删除操作。quiz 使用 `QUIZ_*` 变量与独立 prefix；活动结束时只能清理 quiz keys/prefix 或解除项目关联，不得删除整个 resource。
 
-### GitHub：内容存储和写入协议合二为一
+### Content service：生产内容读取边界
 
-Realm 只读：
+Realm 生产只读：
 
-- `GITHUB_OWNER`、`GITHUB_REPO`、`GITHUB_BRANCH`、`GITHUB_READ_TOKEN` 是全局应用环境变量。
-- 服务端使用 Contents API raw media type 读取 index、MDX 和 tweet JSON。
-- Content API 不直接暴露给浏览器。
+- `CONTENT_BASE_URL` 指向 `content.arsvine.com`。
+- 服务端读取已发布 release 的 Blog/Tweet metadata、variant 和 month API。
+- Content API 不直接暴露给浏览器；Realm 负责 visitor TOTP grant，Content 负责 release 读取和正文隔离。
+
+GitHub 内容读取仅保留在迁移/回滚工具和本地开发兼容路径中，不再是生产内容来源。
 
 Admin 读写：
 
@@ -108,7 +110,7 @@ GitHub 官方 Contents API 支持读取文件/目录、使用 Git Trees API 递�
 
 Realm 还使用 GitHub Actions 在 push/pull request 上运行 Ubuntu `pnpm check` 和 Windows `pnpm build`；Admin、Content、Docs、Lab 当前没有发现同类 workflow。该 CI 是交付验证面，不是 Content 运行时数据源；VPS 迁移时可以保留 GitHub Actions，也可以迁移到其他 CI runner。
 
-因此 GitHub 是当前最深的业务供应商边界。若只是脱离 Vercel，建议暂时保留 GitHub；若同时脱离 GitHub，必须先定义 repository-neutral 的 path、ref、read/list、CAS write/delete、commit/audit 和 conflict contract。
+Admin 的 GitHub 写入能力仍属于迁移期 Console 兼容面；新的 authoring/API/publishing 路径不应把 GitHub 作为生产读取或发布真相。
 
 ### COS + EdgeOne：已有语义化资产边界
 
