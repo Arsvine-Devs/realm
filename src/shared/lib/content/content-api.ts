@@ -2,6 +2,14 @@ import type { ContentBlogIndex } from './types';
 import type { TweetIndexItem, TweetItem } from '@/features/tweets/model/types';
 
 const FETCH_TIMEOUT_MS = 8000;
+const PROTECTED_SCOPE = 'content:protected:read';
+
+type ServiceToken = {
+  accessToken: string;
+  expiresAt: number;
+};
+
+let serviceToken: ServiceToken | null = null;
 
 export class ContentServiceError extends Error {
   constructor(
@@ -33,15 +41,76 @@ export function hasContentServiceConfig() {
   return Boolean(process.env.CONTENT_BASE_URL?.trim());
 }
 
-async function fetchContentJson<T>(path: string): Promise<T> {
+function getProtectedContentAuthConfig() {
+  const tokenUrl = process.env.CONTENT_AUTH_TOKEN_URL?.trim();
+  const clientId = process.env.CONTENT_AUTH_CLIENT_ID?.trim();
+  const clientSecret = process.env.CONTENT_AUTH_CLIENT_SECRET?.trim();
+  if (!tokenUrl || !clientId || !clientSecret) {
+    throw new ContentServiceError('Protected content service credentials are not configured.');
+  }
+  return { tokenUrl, clientId, clientSecret };
+}
+
+async function getProtectedContentToken() {
+  if (serviceToken && serviceToken.expiresAt > Date.now() + 30_000) {
+    return serviceToken.accessToken;
+  }
+
+  const { tokenUrl, clientId, clientSecret } = getProtectedContentAuthConfig();
+  const resource = new URL(getBaseUrl()).origin;
+  const response = await fetch(tokenUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
+    body: new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: clientId,
+      client_secret: clientSecret,
+      scope: PROTECTED_SCOPE,
+      resource,
+    }),
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    cache: 'no-store',
+  });
+  const body = (await response.json().catch(() => null)) as {
+    access_token?: string;
+    expires_in?: number;
+    error?: string;
+    error_description?: string;
+  } | null;
+  if (!response.ok || typeof body?.access_token !== 'string') {
+    throw new ContentServiceError(
+      body?.error_description ?? body?.error ?? `Auth service returned ${response.status}.`,
+      response.status,
+    );
+  }
+  serviceToken = {
+    accessToken: body.access_token,
+    expiresAt: Date.now() + Math.max(60, body.expires_in ?? 300) * 1000,
+  };
+  return serviceToken.accessToken;
+}
+
+async function fetchContentJson<T>(
+  path: string,
+  options: { protected?: boolean } = {},
+  retry = true,
+): Promise<T> {
+  const headers = new Headers({ Accept: 'application/json' });
+  if (options.protected) {
+    headers.set('Authorization', `Bearer ${await getProtectedContentToken()}`);
+  }
   const response = await fetch(`${getBaseUrl()}${path}`, {
-    headers: { Accept: 'application/json' },
+    headers,
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     cache: 'no-store',
   });
   const body = (await response.json().catch(() => null)) as {
     error?: { code?: string; message?: string };
   } | null;
+  if (options.protected && response.status === 401 && retry) {
+    serviceToken = null;
+    return fetchContentJson<T>(path, options, false);
+  }
   if (!response.ok) {
     throw new ContentServiceError(
       body?.error?.message ?? `Content service returned ${response.status}.`,
@@ -73,9 +142,14 @@ export type PublishedPostVariant = {
   bodyMdx: string;
 };
 
-export async function fetchPublishedPostVariant(slug: string, locale: string) {
+export async function fetchPublishedPostVariant(
+  slug: string,
+  locale: string,
+  options: { protected?: boolean } = {},
+) {
   const data = await fetchContentJson<{ variant: PublishedPostVariant }>(
-    `/v1/posts/${encodeURIComponent(slug)}/variants/${encodeURIComponent(locale)}`,
+    `${options.protected ? '/v1/internal' : '/v1'}/posts/${encodeURIComponent(slug)}/variants/${encodeURIComponent(locale)}`,
+    options,
   );
   if (!data.variant || typeof data.variant.bodyMdx !== 'string') {
     throw new ContentServiceError('Published content variant is invalid.');

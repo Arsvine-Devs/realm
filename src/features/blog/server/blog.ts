@@ -58,9 +58,15 @@ function buildVariantPath(slug: string, locale: BlogContentLocale) {
   return `blog/${slug}/${locale}.mdx`;
 }
 
-async function readVariantDocument(slug: string, locale: BlogContentLocale) {
+async function readVariantDocument(
+  slug: string,
+  locale: BlogContentLocale,
+  protectedContent = false,
+) {
   if (hasContentServiceConfig()) {
-    const variant = await fetchPublishedPostVariant(slug, locale);
+    const variant = await fetchPublishedPostVariant(slug, locale, {
+      protected: protectedContent,
+    });
     return {
       data: {
         title: variant.title,
@@ -232,7 +238,7 @@ export async function getPostBySlugAndContentLocale(slug: string, locale: BlogCo
     throw new Error(`No post variant found for slug: ${slug}, locale: ${locale}`);
   }
 
-  const parsed = await readVariantDocument(slug, locale);
+  const parsed = await readVariantDocument(slug, locale, entry.access.mode === 'totp');
   const meta = getVariantMeta(entry, locale, parsed.content);
 
   return {
@@ -274,7 +280,11 @@ export async function getPostBySlugAndLocale(slug: string, locale: Locale) {
     throw new Error(`No post found for slug: ${slug}`);
   }
 
-  const parsed = await readVariantDocument(slug, metaResult.actualContentLocale);
+  const parsed = await readVariantDocument(
+    slug,
+    metaResult.actualContentLocale,
+    entry.access.mode === 'totp',
+  );
   const meta = getVariantMeta(entry, metaResult.actualContentLocale, parsed.content);
 
   return {
