@@ -65,7 +65,7 @@ GET /api/health/ready  # Realm 进程和必要的当前运行配置可接收请�
 
 ## Status 运维检测
 
-[status.arsvine.com](https://status.arsvine.com) 是独立部署的运维检测和状态展示站点。它可将本节列出的 Realm 健康路由作为公开探针目标；Status 的检测项、通知渠道和状态页内容由该站点维护，不属于 Realm 运行时配置。
+[status.arsvine.com](https://status.arsvine.com) 是 Better Stack Status Page，DNS CNAME 指向 `statuspage.betteruptime.com`，页面公开请求返回 HTTP 200。它可将本节列出的 Realm 健康路由作为公开探针目标；当前 canonical health 请求会被 Vercel Bot Protection 返回 429，Status 需要使用已允许的探针策略或可达的 deployment 检查。检测项、通知渠道和状态页内容由 Status 站点维护，不属于 Realm 运行时配置。
 
 ## 生产配置
 
@@ -114,7 +114,7 @@ git status --short
 - 没有把 `.env.local`、`cos-workspace/`、`dist/` 或私有媒体加入提交；
 - protected post 和 asset Catalog 依赖已准备；
 - 文档中的 migration/rollback 步骤已评审。
-- Neon production branch 已完成 visitor statistics migration。
+- Neon production 的 visitor-statistics migration 状态必须在数据库侧确认；本地 migration 命令成功不等于 production schema 已完成。
 
 ## Revalidation API
 

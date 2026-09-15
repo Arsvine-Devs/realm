@@ -6,13 +6,13 @@
 
 ## 存储边界
 
-| 位置               | 内容                                                      | 规则                               |
-| ------------------ | --------------------------------------------------------- | ---------------------------------- |
-| `public/`          | avatar/logo、favicon、PWA icon/manifest、启动关键本地字体 | 小、稳定、首屏必要                 |
-| public COS         | 图片、音频、QR、装饰图、字体、public site manifest        | public-read、immutable hash object |
-| private COS        | versioned Catalog 和 `current.json`                       | server-only 读取                   |
-| `cos-workspace/`   | 本地 mirror、metadata、coscli                             | gitignored，不提交                 |
-| `dist/cos-upload/` | 构建生成的上传树                                          | 可重建，不手工编辑                 |
+| 位置               | 内容                                                      | 规则                                                                     |
+| ------------------ | --------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `public/`          | avatar/logo、favicon、PWA icon/manifest、启动关键本地字体 | 小、稳定、首屏必要                                                       |
+| public COS         | 图片、音频、QR、装饰图、字体、public site manifest        | EdgeOne 提供公开 HTTPS，COS 桶 ACL 保持私有读写；对象使用 immutable hash |
+| private COS        | versioned Catalog 和 `current.json`                       | server-only 读取                                                         |
+| `cos-workspace/`   | 本地 mirror、metadata、coscli                             | gitignored，不提交                                                       |
+| `dist/cos-upload/` | 构建生成的上传树                                          | 可重建，不手工编辑                                                       |
 
 业务数据保存稳定 `catalogKey`，Catalog 在 SSG/ISR 时将它映射到带 hash 的 `objectKey`。不要把旧 COS prefix 或 hash 直接写入 TypeScript 数据。
 
@@ -190,6 +190,7 @@ public bucket 至少允许 `GET` / `HEAD`：
 https://arsvine.com
 预期的 *.arsvine.com origin
 http://dev.arsvine.com
+https://*.vercel.app
 ```
 
 Referer allowlist 与这些 origin 保持一致。CDN 如果缓存 CORS response，cache key 必须包含 `Origin`，或正确遵循 `Vary: Origin`，避免 production response 污染本地 manifest 请求。
