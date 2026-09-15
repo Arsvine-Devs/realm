@@ -2,7 +2,7 @@
 
 [返回文档索引](../INDEX.md)
 
-本文说明受保护文章、TOTP、签名 Cookie、访客统计、限流、可信代理、Content service、legacy GitHub 内容路径、外链和内部重定向的安全边界。
+本文说明受保护文章、TOTP、签名 Cookie、访客统计、限流、可信代理、Content service、外链和内部重定向的安全边界。
 
 ## 威胁模型
 
@@ -12,7 +12,6 @@
 - 伪造或过期访问 Cookie；
 - TOTP 暴力尝试；
 - 通过转发头绕过限流；
-- GitHub Contents API 路径穿越或请求任意 URL；
 - `javascript:` / `data:` 外链 XSS；
 - 未验证 slug 或 locale 进入内部导航；
 - revalidation endpoint 被未授权调用；
@@ -133,20 +132,6 @@ Secure
 - 自托管：只有可信反向代理会覆盖来访者 header 时才设置 `TRUST_PROXY=1`。
 - 直接暴露：不要设置 `TRUST_PROXY`，否则攻击者可能伪造 IP key。
 
-## Legacy GitHub 内容路径
-
-该校验只保护本地开发、迁移和 Console 兼容路径。Realm 生产读取使用 `content.arsvine.com`，不接受来自浏览器的 Content service token。
-
-传给 GitHub Contents API 的路径必须是 repo-relative：
-
-- 拒绝绝对 URL 和 `//host/path`；
-- 拒绝 leading `/`、反斜杠、query、fragment；
-- 拒绝 traversal 和 encoded traversal；
-- 按 segment 编码；
-- 最终 URL 从固定 GitHub API base 构建。
-
-不要把用户字符串直接拼进 API URL。
-
 ## Content service protected read
 
 生产 Realm 不向浏览器暴露 Content service token。访客 TOTP grant 只由 Realm 本地签名 Cookie 表示；服务端读取受保护正文时，使用 Auth client-credentials 取得带 `content:protected:read` scope、面向 `content.arsvine.com` resource 的短期 JWT。
@@ -168,7 +153,7 @@ MDX 链接使用专用规则：允许安全绝对 URL、`mailto:`、relative pat
 
 ## Revalidation 认证
 
-所有 revalidation handler 使用 `REVALIDATE_SECRET`。未配置或不匹配时必须拒绝。不要在 URL、客户端 bundle 或日志中暴露 secret。
+内部 revalidation handler 使用 `REVALIDATE_WEBHOOK_SECRET` 验证带时间戳的 HMAC。时间戳超出允许窗口、签名不匹配或事件资源越界时必须拒绝。不要在 URL、客户端 bundle 或日志中暴露 secret。
 
 ## 安全验证清单
 
@@ -177,7 +162,7 @@ MDX 链接使用专用规则：允许安全绝对 URL、`mailto:`、relative pat
 3. 错误 TOTP 触发结构化错误与限流。
 4. 正确 TOTP 设置 HttpOnly Cookie，随后正文可加载。
 5. 过期、错误 group 或篡改 Cookie 无效。
-6. unsafe GitHub path、external redirect 和 dangerous link 被拒绝。
+6. Content service protected read、external redirect 和 dangerous link 均按边界验证。
 7. revalidation 无 secret 时拒绝。
 8. 生产 Cookie 包含 `Secure`。
 

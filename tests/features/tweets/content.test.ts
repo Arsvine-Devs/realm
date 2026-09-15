@@ -1,3 +1,4 @@
+// The timeline is sourced from the published Content service.
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { fetchPublishedTweetIndexMock, fetchPublishedTweetMonthMock } = vi.hoisted(() => ({
@@ -10,7 +11,7 @@ vi.mock('@/shared/lib/content/content-api', () => ({
   fetchPublishedTweetMonth: fetchPublishedTweetMonthMock,
 }));
 
-import { getTweetMonthGroups } from '@/features/tweets/server/github';
+import { getTweetMonthGroups } from '@/features/tweets/server/content';
 
 describe('published Content tweet source', () => {
   beforeEach(() => {

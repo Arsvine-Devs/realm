@@ -1,3 +1,4 @@
+import { createHmac } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
@@ -153,38 +154,57 @@ export function assertRemoteObjectListed(result, bucket, objectKey) {
   throw new Error(`[assets:publish] verification failed: missing cos://${bucket}/${objectKey}`);
 }
 
-async function revalidate() {
+async function revalidate(releaseId) {
   if (dryRun) {
-    console.log('[assets:publish] dry-run POST /api/revalidate-assets');
+    console.log('[assets:publish] dry-run POST /api/internal/revalidate');
     return;
   }
+  const timestamp = String(Date.now());
+  const body = JSON.stringify({
+    event: 'assets.published',
+    releaseId,
+    resources: ['assets'],
+    timestamp: new Date(Number(timestamp)).toISOString(),
+  });
+  const secret = required('REVALIDATE_WEBHOOK_SECRET');
+  const signature = createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex');
   const response = await fetch(
-    `${required('NEXT_PUBLIC_SITE_URL').replace(/\/$/, '')}/api/revalidate-assets`,
+    `${required('NEXT_PUBLIC_SITE_URL').replace(/\/$/, '')}/api/internal/revalidate`,
     {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ secret: required('REVALIDATE_SECRET') }),
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'x-arsvine-timestamp': timestamp,
+        'x-arsvine-signature': signature,
+      },
+      body,
     },
   );
-  let body = {};
+  let responseBody = {};
   try {
-    body = await response.json();
+    responseBody = await response.json();
   } catch {
-    /* body stays empty */
+    /* responseBody stays empty */
   }
-  if (response.ok && (!body.failed || body.failed.length === 0)) return;
-  if (response.ok && body.failed && body.failed.length > 0) {
+  if (
+    response.ok &&
+    responseBody.revalidated === true &&
+    (!responseBody.failed || responseBody.failed.length === 0)
+  )
+    return;
+  if (response.ok && responseBody.failed && responseBody.failed.length > 0) {
     console.warn(
-      `[assets:publish] revalidation partial: ${body.failed.length} path(s) failed`,
-      body.failed,
+      `[assets:publish] revalidation partial: ${responseBody.failed.length} path(s) failed`,
+      responseBody.failed,
     );
     return;
   }
   const retryAfter = response.headers.get('retry-after');
-  const message = typeof body.message === 'string' ? `: ${body.message}` : '';
+  const message = typeof responseBody.message === 'string' ? `: ${responseBody.message}` : '';
   const retryHint = retryAfter ? `; retry after ${retryAfter}s` : '';
   throw new Error(
-    `Asset revalidation failed with HTTP ${response.status}${message}${retryHint}${body.failed ? ` (failed: ${body.failed.join(', ')})` : ''}`,
+    `Asset revalidation failed with HTTP ${response.status}${message}${retryHint}${responseBody.failed ? ` (failed: ${responseBody.failed.join(', ')})` : ''}`,
   );
 }
 
@@ -226,7 +246,7 @@ async function writePointer(version) {
 async function main() {
   if (rollbackVersion) {
     await writePointer(rollbackVersion);
-    await revalidate();
+    await revalidate(rollbackVersion);
     console.log(`[assets:publish] rolled back to ${rollbackVersion}`);
     return;
   }
@@ -282,7 +302,7 @@ async function main() {
     assertRemoteObjectListed(privateListing, privateBucket, privateAssetKey);
   }
   await writePointer(version);
-  await revalidate();
+  await revalidate(version);
   console.log(`[assets:publish] ${dryRun ? 'dry-run complete for' : 'published'} ${version}`);
 }
 

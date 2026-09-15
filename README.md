@@ -1,7 +1,7 @@
 <div align="center">
   <h1>ARSVINE REALM</h1>
   <p>
-    <a href="https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm/actions/workflows/ci.yml/badge.svg" /></a>
+    <a href="https://github.com/Arsvine-Devs/realm/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Arsvine-Devs/realm/actions/workflows/ci.yml/badge.svg" /></a>
     <a href="https://nodejs.org/"><img alt="Node.js 24.x" src="https://img.shields.io/badge/Node.js-24.x-339933?logo=node.js&logoColor=white" /></a>
     <a href="https://nextjs.org/"><img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white" /></a>
     <a href="https://arsvine.com"><img alt="Deployed on Vercel" src="https://img.shields.io/badge/deployed%20on-Vercel-000000?logo=vercel&logoColor=white" /></a>
@@ -12,7 +12,7 @@
   <p><strong>ARSVINE REALM</strong> is a post-apocalyptic HUD-themed portfolio and blog by <a href="https://github.com/ArsvineZhu">Arsvine Zhu</a>.</p>
   <p>
     <a href="https://arsvine.com">Visit the live site</a> ·
-    <a href="https://github.com/Arsvine-Realm-Dev-Team/arsvine-realm">Browse the repository</a> ·
+    <a href="https://github.com/Arsvine-Devs/realm">Browse the repository</a> ·
     <a href="./docs/README.md">Read the documentation</a>
   </p>
 </div>

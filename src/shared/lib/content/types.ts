@@ -21,13 +21,20 @@ export interface ContentBlogIndexItem {
   pinned: boolean;
   access: ContentPostAccess;
   availableLocales: string[];
-  variants: Record<string, ContentBlogIndexVariant>;
+  variants?: Record<string, ContentBlogIndexVariant>;
 }
 
 export interface ContentBlogIndex {
   version: number;
   updatedAt: string;
   posts: ContentBlogIndexItem[];
+}
+
+export interface ContentTweetIndexItem {
+  month: string;
+  path: string;
+  count?: number;
+  updatedAt?: string;
 }
 
 interface TotpSecretSet {

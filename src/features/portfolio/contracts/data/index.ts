@@ -117,7 +117,7 @@ export const copyableTokens: CopyableToken[] = [
   { pattern: 'Details', label: '查看详情' },
 ];
 
-// 详情页 revalidation 路径注册表，供 /api/revalidate-assets 聚合调用
+// 详情页 revalidation 路径注册表，供内部 assets.published 事件调用
 export function getAssetRevalidationPaths(locale: Locale): string[] {
   return [...webProjects, ...gameProjects, ...earlyProjects].map(
     (project) => `/${locale}/web/${project.id}`,

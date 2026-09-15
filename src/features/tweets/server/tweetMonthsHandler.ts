@@ -1,4 +1,4 @@
-import { getTweetMonthGroupsPage } from './github';
+import { getTweetMonthGroupsPage } from './content';
 import { jsonResponse } from '@/shared/server/http';
 
 function parsePositiveInt(value: string | null, fallback: number) {

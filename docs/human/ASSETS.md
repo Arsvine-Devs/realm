@@ -107,7 +107,7 @@ flowchart TD
   D --> E[verify public assets.json]
   E --> F[verify private static-assets.json]
   F --> G[switch public and private current.json]
-  G --> H[POST revalidate-assets]
+  G --> H[POST internal revalidate event]
 ```
 
 先 dry-run：
@@ -144,7 +144,7 @@ COS_PRIVATE_REGION
 COS_SECRET_ID
 COS_SECRET_KEY
 NEXT_PUBLIC_SITE_URL
-REVALIDATE_SECRET
+REVALIDATE_WEBHOOK_SECRET
 ```
 
 可选：`COS_SESSION_TOKEN`、`COSCLI_PATH`。
@@ -171,7 +171,7 @@ REVALIDATE_SECRET
 pnpm assets:publish -- --rollback 20260710T120000Z
 ```
 
-version 必须匹配 `YYYYMMDDTHHMMSSZ`。回滚只把 public/private pointer 指回已存在版本，然后调用 `/api/revalidate-assets`；不会重新上传 object。
+version 必须匹配 `YYYYMMDDTHHMMSSZ`。回滚只把 public/private pointer 指回已存在版本，然后发送 `assets.published` 内部事件；不会重新上传 object。
 
 回滚前确认两个 bucket 中目标 version 完整存在。
 
@@ -247,7 +247,7 @@ node scripts/convert-images.mjs --src path/to/in --out path/to/out --overwrite
 - 两个 `current.json` 指向同一 version。
 - Catalog 中每个 `objectKey` 可访问。
 - public manifest 不含 private metadata。
-- `/api/revalidate-assets` 没有 failed path。
+- 内部 revalidation 事件返回 `revalidated: true` 且没有 failed path。
 - home、content、friends、web/life detail 显示新资产。
 - CORS、Referer、font Content-Type 与 Cache-Control 正确。
 - 验证完成前不删除旧 prefix 或旧 version。

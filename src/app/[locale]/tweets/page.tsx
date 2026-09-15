@@ -1,5 +1,5 @@
 import TweetsPage, { type TweetsPageProps } from '@/features/tweets/ui/TweetsPage';
-import { getTweetMonthGroupsPage } from '@/features/tweets/server/github';
+import { getTweetMonthGroupsPage } from '@/features/tweets/server/content';
 import { loadMessages } from '@/app/i18n/data';
 import type { Locale } from '@/app/i18n/config';
 import { localizedMetadata } from '@/app/metadata';

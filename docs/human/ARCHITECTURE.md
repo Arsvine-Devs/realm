@@ -128,7 +128,7 @@ styles/      feature styles
 
 生产服务端通过 `CONTENT_BASE_URL` 读取已发布 release 的 Blog/Tweet metadata、MDX variant 和 tweet month。公开 Content API 不返回受保护正文；Realm 在验证访客 TOTP grant 后使用 Auth client-credentials 和 `content:protected:read` scope 读取正文。
 
-GitHub 内容读取仅保留在迁移/回滚工具、本地开发兼容路径和 Console 迁移期写入路径中，不再是 Realm 生产内容来源。
+Realm 运行时不包含 GitHub 内容读取器；已发布 Content service 是 Blog/Tweet 的唯一运行时来源。
 
 ### COS Catalog
 
@@ -138,19 +138,17 @@ GitHub 内容读取仅保留在迁移/回滚工具、本地开发兼容路径和
 
 ## API 边界
 
-| Route                                  | 责任                                      |
-| -------------------------------------- | ----------------------------------------- |
-| `/api/hitokoto`                        | timeout/cached 第三方文本代理             |
-| `/api/visitor-stats`                   | 生产主域名的去重访客统计                  |
-| `/api/grant-check`                     | 检查签名访问 Cookie                       |
-| `/api/protected-verify`                | 校验 TOTP、限流、设置 Cookie              |
-| `/api/post-variant`                    | 按 locale 返回 MDX；protected 需要 grant  |
-| `/api/tweet-months`                    | 分页返回 tweet month group                |
-| `/api/assets/{audio,home,links,works}` | 读取当前 Catalog section                  |
-| `/api/assets/collections/[slug]`       | 分页读取 collection                       |
-| `/api/revalidate`                      | 刷新 tweet 页面                           |
-| `/api/revalidate-content`              | 刷新 content 与可选 blog slug             |
-| `/api/revalidate-assets`               | 刷新 home/content/friends/detail 资产页面 |
+| Route                                  | 责任                                        |
+| -------------------------------------- | ------------------------------------------- |
+| `/api/hitokoto`                        | timeout/cached 第三方文本代理               |
+| `/api/visitor-stats`                   | 生产主域名的去重访客统计                    |
+| `/api/grant-check`                     | 检查签名访问 Cookie                         |
+| `/api/protected-verify`                | 校验 TOTP、限流、设置 Cookie                |
+| `/api/post-variant`                    | 按 locale 返回 MDX；protected 需要 grant    |
+| `/api/tweet-months`                    | 分页返回 tweet month group                  |
+| `/api/assets/{audio,home,links,works}` | 读取当前 Catalog section                    |
+| `/api/assets/collections/[slug]`       | 分页读取 collection                         |
+| `/api/internal/revalidate`             | 接收 Content/asset 发布 HMAC 事件并刷新页面 |
 
 Route 文件只适配 Web `Request` / `Response`；业务 handler 位于 feature/server。当前 route method 的权威列表见 [`docs/ai/API-REF.md`](../ai/API-REF.md)，未导出的方法由 Next.js 返回 `405`。
 

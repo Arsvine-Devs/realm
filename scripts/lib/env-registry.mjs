@@ -50,6 +50,26 @@ export const SECTIONS = [
         exampleValue: 'https://content.arsvine.com',
         comments: ['Published Content service base URL.'],
       },
+      {
+        key: 'AUTH_ISSUER',
+        localDefault: 'https://auth.arsvine.com',
+        exampleValue: 'https://auth.arsvine.com',
+        comments: ['Stable Auth issuer used for protected Content service access.'],
+      },
+      {
+        key: 'CONTENT_SERVICE_CLIENT_ID',
+        localDefault: '',
+        exampleValue: 'realm-content-reader',
+        commentOutInExample: true,
+        comments: ['OAuth client ID for Realm protected-content service access.'],
+      },
+      {
+        key: 'CONTENT_SERVICE_CLIENT_SECRET',
+        localDefault: '',
+        exampleValue: 'replace-with-a-long-random-secret',
+        commentOutInExample: true,
+        comments: ['OAuth client secret for Realm protected-content service access.'],
+      },
     ],
   },
   {
@@ -72,11 +92,11 @@ export const SECTIONS = [
         comments: ['Server-side TOTP groups JSON map.'],
       },
       {
-        key: 'REVALIDATE_SECRET',
+        key: 'REVALIDATE_WEBHOOK_SECRET',
         localDefault: '',
-        exampleValue: 'replace-with-a-random-long-string',
+        exampleValue: 'replace-with-a-long-random-secret',
         commentOutInExample: true,
-        comments: ['Secret for ISR revalidation endpoints.'],
+        comments: ['HMAC secret for internal API-to-Realm revalidation events.'],
       },
       {
         key: 'TRUST_PROXY',

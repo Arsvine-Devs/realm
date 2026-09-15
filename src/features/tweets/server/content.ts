@@ -1,3 +1,4 @@
+// Published Content source for the Realm timeline.
 import type {
   TweetIndexItem,
   TweetItem,
@@ -185,7 +186,10 @@ export async function getTweetMonthGroups(): Promise<TweetMonthGroup[]> {
   try {
     index = await getTweetIndex();
   } catch (error) {
-    console.warn('[tweets/content] published release unavailable, returning empty month groups:', error);
+    console.warn(
+      '[tweets/content] published release unavailable, returning empty month groups:',
+      error,
+    );
     return [];
   }
 

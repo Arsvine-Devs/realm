@@ -1,0 +1,14 @@
+.git
+.git/**
+node_modules
+.next
+dist
+coverage
+output
+cos-workspace
+coscli_output
+.vercel
+*.tsbuildinfo
+.env
+.env.*
+!.env.example

@@ -44,6 +44,27 @@ pm2 start server.js --name arsvine-realm
 
 自托管反向代理必须传递正确 host/protocol，并只在它覆盖 forwarding IP header 时设置 `TRUST_PROXY=1`。
 
+### Docker 参考镜像
+
+仓库根目录的 [`Dockerfile`](../../Dockerfile) 提供 Node.js 24 参考镜像。它不把 Content、COS、Neon 或 Upstash 凭据写入镜像：
+
+```bash
+docker build -t arsvine-realm:local .
+docker run --rm -p 3000:3000 \\
+  -e NEXT_PUBLIC_SITE_URL=http://localhost:3000 \\
+  -e CONTENT_BASE_URL=http://localhost:3002 \\
+  arsvine-realm:local
+```
+
+容器健康入口：
+
+```text
+GET /api/health/live   # 进程可响应
+GET /api/health/ready  # Realm 进程和必要的当前运行配置可接收请求
+```
+
+`ready` 不等于 Content release、COS、Neon 或 Upstash 的完整业务验收；生产内容读取必须通过 `CONTENT_BASE_URL` 指向的 Content service。Realm 生产不再使用 GitHub 内容 Token。
+
 ## 生产配置
 
 最低配置：
@@ -51,9 +72,11 @@ pm2 start server.js --name arsvine-realm
 ```env
 NODE_ENV=production
 NEXT_PUBLIC_SITE_URL=https://arsvine.com
+CONTENT_BASE_URL=https://content.arsvine.com
+AUTH_ISSUER=https://auth.arsvine.com
 ```
 
-实际功能还可能需要 GitHub、TOTP、Upstash、COS、Neon 和 revalidation 变量。完整矩阵见 [`API-REF.md`](../ai/API-REF.md)。
+受保护文章还需要服务端 `CONTENT_SERVICE_CLIENT_ID`、`CONTENT_SERVICE_CLIENT_SECRET` 和 `REVALIDATE_WEBHOOK_SECRET`。实际功能还可能需要 TOTP、Upstash、COS、Neon 变量。Realm 运行时不依赖 GitHub 内容变量。完整矩阵见 [`API-REF.md`](../ai/API-REF.md)。
 
 部署环境中的 secret 不得暴露为 `NEXT_PUBLIC_*`。
 
@@ -77,33 +100,23 @@ git status --short
 
 ## Revalidation API
 
-认证 secret 放在 JSON body：
+当前唯一的服务间刷新接口是 `POST /api/internal/revalidate`。Content/API 和资产发布脚本发送 JSON 事件，并使用 `REVALIDATE_WEBHOOK_SECRET` 对 `timestamp-header + "." + raw-body` 计算 SHA-256 HMAC，签名放在 `X-Arsvine-Signature`，毫秒时间戳放在 `X-Arsvine-Timestamp`。
 
-```bash
-curl -X POST https://arsvine.com/api/revalidate-content \
-  -H "content-type: application/json" \
-  -d '{"secret":"REPLACE_ME","slug":"example-post"}'
-```
+事件类型为 `content.published` 或 `assets.published`。Content 事件的 `resources` 使用 `posts:<slug>`、`tweets`；资产事件使用 `assets`。Realm 只接受时间窗口内的有效签名，不接受浏览器请求、query secret 或旧的多端点协议。
 
-| Route                          | 刷新范围                                             |
-| ------------------------------ | ---------------------------------------------------- |
-| `POST /api/revalidate`         | 三个 locale 的 tweets page                           |
-| `POST /api/revalidate-content` | 三个 locale 的 content；可选安全 slug 的 blog detail |
-| `POST /api/revalidate-assets`  | home、content、friends、web/life detail              |
+发布方必须检查响应中的 `revalidated`、`failed` 和 HTTP 状态；部分刷新会返回 `partial`，全部失败返回 `500`。
 
-`/api/revalidate` 为旧管理客户端保留 `GET ?secret=`，新自动化应使用 POST body。其他两个 endpoint 不接受 query secret。
+## Published Content service
 
-Revalidation 每个 client 每分钟最多 30 次。响应可能包含 `paths`、`skipped`、`failed` 或 `partial`，自动化不能只检查 HTTP `2xx`；还要检查失败数组。
+生产 Function 通过 `CONTENT_BASE_URL` 读取已发布 release。运维检查：
 
-## 外部 GitHub 内容
+1. `CONTENT_BASE_URL` 使用生产 Content URL。
+2. `/health/ready` 能读取当前 pointer 和 manifest。
+3. `/v1/posts` 与 `/v1/tweets/months` 返回当前 release。
+4. 公开 protected variant 返回 `PROTECTED_CONTENT`。
+5. Realm 访客 grant 成功后，server-only service token 才能读取 protected body。
 
-生产 Function 通过 GitHub Contents API 读取私有仓库。运维检查：
-
-1. Token 只读且未过期。
-2. owner/repo/branch 指向预期环境。
-3. `blog-index.json` 与实际 MDX locale 对齐。
-4. 新内容发布后调用对应 revalidation。
-5. GitHub failure 时 fallback 行为不会泄露 protected metadata。
+Content release 是生产内容的唯一读取来源；故障处理应检查 Content pointer、manifest 和服务认证，不恢复 GitHub 回退。
 
 ## Protected post
 
@@ -215,18 +228,18 @@ pnpm assets:publish -- --rollback <version>
 
 ### 内容
 
-恢复外部内容仓库文件或索引后，调用 content/tweet revalidation。Protected metadata 泄漏类问题应先下线索引入口，再调查缓存。
+确认 Content release 或 pointer 修复后，调用 content/tweet revalidation。Protected metadata 泄漏类问题应先下线索引入口，再调查缓存。
 
 ### Secret
 
-泄漏时在平台轮换 secret/Token，重新部署 Function，并验证旧凭据失效。COS、GitHub、Upstash、TOTP 和 revalidation secret 分别处理。
+泄漏时在平台轮换 secret/Token，重新部署 Function，并验证旧凭据失效。Auth、Content、COS、Upstash、TOTP 和 revalidation secret 分别处理。
 
 ## 故障响应顺序
 
 1. 判断影响面：单 locale、单 route、内容、资产、认证或全站。
 2. 查看 Vercel runtime/build log 或自托管 process log。
 3. 检查最近 deployment、content index 和 Catalog pointer。
-4. 检查外部依赖：GitHub、COS/CDN、Upstash。
+4. 检查外部依赖：Auth、Content、COS/CDN、Upstash。
 5. 使用最小只读请求复现。
 6. 能安全回滚时优先恢复服务，再做根因修复。
 7. 把新发现的稳定陷阱补充到 [`AI GOTCHAS`](../ai/GOTCHAS.md)。

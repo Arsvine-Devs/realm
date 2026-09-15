@@ -164,7 +164,7 @@
     },
     "posts": {
       "title": "POSTS",
-      "description": "Runtime-loaded writing archive from the private content repository.",
+      "description": "Published writing archive from the Content service.",
       "heading": "Posts",
       "empty": "No posts yet.",
       "loading": "Decoding post archive...",

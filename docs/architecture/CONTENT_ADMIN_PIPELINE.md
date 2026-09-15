@@ -2,11 +2,13 @@
 
 [返回文档组](./README.md)
 
+> 文档状态：历史迁移快照。独立 `arsvine-content` 仓库已退出运行时链路；当前 Realm 只读取 `content.arsvine.com`，当前 Console 只通过 `api.arsvine.com` 访问 Core authoring API。本文的旧 GitHub 流程、回退和兼容描述不构成当前操作指引。
+
 本文描述内容仓库、Admin 管理台和 Realm 主站之间的控制流与数据流。它不修改内容仓库，也不把 Admin 的开发预览数据当成生产内容。
 
 ## 内容面当前形态
 
-本次从 `Arsvine-Realm-Dev-Team/arsvine-content` 的 `main` 浅克隆得到 commit `a0237c4`。只读统计如下：
+本次从 `Arsvine-Devs/arsvine-content` 的 `main` 浅克隆得到 commit `a0237c4`。只读统计如下：
 
 | 内容                               | 当前快照                                               |
 | ---------------------------------- | ------------------------------------------------------ |

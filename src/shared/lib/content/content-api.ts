@@ -1,8 +1,9 @@
-import type { ContentBlogIndex } from './types';
-import type { TweetIndexItem, TweetItem } from '@/features/tweets/model/types';
+import type { ContentBlogIndex, ContentTweetIndexItem } from './types';
 
 const FETCH_TIMEOUT_MS = 8000;
+const PUBLIC_CONTENT_REVALIDATE_SECONDS = 300;
 const PROTECTED_SCOPE = 'content:protected:read';
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 
 type ServiceToken = {
   accessToken: string;
@@ -11,7 +12,7 @@ type ServiceToken = {
 
 let serviceToken: ServiceToken | null = null;
 
-export class ContentServiceError extends Error {
+class ContentServiceError extends Error {
   constructor(
     message: string,
     readonly status?: number,
@@ -22,6 +23,8 @@ export class ContentServiceError extends Error {
   }
 }
 
+const AUTH_TOKEN_PATH = '/api/auth/oauth2/token';
+
 function getBaseUrl() {
   const value = process.env.CONTENT_BASE_URL?.trim();
   if (!value) throw new ContentServiceError('Content service is not configured.');
@@ -31,19 +34,32 @@ function getBaseUrl() {
   } catch {
     throw new ContentServiceError('CONTENT_BASE_URL must be an absolute URL.');
   }
-  if (url.protocol !== 'https:' && url.hostname !== 'localhost') {
+  if (url.protocol !== 'https:' && !LOOPBACK_HOSTS.has(url.hostname)) {
     throw new ContentServiceError('CONTENT_BASE_URL must use HTTPS outside localhost.');
   }
   return url.toString().replace(/\/$/, '');
 }
 
 function getProtectedContentAuthConfig() {
-  const tokenUrl = process.env.CONTENT_AUTH_TOKEN_URL?.trim();
-  const clientId = process.env.CONTENT_AUTH_CLIENT_ID?.trim();
-  const clientSecret = process.env.CONTENT_AUTH_CLIENT_SECRET?.trim();
-  if (!tokenUrl || !clientId || !clientSecret) {
+  const issuer = process.env.AUTH_ISSUER?.trim();
+  const clientId = process.env.CONTENT_SERVICE_CLIENT_ID?.trim();
+  const clientSecret = process.env.CONTENT_SERVICE_CLIENT_SECRET?.trim();
+  if (!issuer) {
+    throw new ContentServiceError('AUTH_ISSUER is not configured.');
+  }
+  if (!clientId || !clientSecret) {
     throw new ContentServiceError('Protected content service credentials are not configured.');
   }
+  let issuerUrl: URL;
+  try {
+    issuerUrl = new URL(issuer);
+  } catch {
+    throw new ContentServiceError('AUTH_ISSUER must be an absolute URL.');
+  }
+  if (issuerUrl.protocol !== 'https:' && !LOOPBACK_HOSTS.has(issuerUrl.hostname)) {
+    throw new ContentServiceError('AUTH_ISSUER must use HTTPS outside localhost.');
+  }
+  const tokenUrl = new URL(AUTH_TOKEN_PATH, issuerUrl).toString();
   return { tokenUrl, clientId, clientSecret };
 }
 
@@ -101,7 +117,9 @@ async function fetchContentJson<T>(
   const response = await fetch(`${getBaseUrl()}${path}`, {
     headers,
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-    cache: 'no-store',
+    ...(options.protected
+      ? { cache: 'no-store' as const }
+      : { next: { revalidate: PUBLIC_CONTENT_REVALIDATE_SECONDS } }),
   });
   const body = (await response.json().catch(() => null)) as {
     error?: { code?: string; message?: string };
@@ -157,11 +175,11 @@ export async function fetchPublishedPostVariant(
 }
 
 export async function fetchPublishedTweetIndex() {
-  return fetchContentJson<{ months: TweetIndexItem[] }>('/v1/tweets/months');
+  return fetchContentJson<{ months: ContentTweetIndexItem[] }>('/v1/tweets/months');
 }
 
 export async function fetchPublishedTweetMonth(month: string) {
-  return fetchContentJson<{ month: string; tweets: TweetItem[] }>(
+  return fetchContentJson<{ month: string; tweets: unknown[] }>(
     `/v1/tweets/months/${encodeURIComponent(month)}`,
   );
 }

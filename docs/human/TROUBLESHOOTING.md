@@ -108,15 +108,15 @@ pnpm vitest run tests/app/locale-hot-switch.test.tsx
 - `variants` key 是否一致；
 - `blog/<slug>/<locale>.mdx` 是否存在；
 - `originLocale` 是否为 `zh-CN`、`zh-TW` 或 `en`；
-- GitHub owner/repo/branch/Token 是否指向预期仓库。
+- `CONTENT_BASE_URL` 是否指向预期的 Content service。
 
 UI locale 和 content-only locale 是两个概念；`ja`、`ru`、`fr` 不会切换 UI。
 
 ## 博客或推文没有外部内容
 
-缺少 GitHub 配置时是预期 fallback。配置存在时检查 Function log 中的 GitHub status，但不要记录 Token。
+检查 `CONTENT_BASE_URL` 对应的 `/health/ready`、`/v1/posts` 和 `/v1/tweets/months`。受保护文章还需要检查 `AUTH_ISSUER`、`CONTENT_SERVICE_CLIENT_ID` 和 `CONTENT_SERVICE_CLIENT_SECRET`；不要记录 client secret 或 access token。
 
-路径错误时检查 repo-relative 规则，不要通过允许 absolute URL 或 traversal 来“修复”。
+Content release 不可用时，Realm 不恢复 GitHub 读取；应检查 Content pointer、manifest、对象存储和服务认证状态。
 
 开发推文压力模式：
 
@@ -177,7 +177,7 @@ scripts\dev-host-setup.cmd
 
 1. public/private version object 是否存在；
 2. 两个 pointer 是否指向新 version；
-3. `/api/revalidate-assets` response 的 `failed`；
+3. `/api/internal/revalidate` response 的 `failed`；
 4. ISR route 是否包含目标 detail；
 5. CDN 是否缓存了旧 public manifest；
 6. 数据中的 `catalogKey` 是否正确。
@@ -235,13 +235,13 @@ document.documentElement.dataset.performanceReason;
 $env:NEXT_BUILD_DIR='.next-diagnostic'; pnpm build
 ```
 
-## Revalidation 返回 `401`、`429` 或 partial
+## Revalidation 返回 `401`、`422` 或 partial
 
-- `401`：`REVALIDATE_SECRET` 未配置、请求未携带或不匹配。
-- `429`：一分钟窗口超限，遵循 `Retry-After`。
-- `partial` / `failed`：逐项检查 route；不要只根据 HTTP `2xx` 判定成功。
+- `401`：`REVALIDATE_WEBHOOK_SECRET` 未配置、时间戳过期或 HMAC 不匹配。
+- `422`：事件类型、release ID 或 resources 不符合当前契约。
+- `partial` / `failed`：逐项检查刷新结果；不要只根据 HTTP `2xx` 判定成功。
 
-`revalidate-content` 和 `revalidate-assets` 使用 POST JSON body。只有旧 `/api/revalidate` 兼容 query secret。
+唯一接口是 `POST /api/internal/revalidate`。发布方必须发送 `X-Arsvine-Timestamp`、`X-Arsvine-Signature` 和原始 JSON body；它不接受 query secret。
 
 ## `pnpm env:sync` 后出现未知键
 

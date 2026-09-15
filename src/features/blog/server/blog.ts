@@ -78,7 +78,43 @@ function getVariantForLocale(
   entry: ContentBlogIndexItem,
   locale: BlogContentLocale,
 ): BlogIndexVariant | null {
-  return (entry.variants[locale] as BlogIndexVariant | undefined) ?? null;
+  return (entry.variants?.[locale] as BlogIndexVariant | undefined) ?? null;
+}
+
+type LoadedVariantData = {
+  title?: string;
+  excerpt?: string;
+  tags?: string[];
+  originLocale?: string;
+  access?: ContentPostAccess;
+};
+
+function buildLoadedVariantMeta(
+  entry: ContentBlogIndexItem,
+  actualContentLocale: BlogContentLocale,
+  data: LoadedVariantData,
+  content: string,
+): BlogPostMeta {
+  const indexedVariant = getVariantForLocale(entry, actualContentLocale);
+  const originLocale = resolveOriginLocale(data.originLocale ?? indexedVariant?.originLocale);
+  const tags = data.tags?.length
+    ? data.tags
+    : indexedVariant?.tags?.length
+      ? indexedVariant.tags
+      : [];
+
+  return {
+    slug: entry.slug,
+    title: data.title?.trim() || indexedVariant?.title?.trim() || entry.slug,
+    date: entry.date,
+    updated: entry.updatedAt,
+    excerpt: data.excerpt?.trim() || indexedVariant?.excerpt?.trim() || '',
+    tags: tags.length > 0 ? tags : entry.tags,
+    readingMinutes: estimateReadingMinutes(content, actualContentLocale),
+    pinned: entry.pinned,
+    ...(originLocale ? { originLocale } : {}),
+    access: normalizeAccess(data.access ?? entry.access),
+  };
 }
 
 function getPreferredVariantLocale(entry: ContentBlogIndexItem, locale: Locale): BlogContentLocale {
@@ -230,7 +266,10 @@ export async function getPostBySlugAndContentLocale(slug: string, locale: BlogCo
   }
 
   const parsed = await readVariantDocument(slug, locale, entry.access.mode === 'totp');
-  const meta = getVariantMeta(entry, locale, parsed.content);
+  const meta =
+    entry.access.mode === 'totp'
+      ? buildLoadedVariantMeta(entry, locale, parsed.data, parsed.content)
+      : getVariantMeta(entry, locale, parsed.content);
 
   return {
     meta,

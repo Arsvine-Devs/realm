@@ -164,7 +164,7 @@
     },
     "posts": {
       "title": "POSTS",
-      "description": "来自私有内容仓库、按运行时读取的文章归档。",
+      "description": "来自 Content service 的已发布文章归档。",
       "heading": "Posts",
       "empty": "暂无文章信号。",
       "loading": "正在解码文章归档…",

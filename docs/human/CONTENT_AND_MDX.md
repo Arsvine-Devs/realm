@@ -15,10 +15,10 @@ Content release 不可用时：
 
 - 公开内容请求按 Content client 的错误边界失败；
 - 不得在生产运行时恢复 GitHub 内容读取；
-- 本地开发和迁移工具可以使用 `content/blog/init/` 或 legacy GitHub 兼容路径。
+- 本地开发和测试同样通过 `CONTENT_BASE_URL` 访问 Content service；测试中的 fixture 在对应测试边界内提供。
 - 开发环境可用 `TWEETS_STRESS_TEST=1` 生成合成归档。
 
-开发环境和测试环境可以优先读取仓库内 `content/blog/init/<locale>.mdx`，用于验证本地内容修改；生产环境以 Content release 为主。
+Realm 运行时只读取已发布 Content release；文章源文件的导入由 Platform 的一次性迁移工具负责。
 
 ## 结构化数据
 
@@ -43,9 +43,9 @@ en.ts
 
 `src/app/i18n/data.ts` 使用显式静态注册表。不要改成动态 `require()`。
 
-## Legacy 内容仓库结构
+## 一次性内容导入格式
 
-以下结构是迁移工具和历史 authoring 兼容面的输入格式，不是 Realm 生产读取协议。
+以下结构仅是一次性内容导入工具的输入格式，不是 Realm 运行时或回退协议。导入完成后，独立内容仓库不再是站点的运行时依赖。
 
 ```text
 blog-index.json
@@ -200,11 +200,9 @@ protected body 不得进入静态 props、HTML 或 RSC payload。页面初始只
 
 ## 发布内容后的刷新
 
-- 推文：`POST /api/revalidate`
-- content 与可选 blog slug：`POST /api/revalidate-content`
-- 资产相关页面：`POST /api/revalidate-assets`
+Content/API 和资产发布脚本向 `POST /api/internal/revalidate` 发送带时间戳的 HMAC 事件。Content 事件包含 `posts:<slug>` 与 `tweets` 资源；资产事件包含 `assets` 资源。Realm 验证 `REVALIDATE_WEBHOOK_SECRET` 后刷新对应页面。
 
-请求必须通过 `REVALIDATE_SECRET` 认证。具体运维方式见 [`OPERATIONS.md`](./OPERATIONS.md)。
+该接口是服务间接口，不接受浏览器请求或 URL/query secret。具体签名边界见 [`SECURITY.md`](./SECURITY.md)。
 
 ## 修改检查清单
 

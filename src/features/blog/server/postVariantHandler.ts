@@ -31,12 +31,12 @@ export default async function handler(request: Request) {
   try {
     entry = await getBlogPostEntry(slugParam);
   } catch (error) {
-    // 上游 GitHub 5xx / 超时 / 网络错误 → 502，让前端知道是临时问题（可重试）
+    // 上游 Content 5xx / 超时 / 网络错误 → 502，让前端知道是临时问题（可重试）
     console.error('[post-variant] getBlogPostEntry failed:', error);
     return jsonResponse(
       {
         ok: false,
-        error: { code: 'UPSTREAM_FAILED', message: 'Content repository unreachable.' },
+        error: { code: 'UPSTREAM_FAILED', message: 'Content service unreachable.' },
       },
       { ...responseInit, status: 502 },
     );
@@ -84,7 +84,7 @@ export default async function handler(request: Request) {
     );
   } catch (error) {
     // 区分"文章不存在"与"MDX 序列化失败" / "上游错误"。
-    // 文章找不到（GitHub 404）走 404 + NOT_FOUND；其他（MDX 编译、序列化、5xx）走 500。
+    // 文章找不到（Content 404）走 404 + NOT_FOUND；其他（MDX 编译、序列化、5xx）走 500。
     const message = error instanceof Error ? error.message : '';
     if (message.includes('not found') || message.includes('404')) {
       return jsonResponse(

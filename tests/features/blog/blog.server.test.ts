@@ -156,6 +156,45 @@ describe('getAllPostsForLocale', () => {
       access: { mode: 'totp', group: 'family' },
     });
   });
+
+  it('accepts a protected index without public variants', async () => {
+    fetchPublishedBlogIndexMock.mockResolvedValue({
+      version: 1,
+      updatedAt: '2026-06-17T00:00:00.000Z',
+      posts: [
+        {
+          slug: 'protected-post',
+          date: '2026-05-12',
+          updatedAt: '2026-05-12T00:00:00.000Z',
+          tags: [],
+          pinned: false,
+          access: { mode: 'totp', group: 'family' },
+          availableLocales: ['zh-TW'],
+        },
+      ],
+    });
+    fetchPublishedPostVariantMock.mockResolvedValue({
+      title: 'Protected Post',
+      excerpt: 'Authorized excerpt',
+      tags: ['private'],
+      date: '2026-05-12',
+      updatedAt: '2026-05-12T00:00:00.000Z',
+      access: { mode: 'totp', group: 'family' },
+      bodyMdx: 'authorized content',
+    });
+
+    const result = await getPostBySlugAndContentLocale('protected-post', 'zh-TW');
+
+    expect(result.meta).toMatchObject({
+      title: 'Protected Post',
+      excerpt: 'Authorized excerpt',
+      tags: ['private'],
+      access: { mode: 'totp', group: 'family' },
+    });
+    expect(fetchPublishedPostVariantMock).toHaveBeenCalledWith('protected-post', 'zh-TW', {
+      protected: true,
+    });
+  });
 });
 
 describe('post variant metadata', () => {

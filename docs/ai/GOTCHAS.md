@@ -9,7 +9,7 @@ Only active constraints belong here. Historical reasons are omitted unless they 
 - Protected post bodies stay out of static props/RSC and load only after a valid grant.
 - Grant checks and variant loads remain XState invoked actors with cancellation on article/locale changes.
 - Protected and revalidation redirects accept only validated internal paths.
-- GitHub content paths are repo-relative; reject absolute, protocol-relative, traversal, query, fragment, and backslash forms.
+- Realm runtime content comes from `CONTENT_BASE_URL`; protected reads use the Auth issuer and `CONTENT_SERVICE_CLIENT_*` credentials server-side.
 - External link variants use parsed URLs and hostnames, never substring matching.
 - TOTP, grant, rate-limit, and protected payload tests are security evidence and should not be replaced by styling tests.
 
