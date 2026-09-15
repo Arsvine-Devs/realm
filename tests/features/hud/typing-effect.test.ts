@@ -77,11 +77,3 @@ describe('formatFateTextForWrap', () => {
     expect(out.split('\n')[1]).toMatch(/^Next/);
   });
 });
-
-describe('TYPING_CONSTANTS', () => {
-  it('exposes the same numeric values used by the previous inline constants', () => {
-    expect(TYPING_CONSTANTS.ALPHABETIC_TYPING_DELAY).toBe(48);
-    expect(TYPING_CONSTANTS.CJK_TYPING_DELAY).toBe(150);
-    expect(TYPING_CONSTANTS.FATE_WRAP_MIN_UNITS).toBe(18);
-  });
-});

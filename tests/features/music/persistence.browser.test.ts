@@ -37,7 +37,7 @@ describe('music player persistence', () => {
     });
   });
 
-  it('accepts legacy isPlaying data without restoring autoplay intent', () => {
+  it('ignores the stored playback flag while preserving position', () => {
     expect(
       parsePersistedPlayerState(
         JSON.stringify({

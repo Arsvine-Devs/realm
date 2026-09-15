@@ -21,11 +21,11 @@ describe('getSiteAssetManifestUrl', () => {
     );
   });
 
-  it('partitions the manifest cache for the beta origin', () => {
-    stubOrigin('https://beta.arsvine.com');
+  it('partitions the manifest cache for an alternate hosted origin', () => {
+    stubOrigin('https://preview.arsvine.com');
 
     expect(getSiteAssetManifestUrl(base, version)).toBe(
-      `${base}/realm/site-catalog/versions/${version}/assets.json?cors-origin=https%3A%2F%2Fbeta.arsvine.com`,
+      `${base}/realm/site-catalog/versions/${version}/assets.json?cors-origin=https%3A%2F%2Fpreview.arsvine.com`,
     );
   });
 

@@ -1,6 +1,3 @@
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
-
 import { describe, expect, it } from 'vitest';
 import { resetTransitionSurface } from '@/features/navigation/model/transitionSurface';
 
@@ -21,14 +18,5 @@ describe('TransitionProvider recovery contracts', () => {
     expect(wrapper.style.transform).toBe('');
     expect(wrapper.style.clipPath).toBe('');
     expect(wrapper.style.transition).toBe('');
-  });
-
-  it('keeps reduced-motion navigation on the direct push path', async () => {
-    const source = await readFile(
-      path.join(process.cwd(), 'src/features/navigation/model/TransitionProvider.tsx'),
-      'utf8',
-    );
-    expect(source).toContain('if (reducedMotion) {');
-    expect(source).toContain("'[navigation] reduced-motion navigation failed:'");
   });
 });

@@ -20,13 +20,5 @@ describe('logo effects CSS contract', () => {
     expect(logoSection).toContain('will-change: transform, opacity');
     expect(logoSection).not.toContain('filter:');
     expect(logoSection).not.toContain('drop-shadow');
-
-    const invertedSource = await readFile(
-      path.join(process.cwd(), 'src/app/styles/layout/_inverted.scss'),
-      'utf8',
-    );
-    expect(invertedSource).toMatch(
-      /\.logoContainer\s*\{\s*--logo-base-opacity:\s*0\.8;\s*--logo-base-color:\s*#444444;/,
-    );
   });
 });

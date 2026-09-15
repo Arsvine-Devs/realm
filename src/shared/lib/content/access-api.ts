@@ -1,4 +1,4 @@
-export type AccessApiErrorCode =
+type AccessApiErrorCode =
   | 'METHOD_NOT_ALLOWED'
   | 'VALIDATION_FAILED'
   | 'GROUP_NOT_FOUND'
