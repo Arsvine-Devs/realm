@@ -26,7 +26,7 @@ node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'
 
 真实 secret 只放在未跟踪 `.env.local`、Vercel 对应项目环境或临时发布进程中，不进入 Git、浏览器 bundle、日志或测试 fixture。
 
-截至 2026-09-15，Realm 和 Platform 的 Vercel production deployment 已使用当前主分支版本；生产环境键名只保留动态运行时契约，固定拓扑键不再注入。新增或修改固定拓扑时，先更新源码配置并完成 deployment，再按环境契约复查 Vercel 键名。
+Realm 和 Platform 的 Vercel production deployment 使用当前主分支版本；生产环境键名只保留动态运行时契约，固定拓扑键不再注入。新增或修改固定拓扑时，先更新源码配置并完成 deployment，再按环境契约复查 Vercel 键名。
 
 ## 固定站点拓扑
 

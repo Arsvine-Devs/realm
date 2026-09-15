@@ -79,7 +79,7 @@ content: https://content.arsvine.com
 cdn:     https://cdn.arsvine.com
 ```
 
-受保护文章还需要服务端 `CONTENT_SERVICE_CLIENT_ID`、`CONTENT_SERVICE_CLIENT_SECRET` 和 `REVALIDATE_WEBHOOK_SECRET`。实际功能还可能需要 TOTP、Upstash、COS、Neon 变量。完整动态变量见 [`CONFIGURATION.md`](./CONFIGURATION.md)，固定拓扑见 `config/site-config.mjs`。
+动态变量按功能配置：受保护文章链路使用 `CONTENT_SERVICE_CLIENT_ID`、`CONTENT_SERVICE_CLIENT_SECRET`、`ACCESS_GRANT_SECRET` 和 `REVALIDATE_WEBHOOK_SECRET`，启用 TOTP group 时增加 `TOTP_GROUPS_JSON`；访客统计使用 `VISITOR_STATS_SECRET` 和 `DATABASE_URL`；分布式限流使用 `UPSTASH_REDIS_REST_URL` 与 `UPSTASH_REDIS_REST_TOKEN`；COS Catalog 与资产发布使用 `CONFIGURATION.md` 中列出的 COS 变量。完整动态变量见 [`CONFIGURATION.md`](./CONFIGURATION.md)，固定拓扑见 `config/site-config.mjs`。
 
 部署环境中的 secret 不得暴露为 `NEXT_PUBLIC_*`。
 

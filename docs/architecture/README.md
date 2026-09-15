@@ -27,7 +27,7 @@ Realm 单仓库实现细节由 [`human/ARCHITECTURE.md`](../human/ARCHITECTURE.m
 | Realm    | `Arsvine-Devs/realm` / `master`  | `07c761f` · `CURRENT` + `LIVE` | 主站、Realm 数据和资产工具                 |
 | Platform | `Arsvine-Devs/platform` / `main` | `4479147` · `CURRENT` + `LIVE` | Console、Auth、API、Content 和共享运行时包 |
 
-截至 2026-09-15，Vercel 团队 `arsvine-realm` 的核心项目为 `arsvine-realm`、`arsvine-admin`、`arsvine-auth`、`arsvine-api` 和 `arsvine-content`；`status.arsvine.com` 由 Better Stack 独立托管，不属于 Vercel 项目。
+当前 Vercel 团队 `arsvine-realm` 的核心项目为 `arsvine-realm`、`arsvine-admin`、`arsvine-auth`、`arsvine-api` 和 `arsvine-content`；`status.arsvine.com` 由 Better Stack 独立托管，不属于 Vercel 项目。
 
 ## 保护范围
 

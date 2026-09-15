@@ -4,7 +4,7 @@
 
 本文是 ARSVINE 系列站点当前的跨仓库系统地图。Realm 单仓库的组件分层和受保护文章细节以 [`human/ARCHITECTURE.md`](../human/ARCHITECTURE.md) 与 [`human/SECURITY.md`](../human/SECURITY.md) 为准。
 
-截至 2026-09-15，`console`、`auth`、`api` 和 `content` 的公开 liveness/readiness 探针均返回 200；`status.arsvine.com` 返回 200，DNS CNAME 指向 Better Stack。Realm 的 canonical health 路由受到 Vercel Bot Protection challenge，返回 429；Realm production deployment 为 READY。
+当前公开探针结果：`console`、`auth`、`api` 和 `content` 的 liveness/readiness 均返回 200；`status.arsvine.com` 返回 200，DNS CNAME 指向 Better Stack。Realm 的 canonical health 路由受到 Vercel Bot Protection challenge，返回 429；Realm production deployment 为 READY。
 
 ## 一句话模型
 
@@ -104,7 +104,7 @@ Realm 的根入口是 `src/app/layout.tsx`，在 `[locale]` 之上保持全局 c
 | `arsvine-api`     | `apps/api`     | `pnpm install --frozen-lockfile` | `pnpm --filter @arsvine/api... build`     | `dist` |
 | `arsvine-content` | `apps/content` | `pnpm install --frozen-lockfile` | `pnpm --filter @arsvine/content... build` | `dist` |
 
-截至 2026-09-15，五个 production deployment 均为 `READY`，并使用当前主分支基线：
+当前五个 production deployment 均为 `READY`，并使用各自主分支基线：
 
 | 项目              | commit    | ref      | 生产域名              |
 | ----------------- | --------- | -------- | --------------------- |
@@ -120,7 +120,7 @@ Realm 的 `.github/workflows/ci.yml` 在 Ubuntu 运行 `pnpm check`，在 Window
 
 固定 service origin、resource、OIDC endpoint 和 publication pointer 由 Realm `config/site-config.mjs` 与 Platform `@arsvine/site-config` 拥有；动态 secret、凭据和运行时开关按各自 `.env.example` 与 environment provider 维护。
 
-截至 2026-09-15，五个 Vercel production environment 的键名已与动态契约一致；固定拓扑键已清除。详细填写格式、scope、secret 可见性和失败行为见 Realm [`human/CONFIGURATION.md`](../human/CONFIGURATION.md) 与 Platform [`CONFIGURATION.md`](https://github.com/Arsvine-Devs/platform/blob/main/docs/CONFIGURATION.md)。
+五个 Vercel production environment 的键名与动态契约一致；固定拓扑键已清除。详细填写格式、scope、secret 可见性和失败行为见 Realm [`human/CONFIGURATION.md`](../human/CONFIGURATION.md) 与 Platform [`CONFIGURATION.md`](https://github.com/Arsvine-Devs/platform/blob/main/docs/CONFIGURATION.md)。
 
 ## 已验证的公开运行信号
 
