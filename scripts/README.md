@@ -1,13 +1,13 @@
-# Maintenance scripts
+# 维护脚本
 
 [`Repository map`](../INDEX.md) · [`Human documentation catalog`](../docs/INDEX.md)
 
-This directory contains local tools for assets, fonts, images, environment files, database maintenance, and Windows development setup.
+本目录包含资产、字体、图像、环境文件、数据库维护和 Windows 开发启动工具。
 
-- Asset Catalog workflow: `scripts/assets/` and [`docs/human/ASSETS.md`](../docs/human/ASSETS.md)
-- Documentation path audit: `pnpm docs:check` via `scripts/check-doc-links.mjs`
-- Image conversion workflow: [`scripts/images/README.md`](./images/README.md)
-- Deployment and database procedures: [`docs/human/OPERATIONS.md`](../docs/human/OPERATIONS.md)
-- AI safety rules: [`AGENTS.md`](./AGENTS.md)
+- 资产 Catalog 流程：`scripts/assets/` 与 [`docs/human/ASSETS.md`](../docs/human/ASSETS.md)
+- 文档路径检查：`pnpm docs:check`，实现位于 `scripts/check-doc-links.mjs`
+- 图像转换流程：[`scripts/images/README.md`](./images/README.md)
+- 部署和数据库流程：[`docs/human/OPERATIONS.md`](../docs/human/OPERATIONS.md)
+- AI 安全规则：[`AGENTS.md`](./AGENTS.md)
 
-One-shot media and font tools are intentionally independent. Do not run commands that publish COS assets or change a database without explicit authorization.
+一次性媒体和字体工具保持独立。没有明确授权时，不要运行发布 COS 资产或修改数据库的命令。

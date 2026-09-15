@@ -251,3 +251,20 @@ export const SECTIONS = [
 export const ALLOWED_KEYS = new Set(
   SECTIONS.flatMap((section) => section.entries.map((entry) => entry.key)),
 );
+
+// These names were part of the retired GitHub/asset and multi-endpoint
+// content paths. They are removed by env:sync while genuinely unknown local
+// debugging keys remain untouched.
+export const RETIRED_KEYS = new Set([
+  'GITHUB_OWNER',
+  'GITHUB_REPO',
+  'GITHUB_BRANCH',
+  'GITHUB_READ_TOKEN',
+  'GITHUB_WRITE_TOKEN',
+  'CONTENT_AUTH_CLIENT_ID',
+  'CONTENT_AUTH_CLIENT_SECRET',
+  'CONTENT_AUTH_TOKEN_URL',
+  'LEGACY_PUBLIC_ASSET_BASE',
+  'LEGACY_PUBLIC_ASSET_ORIGIN',
+  'REVALIDATE_SECRET',
+]);

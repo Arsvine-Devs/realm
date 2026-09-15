@@ -2,7 +2,7 @@
 
 [`Scripts README`](../README.md) · [`Repository map`](../../INDEX.md)
 
-Drop image files here, then run:
+把图像文件放入这里，然后运行：
 
 ```bash
 node scripts/convert-images.mjs              # convert all to WebP (q=75), output to scripts/images/out
@@ -11,6 +11,6 @@ node scripts/convert-images.mjs avif --quality 50
 node scripts/convert-images.mjs --help
 ```
 
-Source files are never modified; outputs go to `scripts/images/out/` (preserving subdirectory structure). Re-runs skip files whose output already exists — pass `--overwrite` to force re-encode.
+脚本不会修改源文件；输出写入 `scripts/images/out/`，并保留子目录结构。再次运行时会跳过已有输出；传入 `--overwrite` 可强制重新编码。
 
-`scripts/images/out/` is gitignored. The directory stays committed through its tracked `README.md` and `.gitignore`; there is no placeholder `.gitkeep` file.
+`scripts/images/out/` 已加入 gitignore。目录通过已跟踪的 `README.md` 和 `.gitignore` 保持可发现，不需要占位 `.gitkeep` 文件。

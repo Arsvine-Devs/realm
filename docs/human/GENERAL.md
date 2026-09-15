@@ -46,7 +46,6 @@ pnpm check
 src/app/       App Router 页面、layout、Route Handler、i18n
 src/features/  按业务领域组织的 UI、model、server、contracts、styles
 src/shared/    跨 feature 的稳定 contract、hook、UI 和 server helper
-content/       内置博客 fallback
 public/        启动关键静态文件
 scripts/       本地维护、资产、字体和图像工具
 tests/         app、feature、shared、repo、operations、scripts 测试

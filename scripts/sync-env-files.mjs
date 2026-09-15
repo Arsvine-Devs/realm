@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { ALLOWED_KEYS, SECTIONS } from './lib/env-registry.mjs';
+import { ALLOWED_KEYS, RETIRED_KEYS, SECTIONS } from './lib/env-registry.mjs';
 
 const DEFAULT_LOCAL_PATH = path.join(process.cwd(), '.env.local');
 const DEFAULT_EXAMPLE_PATH = path.join(process.cwd(), '.env.example');
@@ -104,7 +104,9 @@ function renderLocalFile(currentValues) {
   }
 
   // 保留 .env.local 中不在注册表的未知键（开发者临时调试 env），避免静默清除
-  const unmanagedKeys = [...currentValues.keys()].filter((key) => !managedKeys.has(key)).sort();
+  const unmanagedKeys = [...currentValues.keys()]
+    .filter((key) => !managedKeys.has(key) && !RETIRED_KEYS.has(key))
+    .sort();
   if (unmanagedKeys.length > 0) {
     lines.push('');
     lines.push('# (unmanaged) keys below are not in the env registry; kept as-is');
@@ -131,13 +133,17 @@ function collectSummary(currentValues) {
     }
   }
 
-  const removed = [...currentKeys].filter((key) => !ALLOWED_KEYS.has(key)).sort();
-  return { kept, added, removed };
+  const retired = [...currentKeys].filter((key) => RETIRED_KEYS.has(key)).sort();
+  const unmanaged = [...currentKeys]
+    .filter((key) => !ALLOWED_KEYS.has(key) && !RETIRED_KEYS.has(key))
+    .sort();
+  return { kept, added, retired, unmanaged };
 }
 
 function printSummary(summary) {
   const render = (label, keys) => `${label}: ${keys.length ? keys.join(', ') : '(none)'}`;
-  console.log(render('unmanaged keys (kept)', summary.removed));
+  console.log(render('retired keys (removed)', summary.retired));
+  console.log(render('unmanaged keys (kept)', summary.unmanaged));
   console.log(render('added keys', summary.added));
   console.log(render('kept keys', summary.kept));
 }

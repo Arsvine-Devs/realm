@@ -20,6 +20,8 @@ describe('sync-env-files script', () => {
         'PORT=4000',
         'NEXT_PUBLIC_SITE_URL=https://dev.arsvine.com',
         'LEGACY_PUBLIC_ASSET_ORIGIN=https://cdn.arsvine.com',
+        'GITHUB_READ_TOKEN=retired-token',
+        'REVALIDATE_SECRET=retired-secret',
         'ACCESS_GRANT_SECRET=my-secret',
         'TOTP_GROUPS_JSON=\'{"friends-a":{"current":"abc"}}\'',
       ].join('\n'),
@@ -50,7 +52,9 @@ describe('sync-env-files script', () => {
     expect(localOutput).toContain('NEXT_PUBLIC_CDN_BASE=https://cdn.arsvine.com');
     expect(localOutput).toContain('ANALYZE=');
     expect(localOutput).toContain('NEXT_BUILD_DIR=');
-    expect(localOutput).toContain('LEGACY_PUBLIC_ASSET_ORIGIN=https://cdn.arsvine.com');
+    expect(localOutput).not.toContain('LEGACY_PUBLIC_ASSET_ORIGIN=');
+    expect(localOutput).not.toContain('GITHUB_READ_TOKEN=');
+    expect(localOutput).not.toContain('REVALIDATE_SECRET=');
 
     expect(exampleOutput).toContain('NEXT_PUBLIC_CDN_BASE=https://cdn.arsvine.com');
     expect(exampleOutput).toContain('# ANALYZE=true');

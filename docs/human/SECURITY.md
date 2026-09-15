@@ -170,7 +170,7 @@ MDX 链接使用专用规则：允许安全绝对 URL、`mailto:`、relative pat
 
 ```text
 tests/features/blog/
-tests/shared/lib/content/
+tests/shared/content-api.test.ts
 tests/shared/lib/safe-external-href.test.ts
 tests/features/blog/mdx-href.test.ts
 ```

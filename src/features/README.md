@@ -1,7 +1,7 @@
-# Feature domains
+# Feature 领域
 
 [`Repository map`](../../INDEX.md) · [`Human documentation catalog`](../../docs/INDEX.md) · [`AI rules`](./AGENTS.md)
 
-`src/features/` groups product behavior by domain. A feature may contain `contracts/`, `model/`, `server/`, `ui/`, and `styles/` as its real responsibilities require.
+`src/features/` 按领域组织产品行为。feature 按实际责任使用 `contracts/`、`model/`、`server/`、`ui/` 和 `styles/`。
 
-Current high-risk domains have local entry points for [`assets`](./assets/README.md), [`blog`](./blog/README.md), and [`navigation`](./navigation/README.md). Other domains should remain self-contained without gaining a local document unless they acquire a distinct workflow or safety boundary.
+当前高风险领域有本地入口：[`assets`](./assets/README.md)、[`blog`](./blog/README.md) 和 [`navigation`](./navigation/README.md)。其他领域保持自包含；只有形成独立流程或安全边界时才增加本地文档。

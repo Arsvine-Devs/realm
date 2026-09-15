@@ -1,7 +1,7 @@
-# Shared layer
+# Shared 层
 
 [`Repository map`](../../INDEX.md) · [`Human documentation catalog`](../../docs/INDEX.md) · [`AI rules`](./AGENTS.md)
 
-`src/shared/` contains stable cross-feature contracts, hooks, server helpers, UI primitives, and configuration. It is a leaf layer: feature-specific algorithms and UI remain in their feature.
+`src/shared/` 包含稳定的跨 feature contract、hook、server helper、UI primitive 和配置。它是叶子层；feature 专属算法和 UI 留在所属 feature。
 
-See [`docs/human/ARCHITECTURE.md`](../../docs/human/ARCHITECTURE.md) for the dependency boundary.
+依赖边界见 [`docs/human/ARCHITECTURE.md`](../../docs/human/ARCHITECTURE.md)。

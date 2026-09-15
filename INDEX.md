@@ -1,34 +1,34 @@
-# Repository map
+# 仓库地图
 
-ARSVINE REALM is a single Next.js App Router application with a feature-oriented source tree and a separate local maintenance toolchain.
+ARSVINE REALM 是一个 Next.js App Router 应用，按 feature 组织源码，并配有独立的本地维护工具链。
 
-## Major areas
+## 主要范围
 
-| Area              | Purpose                                                           | Canonical guidance                                   |
-| ----------------- | ----------------------------------------------------------------- | ---------------------------------------------------- |
-| `src/app/`        | App Router pages, layouts, metadata, route handlers, i18n         | [`src/app/README.md`](./src/app/README.md)           |
-| `src/features/`   | Domain UI, state, server loaders, contracts, and styles           | [`src/features/README.md`](./src/features/README.md) |
-| `src/shared/`     | Stable cross-feature hooks, helpers, UI primitives, and contracts | [`src/shared/README.md`](./src/shared/README.md)     |
-| `content/`        | Bundled blog fallback content                                     | `docs/human/CONTENT_AND_MDX.md`                      |
-| `scripts/`        | Local maintenance, asset, font, image, and database tools         | [`scripts/README.md`](./scripts/README.md)           |
-| `tests/`          | App, feature, shared, repository, operations, and script tests    | [`tests/README.md`](./tests/README.md)               |
-| `.agents/skills/` | Reusable AI workflows for audit, Catalog, and protected content   | `docs/ai/INDEX.md`                                   |
+| 范围              | 责任                                                        | 权威入口                                             |
+| ----------------- | ----------------------------------------------------------- | ---------------------------------------------------- |
+| `src/app/`        | App Router 页面、layout、metadata、Route Handler、i18n      | [`src/app/README.md`](./src/app/README.md)           |
+| `src/features/`   | 领域 UI、状态、server loader、contract 和样式               | [`src/features/README.md`](./src/features/README.md) |
+| `src/shared/`     | 跨 feature 的稳定 hook、helper、UI primitive 和 contract    | [`src/shared/README.md`](./src/shared/README.md)     |
+| `scripts/`        | 本地维护、资产、字体、图像和数据库工具                      | [`scripts/README.md`](./scripts/README.md)           |
+| `tests/`          | app、feature、shared、repository、operations 和 script 测试 | [`tests/README.md`](./tests/README.md)               |
+| `.agents/skills/` | 可复用的审计、Catalog 和 protected content AI 工作流        | `docs/ai/INDEX.md`                                   |
 
-## Entry points
+## 入口
 
-- Human landing page: [`README.md`](./README.md)
-- Human documentation: [`docs/README.md`](./docs/README.md)
-- Human documentation catalog: [`docs/INDEX.md`](./docs/INDEX.md)
-- AI repository rules: [`AGENTS.md`](./AGENTS.md)
-- AI workflow catalog: [`docs/ai/INDEX.md`](./docs/ai/INDEX.md)
+- 人类主页：[`README.md`](./README.md)
+- 人类文档：[`docs/README.md`](./docs/README.md)
+- 人类文档目录：[`docs/INDEX.md`](./docs/INDEX.md)
+- AI 仓库规则：[`AGENTS.md`](./AGENTS.md)
+- AI 工作流目录：[`docs/ai/INDEX.md`](./docs/ai/INDEX.md)
 
-## Important scope guides
+## 重要范围指南
 
-- Feature-specific boundaries: [`assets`](./src/features/assets/README.md), [`blog`](./src/features/blog/README.md), and [`navigation`](./src/features/navigation/README.md)
-- AI workflow implementations: [`realm-maintenance-audit`](./.agents/skills/realm-maintenance-audit/SKILL.md), [`realm-assets-catalog`](./.agents/skills/realm-assets-catalog/SKILL.md), and [`realm-protected-content`](./.agents/skills/realm-protected-content/SKILL.md)
+- Feature 边界：[`assets`](./src/features/assets/README.md)、[`blog`](./src/features/blog/README.md)、[`navigation`](./src/features/navigation/README.md)
+- AI 工作流实现：[`realm-maintenance-audit`](./.agents/skills/realm-maintenance-audit/SKILL.md)、[`realm-assets-catalog`](./.agents/skills/realm-assets-catalog/SKILL.md)、[`realm-protected-content`](./.agents/skills/realm-protected-content/SKILL.md)
 
-## Runtime boundaries
+## 运行时边界
 
-- Vercel uses the standard Next.js App Router output; `server.js` is for local development and optional self-hosting.
-- Public media is resolved through the versioned COS Catalog; generated `dist/` and `cos-workspace/` are local artifacts.
-- Protected blog content is fetched at runtime only after grant verification.
+- Vercel 使用标准 Next.js App Router 输出；`server.js` 只用于本地开发和可选自托管。
+- 公共媒体通过版本化 COS Catalog 解析；生成的 `dist/` 和 `cos-workspace/` 只是本地产物。
+- Blog/Tweet 运行时从 `CONTENT_BASE_URL` 读取已发布 Content release，不再从仓库内 Blog 文件回退读取。
+- Protected blog 正文只在 grant 验证后运行时获取。

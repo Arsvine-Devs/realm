@@ -18,6 +18,7 @@
 ```bash
 pnpm format:check
 pnpm docs:check
+pnpm env:sync
 pnpm maintenance:check
 pnpm lint
 pnpm typecheck
@@ -32,6 +33,8 @@ pnpm check
 pnpm vitest run tests/features/blog/blog-post-state.test.ts
 pnpm vitest run -t "cancels a stale variant actor"
 ```
+
+生产内容读取需要 `CONTENT_BASE_URL`；如果本地环境文件来自旧版本，先运行 `pnpm env:sync`，再按 [`OPERATIONS.md`](./OPERATIONS.md) 补齐 Content/Auth 配置。`env:sync` 会删除已登记的废弃变量，并保留未登记的临时调试键。
 
 ## 目录职责
 
@@ -61,7 +64,7 @@ pnpm vitest run -t "cancels a stale variant actor"
 
 ## 质量原则
 
-- 测试保护当前语义、已观察风险或有信息价值的不确定性；不为完成的迁移保留源码排版测试。
+- 测试保护当前语义、已观察风险或有信息价值的不确定性；不为完成的迁移、旧内容仓库或源码排版保留测试。
 - 自动生成目录、COS workspace、`.next/`、`dist/` 和本地环境文件不进入提交。
 - 不把本地测试结果写成外部发布、生产、跨平台或独立审查结论。
 - 依赖、抽象和流程的保留必须有持续收益；不要为了减少文件数而破坏真实语义边界。

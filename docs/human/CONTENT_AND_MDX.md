@@ -2,7 +2,7 @@
 
 [返回文档索引](../INDEX.md)
 
-本文说明结构化站点数据、已发布 Content release、MDX 组件、内容 locale、阅读时间和 fallback 行为。受保护内容的认证细节见 [`SECURITY.md`](./SECURITY.md)。
+本文说明结构化站点数据、已发布 Content release、MDX 组件、内容 locale、阅读时间和 locale fallback。受保护内容的认证细节见 [`SECURITY.md`](./SECURITY.md)。
 
 ## 内容来源
 
@@ -11,14 +11,7 @@
 1. 仓库内 TypeScript 数据：作品、经历、Life、技能、友链和站点配置。
 2. `content.arsvine.com` 发布读面：博客索引、已发布 MDX variant 和推文归档。
 
-Content release 不可用时：
-
-- 公开内容请求按 Content client 的错误边界失败；
-- 不得在生产运行时恢复 GitHub 内容读取；
-- 本地开发和测试同样通过 `CONTENT_BASE_URL` 访问 Content service；测试中的 fixture 在对应测试边界内提供。
-- 开发环境可用 `TWEETS_STRESS_TEST=1` 生成合成归档。
-
-Realm 运行时只读取已发布 Content release；文章源文件的导入由 Platform 的一次性迁移工具负责。
+Realm 运行时只读取已发布 Content release。Content release 不可用时，Blog 读取按 Content client 错误边界失败，Tweet loader 只保留仍可读取的月度数据；不会恢复 GitHub 或仓库内文件读取。测试通过对应边界的 fixture 提供数据，开发环境可用 `TWEETS_STRESS_TEST=1` 生成合成归档。
 
 ## 结构化数据
 
@@ -36,34 +29,14 @@ src/shared/config/site.ts
 一般采用：
 
 ```text
-index.ts   zh-CN 和 fallback
+index.ts   zh-CN 和 locale fallback
 zh-TW.ts
 en.ts
 ```
 
 `src/app/i18n/data.ts` 使用显式静态注册表。不要改成动态 `require()`。
 
-## 一次性内容导入格式
-
-以下结构仅是一次性内容导入工具的输入格式，不是 Realm 运行时或回退协议。导入完成后，独立内容仓库不再是站点的运行时依赖。
-
-```text
-blog-index.json
-blog/<slug>/
-  zh-CN.mdx
-  zh-TW.mdx
-  en.mdx
-  ja.mdx
-  ru.mdx
-  fr.mdx
-tweets/
-  index.json
-  YYYY-MM.json
-```
-
-UI locale 只有 `zh-CN`、`zh-TW`、`en`。博客额外允许 `ja`、`ru`、`fr` 作为 content-only locale，它们只切换文章正文，不改变 UI 语言。
-
-## blog-index.json
+## Content release index
 
 索引是列表与受保护 metadata 的权威来源。单篇结构：
 
@@ -103,22 +76,7 @@ UI locale 只有 `zh-CN`、`zh-TW`、`en`。博客额外允许 `ja`、`ru`、`fr
 - 加载正文后会根据实际正文重新计算阅读时间。
 - protected post 的公开 metadata 会清空 excerpt、tags 和 reading time。
 
-## MDX frontmatter
-
-内置文章可以包含：
-
-```mdx
----
-title: '标题'
-date: '2026-07-14'
-excerpt: '摘要'
-tags: []
-pinned: false
-originLocale: zh-CN
----
-```
-
-外部内容的展示 metadata 主要来自 `blog-index.json`；不要依赖正文 frontmatter 覆盖索引中的 title、access 或列表字段。
+发布 variant 的正文以 Content release 中的 `bodyMdx` 字段为准。展示 metadata 来自 release index 和 variant descriptor；Realm 不把本地 MDX frontmatter 作为运行时输入。
 
 ## 自定义 MDX 组件
 
@@ -189,14 +147,14 @@ protected body 不得进入静态 props、HTML 或 RSC payload。页面初始只
 
 ## 推文归档
 
-`tweets/index.json` 指向每月 JSON 文件；loader 会：
+Realm 通过 Content service 的 `/v1/tweets/months` 和 `/v1/tweets/months/:month` 读取月度归档；loader 会：
 
 - 读取并排序月份；
 - 过滤不可见记录；
 - 对单月读取失败进行容错；
 - 通过 `/api/tweet-months?offset=&limit=` 分页返回月份组。
 
-新仓库中没有 `tweets/index.json` 时按“暂无推文”处理，而不是让整个页面失败。
+索引或单月读取失败时保留可用月份；没有可用数据时页面显示空状态。
 
 ## 发布内容后的刷新
 
@@ -206,7 +164,7 @@ Content/API 和资产发布脚本向 `POST /api/internal/revalidate` 发送带�
 
 ## 修改检查清单
 
-- 索引 locale 与实际 MDX 文件一致。
+- release index 的 locale 与可读取 variant 一致。
 - 每个 variant 有 title 和 excerpt。
 - `originLocale` 只使用 UI locale 合约允许的值。
 - protected metadata 不泄漏摘要、tag 或 reading time。
