@@ -18,6 +18,7 @@ ARSVINE REALM 是一个 Next.js App Router 应用，按 feature 组织源码，�
 - 人类主页：[`README.md`](./README.md)
 - 人类文档：[`docs/README.md`](./docs/README.md)
 - 人类文档目录：[`docs/INDEX.md`](./docs/INDEX.md)
+- 全网站架构拓扑：[`docs/architecture/SYSTEM_MAP.md`](./docs/architecture/SYSTEM_MAP.md)
 - AI 仓库规则：[`AGENTS.md`](./AGENTS.md)
 - AI 工作流目录：[`docs/ai/INDEX.md`](./docs/ai/INDEX.md)
 
@@ -30,5 +31,5 @@ ARSVINE REALM 是一个 Next.js App Router 应用，按 feature 组织源码，�
 
 - Vercel 使用标准 Next.js App Router 输出；`server.js` 只用于本地开发和可选自托管。
 - 公共媒体通过版本化 COS Catalog 解析；生成的 `dist/` 和 `cos-workspace/` 只是本地产物。
-- Blog/Tweet 运行时从 `CONTENT_BASE_URL` 读取已发布 Content release，不再从仓库内 Blog 文件回退读取。
+- Blog/Tweet 运行时通过 `CONTENT_BASE_URL` 读取已发布 Content release。
 - Protected blog 正文只在 grant 验证后运行时获取。

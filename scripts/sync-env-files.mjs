@@ -1,6 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { ALLOWED_KEYS, RETIRED_KEYS, SECTIONS } from './lib/env-registry.mjs';
 
 const DEFAULT_LOCAL_PATH = path.join(process.cwd(), '.env.local');
 const DEFAULT_EXAMPLE_PATH = path.join(process.cwd(), '.env.example');
@@ -38,18 +37,23 @@ async function safeRead(filePath) {
   }
 }
 
+async function readContract() {
+  const filePath = path.join(process.cwd(), 'config', 'env-contracts.json');
+  const contract = JSON.parse(await readFile(filePath, 'utf-8'));
+  if (contract.version !== 1 || !Array.isArray(contract.entries)) {
+    throw new Error('config/env-contracts.json must contain version 1 and entries');
+  }
+  return contract;
+}
+
 function parseEnv(content) {
   const values = new Map();
   for (const rawLine of content.split(/\r?\n/)) {
     const line = rawLine.trim();
-    if (!line || line.startsWith('#')) {
-      continue;
-    }
+    if (!line || line.startsWith('#')) continue;
 
     const separatorIndex = line.indexOf('=');
-    if (separatorIndex === -1) {
-      continue;
-    }
+    if (separatorIndex === -1) continue;
 
     const key = line.slice(0, separatorIndex).trim();
     const value = line.slice(separatorIndex + 1);
@@ -58,105 +62,82 @@ function parseEnv(content) {
   return values;
 }
 
-function renderSectionHeader(title) {
-  return [`# ${title}`];
-}
-
-function renderComments(comments) {
-  return comments.map((comment) => `# ${comment}`);
-}
-
-function renderExampleFile() {
-  const lines = [];
-  for (const section of SECTIONS) {
-    if (lines.length > 0) {
-      lines.push('');
+function groupEntries(entries) {
+  const sections = [];
+  const byTitle = new Map();
+  for (const entry of entries) {
+    let section = byTitle.get(entry.section);
+    if (!section) {
+      section = { title: entry.section, entries: [] };
+      byTitle.set(entry.section, section);
+      sections.push(section);
     }
+    section.entries.push(entry);
+  }
+  return sections;
+}
 
-    lines.push(...renderSectionHeader(section.title));
+function renderComments(entry) {
+  const lines = [`# ${entry.description}`, `# Format: ${entry.format}`];
+  if (entry.secret) lines.push('# Secret: keep this value in an untracked environment file.');
+  if (entry.scopes?.length) lines.push(`# Scope: ${entry.scopes.join(', ')}`);
+  return lines;
+}
+
+function renderExampleFile(entries) {
+  const lines = [];
+  for (const section of groupEntries(entries.filter((entry) => entry.exampleFiles.length > 0))) {
+    if (lines.length > 0) lines.push('');
+    lines.push(`# ${section.title}`);
     for (const entry of section.entries) {
-      lines.push(...renderComments(entry.comments));
-      const value = entry.exampleValue ?? entry.localDefault ?? '';
+      lines.push(...renderComments(entry));
+      const value = entry.example ?? '';
       const line = `${entry.key}=${value}`;
-      lines.push(entry.commentOutInExample ? `# ${line}` : line);
+      lines.push(entry.commented ? `# ${line}` : line);
     }
   }
-
   return `${lines.join('\n')}\n`;
 }
 
-function renderLocalFile(currentValues) {
-  const managedKeys = new Set();
+function renderLocalFile(entries, currentValues) {
   const lines = [];
-  for (const section of SECTIONS) {
-    if (lines.length > 0) {
-      lines.push('');
-    }
-
-    lines.push(...renderSectionHeader(section.title));
+  for (const section of groupEntries(entries)) {
+    if (lines.length > 0) lines.push('');
+    lines.push(`# ${section.title}`);
     for (const entry of section.entries) {
-      managedKeys.add(entry.key);
       const value = currentValues.has(entry.key)
         ? currentValues.get(entry.key)
-        : entry.localDefault;
-      lines.push(`${entry.key}=${value ?? ''}`);
+        : (entry.localDefault ?? '');
+      lines.push(`${entry.key}=${value}`);
     }
   }
-
-  // 保留 .env.local 中不在注册表的未知键（开发者临时调试 env），避免静默清除
-  const unmanagedKeys = [...currentValues.keys()]
-    .filter((key) => !managedKeys.has(key) && !RETIRED_KEYS.has(key))
-    .sort();
-  if (unmanagedKeys.length > 0) {
-    lines.push('');
-    lines.push('# (unmanaged) keys below are not in the env registry; kept as-is');
-    for (const key of unmanagedKeys) {
-      lines.push(`${key}=${currentValues.get(key)}`);
-    }
-  }
-
   return `${lines.join('\n')}\n`;
 }
 
-function collectSummary(currentValues) {
-  const currentKeys = new Set(currentValues.keys());
-  const kept = [];
-  const added = [];
-
-  for (const section of SECTIONS) {
-    for (const entry of section.entries) {
-      if (currentKeys.has(entry.key)) {
-        kept.push(entry.key);
-      } else {
-        added.push(entry.key);
-      }
-    }
-  }
-
-  const retired = [...currentKeys].filter((key) => RETIRED_KEYS.has(key)).sort();
-  const unmanaged = [...currentKeys]
-    .filter((key) => !ALLOWED_KEYS.has(key) && !RETIRED_KEYS.has(key))
-    .sort();
-  return { kept, added, retired, unmanaged };
+function collectSummary(entries, currentValues) {
+  const registered = new Set(entries.map((entry) => entry.key));
+  const removed = [...currentValues.keys()].filter((key) => !registered.has(key)).sort();
+  const kept = [...currentValues.keys()].filter((key) => registered.has(key)).sort();
+  const added = entries.filter((entry) => !currentValues.has(entry.key)).map((entry) => entry.key);
+  return { added, kept, removed };
 }
 
 function printSummary(summary) {
   const render = (label, keys) => `${label}: ${keys.length ? keys.join(', ') : '(none)'}`;
-  console.log(render('retired keys (removed)', summary.retired));
-  console.log(render('unmanaged keys (kept)', summary.unmanaged));
+  console.log(render('removed unregistered keys', summary.removed));
   console.log(render('added keys', summary.added));
   console.log(render('kept keys', summary.kept));
 }
 
 async function main() {
   const options = parseArgs(process.argv);
+  const contract = await readContract();
   const localContent = await safeRead(options.localPath);
   const currentValues = parseEnv(localContent);
-  const summary = collectSummary(currentValues);
+  const summary = collectSummary(contract.entries, currentValues);
 
-  await writeFile(options.examplePath, renderExampleFile(), 'utf-8');
-  await writeFile(options.localPath, renderLocalFile(currentValues), 'utf-8');
-
+  await writeFile(options.examplePath, renderExampleFile(contract.entries), 'utf-8');
+  await writeFile(options.localPath, renderLocalFile(contract.entries, currentValues), 'utf-8');
   printSummary(summary);
 }
 

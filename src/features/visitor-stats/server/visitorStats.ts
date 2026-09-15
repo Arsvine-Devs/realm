@@ -1,6 +1,7 @@
 import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
 import { neon, type NeonQueryFunction } from '@neondatabase/serverless';
 
+import { readEnv } from '@/shared/config/env-provider';
 import { getSiteUrl } from '@/shared/config/site';
 import { enforceRateLimit } from '@/shared/lib/content/rate-limit';
 import { getClientAddress, jsonResponse, parseCookieHeader } from '@/shared/server/http';
@@ -22,12 +23,12 @@ let sqlClient: VisitorStatsSql | null = null;
 let sqlConnectionString = '';
 
 function getVisitorStatsSecret(): string | null {
-  const secret = process.env.VISITOR_STATS_SECRET?.trim();
+  const secret = readEnv('VISITOR_STATS_SECRET');
   return secret || null;
 }
 
 function getDatabaseUrl(): string | null {
-  const databaseUrl = process.env.DATABASE_URL?.trim();
+  const databaseUrl = readEnv('DATABASE_URL');
   return databaseUrl || null;
 }
 

@@ -15,6 +15,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "docs:check": "node scripts/check-doc-links.mjs",
+    "envctl": "node scripts/env.mjs",
+    "env:check": "node scripts/check-env-contract.mjs",
     "assets:prepare-legacy": "node scripts/assets/prepare-legacy.mjs",
     "assets:build": "node scripts/assets/build.mjs",
     "assets:publish": "node scripts/assets/publish.mjs",
@@ -22,7 +24,7 @@
     "db:seed:visitor-stats": "node scripts/visitor-stats-seed.mjs",
     "env:sync": "node scripts/sync-env-files.mjs",
     "maintenance:check": "node scripts/fetch-google-fonts.mjs --check-config && pnpm docs:check",
-    "check": "pnpm format:check && pnpm maintenance:check && pnpm lint && pnpm typecheck && pnpm quality && pnpm test && pnpm build"
+    "check": "pnpm format:check && pnpm maintenance:check && pnpm env:check && pnpm lint && pnpm typecheck && pnpm quality && pnpm test && pnpm build"
   },
   "prettier": "./config/prettier.json",
   "keywords": [],

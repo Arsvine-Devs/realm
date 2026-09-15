@@ -5,16 +5,17 @@ import type {
   TweetMonthGroup,
   TweetMonthGroupsPage,
 } from '../model/types';
+import { readEnv } from '@/shared/config/env-provider';
 import {
   fetchPublishedTweetIndex,
   fetchPublishedTweetMonth,
 } from '@/shared/lib/content/content-api';
 
-const STRESS_TEST_ENABLED = process.env.TWEETS_STRESS_TEST === '1';
-const STRESS_TEST_YEARS = parsePositiveInt(process.env.TWEETS_STRESS_YEARS, 6);
-const STRESS_TEST_MONTHS_PER_YEAR = parsePositiveInt(process.env.TWEETS_STRESS_MONTHS_PER_YEAR, 12);
+const STRESS_TEST_ENABLED = readEnv('TWEETS_STRESS_TEST') === '1';
+const STRESS_TEST_YEARS = parsePositiveInt(readEnv('TWEETS_STRESS_YEARS'), 6);
+const STRESS_TEST_MONTHS_PER_YEAR = parsePositiveInt(readEnv('TWEETS_STRESS_MONTHS_PER_YEAR'), 12);
 const STRESS_TEST_TWEETS_PER_MONTH = parsePositiveInt(
-  process.env.TWEETS_STRESS_TWEETS_PER_MONTH,
+  readEnv('TWEETS_STRESS_TWEETS_PER_MONTH'),
   24,
 );
 

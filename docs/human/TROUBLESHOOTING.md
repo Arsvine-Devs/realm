@@ -243,16 +243,15 @@ $env:NEXT_BUILD_DIR='.next-diagnostic'; pnpm build
 
 唯一接口是 `POST /api/internal/revalidate`。发布方必须发送 `X-Arsvine-Timestamp`、`X-Arsvine-Signature` 和原始 JSON body；它不接受 query secret。
 
-## `pnpm env:sync` 后出现未知键
+## `pnpm env:sync` 后配置缺失
 
-脚本会保留未注册键到 `(unmanaged)` 区域，防止删除开发者临时配置。检查它是否为：
+同步脚本只保留环境契约登记的键。若某个配置消失，先检查它是否为：
 
-- 合法临时变量；
-- 已删除变量；
-- 拼写错误；
-- 本应加入注册表的新配置。
+- 仍由当前源码或脚本消费的变量；
+- 拼写正确且已加入 `config/env-contracts.json`；
+- 应登记为 source-only 的本地发布/测试输入。
 
-修正后再次运行并检查 Git diff。
+通过 `pnpm envctl register ...` 登记新变量后再次运行 `pnpm env:sync`，并检查 Git diff。
 
 ## 何时升级为回归说明
 

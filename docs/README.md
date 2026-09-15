@@ -12,6 +12,7 @@ AI editing rules for this directory live in [`AGENTS.md`](./AGENTS.md).
 - 修改代码或测试：[`human/MAINTAINER.md`](./human/MAINTAINER.md)
 - 理解系统边界：[`human/ARCHITECTURE.md`](./human/ARCHITECTURE.md)
 - 发布或维护资产：[`human/OPERATIONS.md`](./human/OPERATIONS.md) 与 [`human/ASSETS.md`](./human/ASSETS.md)
+- 配置环境变量：[`human/CONFIGURATION.md`](./human/CONFIGURATION.md)
 - 排查故障：[`human/TROUBLESHOOTING.md`](./human/TROUBLESHOOTING.md)
 
 ## Audience and language

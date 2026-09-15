@@ -1,5 +1,6 @@
 import { createHmac } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
+import { readEnv } from '@/shared/config/env-provider';
 import { locales } from '@/shared/contracts/locale';
 import { getAssetRevalidationPaths as getPortfolioPaths } from '@/features/portfolio/contracts/data';
 import { getAssetRevalidationPaths as getLifePaths } from '@/features/life/contracts/data';
@@ -22,7 +23,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function readSecret() {
-  return process.env.REVALIDATE_WEBHOOK_SECRET?.trim() ?? '';
+  return readEnv('REVALIDATE_WEBHOOK_SECRET') ?? '';
 }
 
 function readTimestamp(value: string | null) {

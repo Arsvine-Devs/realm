@@ -1,4 +1,5 @@
 import { Redis } from '@upstash/redis';
+import { readEnv } from '@/shared/config/env-provider';
 
 /**
  * 滑动 / 固定窗口内对 (key, limit, windowMs) 进行计数，达到 limit 后阻断后续请求。
@@ -26,8 +27,8 @@ const buckets = new Map<string, Bucket>();
 const LOCAL_CLEANUP_INTERVAL_MS = 60_000;
 let nextLocalCleanupAt = 0;
 
-const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL?.trim();
-const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
+const REDIS_URL = readEnv('UPSTASH_REDIS_REST_URL');
+const REDIS_TOKEN = readEnv('UPSTASH_REDIS_REST_TOKEN');
 
 let redisClient: Redis | null = null;
 function getRedis(): Redis | null {

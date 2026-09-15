@@ -31,7 +31,7 @@
 - 运行时受 TOTP 保护的文章；未授权静态输出不包含 protected body。
 - 使用不可变 hash 对象和 pointer-last 发布的腾讯 COS 媒体 Catalog。
 
-Blog 与 Tweet 的运行时内容来自 `content.arsvine.com` 的已发布 release；站点不再把仓库内的旧 Blog 文件作为运行时来源。
+Blog 与 Tweet 的运行时内容统一来自 `content.arsvine.com` 的已发布 release。
 
 ## 技术栈
 
@@ -51,7 +51,7 @@ PowerShell 也可以从模板开始：
 Copy-Item .env.example .env.local
 ```
 
-打开 `http://localhost:3000`。完整环境变量说明见 [`docs/human/OPERATIONS.md`](./docs/human/OPERATIONS.md)。
+打开 `http://localhost:3000`。完整环境变量说明见 [`docs/human/CONFIGURATION.md`](./docs/human/CONFIGURATION.md)。
 
 ## 继续阅读
 

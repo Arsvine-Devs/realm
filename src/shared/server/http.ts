@@ -1,4 +1,5 @@
 import { timingSafeEqual } from 'node:crypto';
+import { readEnv } from '@/shared/config/env-provider';
 
 const JSON_CONTENT_TYPE = 'application/json; charset=utf-8';
 
@@ -44,7 +45,7 @@ export function secureStringEqual(left: string, right: string) {
 }
 
 function isProxyTrusted() {
-  const configured = process.env.TRUST_PROXY?.trim().toLowerCase();
+  const configured = readEnv('TRUST_PROXY')?.toLowerCase();
   if (configured) {
     return configured === '1' || configured === 'true' || configured === 'yes';
   }

@@ -34,7 +34,7 @@ pnpm vitest run tests/features/blog/blog-post-state.test.ts
 pnpm vitest run -t "cancels a stale variant actor"
 ```
 
-生产内容读取需要 `CONTENT_BASE_URL`；如果本地环境文件来自旧版本，先运行 `pnpm env:sync`，再按 [`OPERATIONS.md`](./OPERATIONS.md) 补齐 Content/Auth 配置。`env:sync` 会删除已登记的废弃变量，并保留未登记的临时调试键。
+生产内容读取需要 `CONTENT_BASE_URL`；先按 [`CONFIGURATION.md`](./CONFIGURATION.md) 填写，再运行 `pnpm env:check`。`pnpm env:sync` 以登记契约为准重建本地键集合，并清理未登记键。
 
 ## 目录职责
 

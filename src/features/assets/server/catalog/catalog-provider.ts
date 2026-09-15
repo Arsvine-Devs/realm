@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import COS from 'cos-nodejs-sdk-v5';
+import { readEnv } from '@/shared/config/env-provider';
 import { parseCatalogSection } from './catalog-validator';
 
 const PROJECT_NAMESPACE = 'realm';
@@ -92,7 +93,7 @@ function readJson<T>(raw: string): T {
   return JSON.parse(raw) as T;
 }
 
-function normalizePrefix(prefix = process.env.COS_PRIVATE_CATALOG_PREFIX || '') {
+function normalizePrefix(prefix = readEnv('COS_PRIVATE_CATALOG_PREFIX') || '') {
   return prefix.replace(/^\/+|\/+$/g, '');
 }
 
@@ -102,8 +103,8 @@ function buildCatalogKey(relativeKey: string) {
 }
 
 function getCosClient() {
-  const secretId = process.env.COS_SECRET_ID;
-  const secretKey = process.env.COS_SECRET_KEY;
+  const secretId = readEnv('COS_SECRET_ID');
+  const secretKey = readEnv('COS_SECRET_KEY');
   if (!secretId || !secretKey) {
     return null;
   }
@@ -115,8 +116,8 @@ function getCosClient() {
 }
 
 async function readCosObjectText(key: string) {
-  const bucket = process.env.COS_PRIVATE_BUCKET;
-  const region = process.env.COS_PRIVATE_REGION;
+  const bucket = readEnv('COS_PRIVATE_BUCKET');
+  const region = readEnv('COS_PRIVATE_REGION');
   const client = getCosClient();
   if (!bucket || !region || !client) {
     return null;
@@ -145,8 +146,8 @@ async function readCosObjectText(key: string) {
 
 async function readLocalObjectText(key: string) {
   const localRoot =
-    process.env.NODE_ENV === 'test' && process.env.COS_PRIVATE_LOCAL_ROOT
-      ? process.env.COS_PRIVATE_LOCAL_ROOT
+    process.env.NODE_ENV === 'test' && readEnv('COS_PRIVATE_LOCAL_ROOT')
+      ? readEnv('COS_PRIVATE_LOCAL_ROOT')!
       : DEFAULT_PRIVATE_ROOT;
   const fullPath = path.join(/* turbopackIgnore: true */ localRoot, ...key.split('/'));
   return readFile(fullPath, 'utf-8');
@@ -340,7 +341,7 @@ export async function getAudioAssets() {
 }
 
 export async function getStaticCatalogAssets(): Promise<Record<string, PublicCatalogStaticAsset>> {
-  if (!process.env.COS_PRIVATE_BUCKET || !process.env.COS_PRIVATE_REGION || !getCosClient()) {
+  if (!readEnv('COS_PRIVATE_BUCKET') || !readEnv('COS_PRIVATE_REGION') || !getCosClient()) {
     return {};
   }
 

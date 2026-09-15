@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { readEnv } from '@/shared/config/env-provider';
 
 const ACCESS_COOKIE_NAME = 'arsvine_post_access';
 const ACCESS_GRANT_TTL_MS = 60 * 60 * 1000;
@@ -10,7 +11,7 @@ type AccessGrantPayload = {
 };
 
 function getSecret() {
-  const secret = process.env.ACCESS_GRANT_SECRET?.trim();
+  const secret = readEnv('ACCESS_GRANT_SECRET');
   if (!secret) {
     throw new Error('Missing ACCESS_GRANT_SECRET');
   }

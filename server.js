@@ -1,18 +1,14 @@
 const environment = process.env.NODE_ENV === 'production' ? 'production' : 'development';
-require('dotenv').config({
-  path: [`.env.${environment}.local`, '.env.local', `.env.${environment}`, '.env'],
-});
 
 const { createServer } = require('http');
-const next = require('next');
-
-const dev = process.env.NODE_ENV !== 'production';
-const app = next({
-  dev,
-});
-const handle = app.getRequestHandler();
 
 async function main() {
+  const { loadProjectEnv, readEnv } = await import('./scripts/lib/env-provider.mjs');
+  loadProjectEnv({ mode: environment });
+
+  const next = require('next');
+  const app = next({ dev: environment !== 'production' });
+  const handle = app.getRequestHandler();
   await app.prepare();
 
   const httpServer = createServer(async (req, res) => {
@@ -32,7 +28,7 @@ async function main() {
   process.on('SIGINT', () => gracefulShutdown('SIGINT'));
   process.on('SIGHUP', () => gracefulShutdown('SIGHUP'));
 
-  const port = process.env.PORT || 3000;
+  const port = readEnv('PORT') || 3000;
   httpServer
     .listen(port, () => {
       console.log(`> Ready on http://localhost:${port}`);

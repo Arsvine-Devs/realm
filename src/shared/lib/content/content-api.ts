@@ -1,4 +1,5 @@
 import type { ContentBlogIndex, ContentTweetIndexItem } from './types';
+import { readEnv } from '@/shared/config/env-provider';
 
 const FETCH_TIMEOUT_MS = 8000;
 const PUBLIC_CONTENT_REVALIDATE_SECONDS = 300;
@@ -26,7 +27,7 @@ class ContentServiceError extends Error {
 const AUTH_TOKEN_PATH = '/api/auth/oauth2/token';
 
 function getBaseUrl() {
-  const value = process.env.CONTENT_BASE_URL?.trim();
+  const value = readEnv('CONTENT_BASE_URL');
   if (!value) throw new ContentServiceError('Content service is not configured.');
   let url: URL;
   try {
@@ -41,9 +42,9 @@ function getBaseUrl() {
 }
 
 function getProtectedContentAuthConfig() {
-  const issuer = process.env.AUTH_ISSUER?.trim();
-  const clientId = process.env.CONTENT_SERVICE_CLIENT_ID?.trim();
-  const clientSecret = process.env.CONTENT_SERVICE_CLIENT_SECRET?.trim();
+  const issuer = readEnv('AUTH_ISSUER');
+  const clientId = readEnv('CONTENT_SERVICE_CLIENT_ID');
+  const clientSecret = readEnv('CONTENT_SERVICE_CLIENT_SECRET');
   if (!issuer) {
     throw new ContentServiceError('AUTH_ISSUER is not configured.');
   }

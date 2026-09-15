@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { readEnv } from '@/shared/config/env-provider';
 import type { TotpGroupConfig } from './types';
 
 const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
@@ -70,7 +71,7 @@ export function verifyTotp(opts: {
 }
 
 export function getTotpGroups() {
-  const raw = process.env.TOTP_GROUPS_JSON?.trim();
+  const raw = readEnv('TOTP_GROUPS_JSON');
   if (!raw) return {};
 
   let parsed: unknown;

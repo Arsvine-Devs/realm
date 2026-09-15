@@ -1,5 +1,5 @@
 import { neon } from '@neondatabase/serverless';
-import { loadProjectEnv } from './lib/load-env.mjs';
+import { loadProjectEnv, readEnv } from './lib/env-provider.mjs';
 
 loadProjectEnv();
 
@@ -23,7 +23,7 @@ if (!rawTotal || !Number.isSafeInteger(total) || total < 0) {
   process.exit(1);
 }
 
-const databaseUrl = process.env.DATABASE_URL?.trim();
+const databaseUrl = readEnv('DATABASE_URL');
 if (!databaseUrl) {
   console.error('[visitor-stats] DATABASE_URL is required');
   process.exit(1);

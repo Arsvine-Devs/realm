@@ -1,5 +1,7 @@
+import { readEnv } from '@/shared/config/env-provider';
+
 export function GET() {
-  const missing = ['CONTENT_BASE_URL'].filter((key) => !process.env[key]?.trim());
+  const missing = ['CONTENT_BASE_URL'].filter((key) => !readEnv(key));
   if (missing.length > 0) {
     return Response.json(
       {

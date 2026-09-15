@@ -4,6 +4,10 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadProjectEnv, readEnv, requiredEnv } from '../lib/env-provider.mjs';
+
+loadProjectEnv();
+
 const args = new Set(process.argv.slice(2));
 const dryRun = args.has('--dry-run');
 const forceFull = args.has('--force-full');
@@ -11,12 +15,10 @@ const rollbackIndex = process.argv.indexOf('--rollback');
 const rollbackVersion = rollbackIndex >= 0 ? process.argv[rollbackIndex + 1] : '';
 const root = process.cwd();
 const coscli =
-  process.env.COSCLI_PATH || path.join(root, 'cos-workspace', 'coscli-windows-amd64.exe');
+  readEnv('COSCLI_PATH') || path.join(root, 'cos-workspace', 'coscli-windows-amd64.exe');
 
 function required(name) {
-  const value = process.env[name]?.trim();
-  if (!value) throw new Error(`Missing required environment variable: ${name}`);
-  return value;
+  return requiredEnv(name);
 }
 
 export function redactCliSecrets(message) {
@@ -37,7 +39,8 @@ function clientArgs(region) {
     '-k',
     required('COS_SECRET_KEY'),
   ];
-  if (process.env.COS_SESSION_TOKEN) values.push('--token', process.env.COS_SESSION_TOKEN);
+  const sessionToken = readEnv('COS_SESSION_TOKEN');
+  if (sessionToken) values.push('--token', sessionToken);
   return values;
 }
 

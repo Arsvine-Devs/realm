@@ -1,11 +1,11 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { neon } from '@neondatabase/serverless';
-import { loadProjectEnv } from './lib/load-env.mjs';
+import { loadProjectEnv, readEnv } from './lib/env-provider.mjs';
 
 loadProjectEnv();
 
-const databaseUrl = process.env.DATABASE_URL?.trim();
+const databaseUrl = readEnv('DATABASE_URL');
 if (!databaseUrl) {
   console.error('[visitor-stats] DATABASE_URL is required');
   process.exit(1);

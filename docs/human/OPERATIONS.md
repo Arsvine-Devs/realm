@@ -63,7 +63,7 @@ GET /api/health/live   # 进程可响应
 GET /api/health/ready  # Realm 进程和必要的当前运行配置可接收请求
 ```
 
-`ready` 不等于 Content release、COS、Neon 或 Upstash 的完整业务验收；生产内容读取必须通过 `CONTENT_BASE_URL` 指向的 Content service。Realm 生产不再使用 GitHub 内容 Token。
+`ready` 不等于 Content release、COS、Neon 或 Upstash 的完整业务验收；生产内容读取通过 `CONTENT_BASE_URL` 指向的 Content service 完成。
 
 ## 生产配置
 
@@ -82,23 +82,18 @@ AUTH_ISSUER=https://auth.arsvine.com
 
 ## Realm 环境变量目录
 
-`.env.example` 和 `scripts/lib/env-registry.mjs` 是变量名称、默认值和示例的机器可读来源。下表只说明责任和使用条件：
+完整的变量用途、填写格式、secret 可见性、作用域、消费者和失败行为见 [`CONFIGURATION.md`](./CONFIGURATION.md)。机器契约是 [`config/env-contracts.json`](../../config/env-contracts.json)，由 `pnpm env:check` 校验。
 
-| 分组         | 变量                                                                                                                                                                                                  | 条件与消费者                                                                              |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| 基础         | `PORT`、`NEXT_PUBLIC_SITE_URL`                                                                                                                                                                        | 启动端口与 canonical site metadata；站点 URL 应与生产域名一致。                           |
-| Content 读取 | `CONTENT_BASE_URL`                                                                                                                                                                                    | Blog/Tweet published release 的唯一运行时来源；构建和服务端读取需要。                     |
-| 受保护内容   | `AUTH_ISSUER`、`CONTENT_SERVICE_CLIENT_ID`、`CONTENT_SERVICE_CLIENT_SECRET`                                                                                                                           | Realm 服务端向 Auth 请求 `content:protected:read` token；只在 protected body 读取时需要。 |
-| 受保护访问   | `ACCESS_GRANT_SECRET`、`TOTP_GROUPS_JSON`、`REVALIDATE_WEBHOOK_SECRET`                                                                                                                                | 本地 grant/TOTP、服务间发布刷新签名；不得进入浏览器。                                     |
-| 访问保护     | `TRUST_PROXY`、`UPSTASH_REDIS_REST_URL`、`UPSTASH_REDIS_REST_TOKEN`                                                                                                                                   | 可信代理 client IP 与多实例限流；Redis 缺失/失败时使用明确的本地 fail-open 限流策略。     |
-| 访客统计     | `DATABASE_URL`、`VISITOR_STATS_SECRET`                                                                                                                                                                | canonical production host 的去重统计；其他 host 不写入。                                  |
-| 资产运行时   | `COS_PRIVATE_BUCKET`、`COS_PRIVATE_REGION`、`COS_SECRET_ID`、`COS_SECRET_KEY`、`COS_PRIVATE_CATALOG_PREFIX`                                                                                           | server-only private Catalog 读取；不向客户端暴露。                                        |
-| 资产发布     | `COS_PUBLIC_BUCKET`、`COS_PUBLIC_REGION`、`COS_SESSION_TOKEN`、`COSCLI_PATH`                                                                                                                          | `scripts/assets/publish.mjs` 的临时发布输入；发布前使用 dry-run。                         |
-| 开发与质量   | `NEXT_PUBLIC_CDN_BASE`、`NEXT_PUBLIC_TELEMETRY_PROVIDER`、`TWEETS_STRESS_TEST`、`TWEETS_STRESS_YEARS`、`TWEETS_STRESS_MONTHS_PER_YEAR`、`TWEETS_STRESS_TWEETS_PER_MONTH`、`ANALYZE`、`NEXT_BUILD_DIR` | CDN/可选 telemetry、合成 Tweet 压测和本地构建选项；不作为生产 secret。                    |
+常用命令：
 
-2026-09-15 通过 Vercel CLI 从 Realm 项目全部环境清除了无代码消费者的 Neon provider 别名：`DATABASE_URL_UNPOOLED`、`NEON_AUTH_BASE_URL`、`NEON_PROJECT_ID`、`PGDATABASE`、`PGHOST`、`PGHOST_UNPOOLED`、`PGPASSWORD`、`PGUSER`、`POSTGRES_DATABASE`、`POSTGRES_HOST`、`POSTGRES_PASSWORD`、`POSTGRES_PRISMA_URL`、`POSTGRES_URL`、`POSTGRES_URL_NO_SSL`、`POSTGRES_URL_NON_POOLING`、`POSTGRES_USER`、`VITE_NEON_AUTH_URL`。它们没有被 Realm 代码读取；`DATABASE_URL` 是保留下来的 visitor statistics 连接变量。
+```bash
+pnpm envctl stats
+pnpm envctl query --key CONTENT_BASE_URL
+pnpm env:sync
+pnpm env:check
+```
 
-本地 `.env.local` 是未跟踪文件。更新旧环境时运行 `pnpm env:sync`；脚本会删除已登记的 GitHub、旧 Content auth、旧 revalidation 和旧 asset 变量，同时保留不在注册表中的临时调试键。不要使用会覆盖整份本地文件的命令来代替这一步。
+`.env.local` 是未跟踪文件。`pnpm env:sync` 按环境契约重建 `.env.example` 和本地键集合，保留已登记值、填入登记的默认值，并清理未登记键；source-only 的资产发布/测试输入只在本地文件中维护，不进入示例文件。Vercel 项目使用同名变量和对应 scope，真实 secret 不进入仓库。
 
 ## 发布前检查
 

@@ -1,44 +1,185 @@
 # 外部供应商与替换边界
 
-[返回文档组](./README.md) · [全系统地图](./SYSTEM_MAP.md)
+[返回文档组](./README.md)
 
-本文只记录当前核心系统确实依赖的托管、存储、身份、CDN/DNS 或外部 API 责任。普通框架和 npm/pnpm 依赖不作为供应商清单。控制台读数和公开探针都有时间性，需按 `CLAIMED`/`LIVE` 标签理解。
+本文只列出承担托管、存储、身份、调度、CDN/DNS 或外部 API 责任的供应商。普通框架和 npm/pnpm 依赖不作为供应商清单；只有它们直接连接到某个外部平台时，才在相关条目中出现。
 
-## 当前供应商矩阵
+## 结论先行
 
-| 供应商/能力     | 当前责任                                                                                   | 代码侧边界                                                                                                                | 状态                     |
-| --------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| Vercel          | Realm、Console、Auth、API、Content 的托管、Next build、Function/ISR/Proxy 和可选 telemetry | 各项目的 root directory、build command 和环境变量；应用不依赖 Vercel Cron                                                 | `CURRENT` + `CLAIMED`    |
-| PostgreSQL/Neon | Realm visitor statistics、Auth DB、Platform Core DB                                        | Realm 只读 `DATABASE_URL`；Auth 读 `AUTH_DATABASE_URL`；API/Core DB 读 `CORE_DATABASE_URL`；事务和 migration 属于应用契约 | `CURRENT`                |
-| Upstash Redis   | Realm 可选多实例限流；Console OIDC session 与限流                                          | REST URL/token；缺失或故障时的本地 limiter 是明确的短期 fail-open 策略                                                    | `CURRENT`                |
-| Auth/OIDC       | `auth.arsvine.com` 的 Better Auth、OAuth/OIDC、JWKS、Passkey、TOTP 和角色                  | issuer、resource/audience、PKCE、redirect、scope 和 RP-initiated logout                                                   | `CURRENT`                |
-| Content service | `content.arsvine.com` 的 published release read plane 和内部 publication endpoint          | immutable objects、current pointer、公开 protected 清理、`content:protected:read`                                         | `CURRENT`                |
-| Tencent COS     | 私有 Catalog、公共媒体对象和发布对象存储                                                   | Realm asset workflow / Content object-storage adapter；pointer-last 和 hash object 是需保留的产品语义                     | `CURRENT` + `CLAIMED`    |
-| Tencent EdgeOne | `cdn.arsvine.com` 的边缘 HTTPS、缓存和 COS 回源                                            | 浏览器只消费公共 CDN；Realm 不直接调用 EdgeOne API                                                                        | `CLAIMED`                |
-| Tencent DNSPod  | apex、服务子域和 CDN 的权威 DNS                                                            | DNS 记录不是应用代码契约；清理时分别核对记录、项目域名和缓存                                                              | `LIVE` + `CLAIMED`       |
-| GitHub          | 代码托管、Realm CI，以及已废弃内容仓库的历史记录                                           | Realm/Platform/Content runtime 不读取 GitHub 内容 API；独立内容仓库不属于当前治理范围                                     | `CURRENT` + `HISTORICAL` |
-| Hitokoto        | Realm `/api/hitokoto` 的可选句子上游                                                       | Realm 自己拥有 timeout、缓存、限流和本地 fallback                                                                         | `CURRENT`                |
+当前系统对供应商的依赖强度不相同：
 
-X 和 translation provider 只作为 Core/Content 中可能存在的来源或 variant metadata；当前 Platform 没有 X timeline scheduler、X API runtime 或 translation worker，不把它们写成当前运行服务。
+- Vercel 同时承担多个运行时和平台能力，是当前最宽的耦合面。
+- GitHub 已退出 Realm 和 Console 的运行时链路；独立内容仓库仅作为一次性迁移输入，迁移完成后不再承担系统职责。
+- Neon 承担真正的持久状态，Realm 与 Admin 的表/职责分开，但是否同一 project 未知。
+- COS/EdgeOne 的媒体链路已经通过 `catalogKey`、immutable object 和 pointer-last 形成相对清晰的语义边界。
+- Upstash 只承担限流状态，X 和翻译只承担可选的输入/处理能力，迁移优先级较低；临时 quiz 也使用同一 Upstash resource，清理必须按 namespace 进行。
+- DNSPod 没有代码耦合，但域名切换时是必要的控制面；域名注册和 SSL 证书仍是独立的腾讯云控制面责任。
 
-## 当前接口抽象
+## 供应商矩阵
 
-| 抽象                      | 当前所有者                                                              | 必须保留的语义                                                         |
-| ------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `PublishedContentReader`  | Realm `src/shared/lib/content/content-api.ts`；Platform `apps/content`  | `CONTENT_BASE_URL`、release pointer、公开/受保护正文隔离               |
-| `InternalRevalidator`     | Realm `/api/internal/revalidate`；Platform API 与 Realm asset publisher | timestamped HMAC、资源白名单、过期签名拒绝、partial/failed 结果        |
-| `AuthVerifier`            | Platform `packages/authz`                                               | issuer、audience、JWKS、Bearer 错误分类和 scope/role 判定              |
-| `ObjectStorage`           | Platform `packages/object-storage`；Realm Catalog adapter               | server-only credentials、text body、missing-body 错误和 key validation |
-| `VisitorStatsPersistence` | Realm visitor feature                                                   | canonical host、匿名签名 key、CTE 幂等和 Asia/Shanghai 日界线          |
-| `TelemetryProvider`       | Realm/Console 各自的可选 Vercel telemetry                               | 可关闭、失败隔离、不能阻断基础 UI                                      |
-| `GeoProvider`             | Realm `src/proxy.ts` 的 Vercel Geo 输入                                 | 只用于 UI/可见性；不得参与 locale、授权或安全判断                      |
+状态含义：`CURRENT` 表示代码或配置已确认，`LIVE` 表示公开探测到，`CLAIMED` 表示控制台、文档或配置意图已观察到但尚未由外部运行时独立证明，`UNKNOWN` 表示仍缺少足够事实。
 
-## 替换规则
+| 供应商/平台          | 当前职责                                                                                                                                                                          | 代码/配置耦合          | 当前证据                                                     | 脱离方式与主要风险                                                                                                          |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| Vercel               | Realm、Console、Auth、API、Content 五个核心项目的托管；Realm ISR/Functions/Proxy/Geo；Console/Auth/API/Content Functions；部分 Analytics/Speed Insights；主站生产访问层 challenge | 高                     | `CURRENT` + `LIVE` + `CLAIMED`                               | Node/VPS + 反向代理；替换 Geo、WAF、缓存/ISR、日志和 telemetry；平台时限、并发和部署语义需要重新实现                        |
+| Neon                 | Realm 访客统计；Platform Auth 身份/会话；Platform Core authoring/publication state                                                                                                | 中高                   | `CURRENT` + `CLAIMED`；数据库 branch `UNKNOWN`               | 标准 PostgreSQL + 迁移/备份；替换 serverless/managed connection adapter；保留事务与并发约束                                 |
+| Upstash Redis        | Realm/Admin 多实例限流；历史 Realm Beta 关联；临时 anti-fraud-quiz 房间状态；`INCR` + `EXPIRE`/`PTTL`                                                                             | 中                     | `CURRENT` + `CLAIMED`；共享 resource 已由 CLI 确认           | Redis/Valkey 自托管或其他 Redis-compatible service；必须决定 Redis 故障时继续 fail-open 还是切换策略；不得删除共享 resource |
+| Auth / OIDC          | `auth.arsvine.com` Better Auth identity、OAuth/OIDC、JWKS、Passkey、TOTP 和 owner/editor role                                                                                     | 中高                   | `CURRENT` + `LIVE`；Discovery/JWKS/health 已验证             | 继续使用标准 OAuth/OIDC；迁移 Owner key 后删除 legacy Console auth                                                          |
+| Content service      | `content.arsvine.com` 已发布 release read plane；COS immutable objects 与 pointer-last publication                                                                                | 中                     | `CURRENT` + `LIVE`；release、公开保护边界和内部 scope 已验证 | API/Storage provider 可替换；保留 release schema、protected body isolation 和 rollback                                      |
+| GitHub               | 一次性内容导入输入和历史证据；Realm、Console、Content runtime 均不读取                                                                                                            | 历史                   | `DEPRECATED_INPUT`；当前代码无运行时消费者                   | 保留必要迁移记录，删除运行时兼容路径                                                                                        |
+| Tencent COS          | 香港地域的公共媒体桶与私有 Catalog 桶；immutable media、private Catalog、public site catalog、字体和音频                                                                          | 中高                   | `CURRENT` + `LIVE` + `CLAIMED`                               | S3/COS-compatible object store + `BlobStore`/Catalog pointer；需迁移对象、metadata、CORS、Referer、缓存和回滚版本           |
+| Tencent EdgeOne      | `cdn.arsvine.com` 的 COS 直回源、边缘缓存、HTTPS、IPv6、WAF/频控和 Bot 处置；代码看到 `EO-Cache-Status`，不直接调用 EdgeOne API                                                   | 低到中，主要是运维配置 | `LIVE` + `CLAIMED` + 源码注释                                | Nginx/Caddy/CDN/其他边缘层；保留 `objectKey` URL、immutable cache、CORS、TLS、WAF 和 custom-domain 行为                     |
+| Tencent DNSPod       | `arsvine.com` 权威 DNS、注册域名的解析记录和子域 CNAME 管理面                                                                                                                     | 低                     | `LIVE` + `CLAIMED`，NS 为 `*.dnspod.net`                     | 迁移 DNS zone 到其他托管 DNS；先降低 TTL、并行验证 CNAME/TLS，再切换；暂停记录、缓存和 Vercel 关联需分开核对                |
+| Tencent Domain/SSL   | 域名注册续费、SSL 证书签发/托管及 COS/EdgeOne 绑定                                                                                                                                | 无运行时代码耦合       | `CLAIMED`；控制台台账                                        | 迁移注册商、ACME/其他 CA 和证书部署流程；必须分别处理续费、DNS 验证、边缘绑定和源站绑定                                     |
+| X                    | 历史/可选的 user-post timeline 输入契约；bearer token、`since_id`、pagination token、external ID reconciliation                                                                   | 低；当前无 X runtime   | `HISTORICAL`                                                 | 需要时保留归档与 external ID；重新启用前再实现 `TimelineProvider`，并单独评估 API 价格与配额                                |
+| Translation endpoint | 历史/可选的 OpenAI-compatible `chat/completions` 输入契约；当前 Platform 没有翻译 runtime                                                                                         | 低；当前无 endpoint    | `HISTORICAL` / `UNKNOWN`                                     | 需要时以明确 provider capability 实现，不以 URL 字符串猜测供应商；先确认数据处理和计费                                      |
+| Hitokoto             | Realm `/api/hitokoto` 的上游句子源                                                                                                                                                | 低                     | `CURRENT`                                                    | 预置本地句库或其他 quote source；保留服务端代理、timeout、cache 和 fallback                                                 |
+| Google Fonts         | 资产构建阶段的 CSS/字体来源；浏览器生产路径改为 `cdn.arsvine.com`                                                                                                                 | 低                     | `CURRENT`                                                    | 继续自托管已下载字体；取消 build-time fetch 后需保留 license、unicode-range 和 font metadata                                |
 
-替换供应商时，先保留上表的产品语义，再替换连接实现。不能因为更换 Vercel、PostgreSQL、Redis、COS 或 CDN 而恢复 GitHub 内容 fallback、扩大浏览器凭据范围、改变 protected body 隔离或删除 revision/pointer 验证。
+## 各供应商边界
 
-当前环境变量的完整目录由 Realm [`docs/human/OPERATIONS.md`](../human/OPERATIONS.md) 和 Platform 仓库的 `docs/OPERATIONS.md` 维护；不要在此复制两份变量表。
+### Vercel：当前最宽的供应商面
 
-## 证据边界
+Realm：
 
-供应商控制面快照见 [`TENCENT_CLOUD_SNAPSHOT.md`](./TENCENT_CLOUD_SNAPSHOT.md)。它记录某一日期的资源状态，不自动覆盖当前代码或后续控制台变更。VPS 迁移文档仍是规划草案，不能作为当前部署步骤。
+- `src/app/` 按 Next.js App Router 产出页面和 Route Handler。
+- `src/proxy.ts` 使用 `@vercel/functions` 的 `geolocation()`，并依据 `VERCEL=1` 信任平台注入的 forwarding headers。
+- 页面使用 ISR/SSR，`/api/*` 多为 Node dynamic route。
+- `@vercel/analytics`、`@vercel/speed-insights` 仅在选择了 Vercel telemetry provider 时加载。
+
+Console、Auth、API、Content：
+
+- `apps/console`、`apps/auth`、`apps/api` 和 `apps/content` 分别承担管理台、身份、控制 API 和 published read plane。
+- Console 公开响应的 CSP/headers 和 `console.arsvine.com` live headers 表明其当前为 Vercel/Next.js 运行。
+- Platform 当前没有本地代码声明的 Vercel Cron；内容发布由 API 调用 Content，并由 Realm revalidation 完成闭环。
+
+Docs/Lab/临时活动站：
+
+- Docs 以 `doc_build/` 静态输出部署；Lab 公开首页也返回 Vercel prerender/cache headers。
+- `arsvine-docs` 历史上是独立站点，项目现已删除；即使其内容过时，也不应被误认成 Realm runtime 的依赖。
+- `anti-fraud-quiz` 是公开 GitHub 仓库驱动的静态 HTML + Functions 项目，输出目录为 `public`，生产 deployment 已 `READY`；`quiz.arsvine.com` 在 DNSPod 中暂停，Vercel 报告该自定义域名尚未正确配置。它是明天活动的临时站点，活动后删除项目和域名关联。
+
+Vercel CLI 当前列出 `arsvine-realm`、`arsvine-admin`、`arsvine-auth`、`arsvine-api` 和 `arsvine-content` 五个核心项目，均使用 Node `24.x` 并分别绑定主站、Console、Auth、API 和 Content 域名。历史 Docs、Lab、Beta 与临时活动项目的部署记录不改变当前核心拓扑。
+
+Vercel 官方资料说明：Cron 触发 Vercel Function，Hobby 每日最多一次且时间精度为小时级；失败不会自动重试，重复投递/重叠运行需要应用自行处理锁和幂等。见 [Cron usage and pricing](https://vercel.com/docs/cron-jobs/usage-and-pricing) 与 [Managing Cron Jobs](https://vercel.com/docs/cron-jobs/manage-cron-jobs)。
+
+Next.js 16 的 `proxy.ts` 约定可自托管，但 Vercel-specific Geo helper、Vercel Bot Protection、Vercel Analytics 和 Speed Insights 不会随普通 Node 进程自动存在。见 [Next.js self-hosting](https://nextjs.org/docs/app/guides/self-hosting)、[Next.js Proxy convention](https://nextjs.org/docs/app/api-reference/file-conventions/proxy) 和 [Vercel Next.js guide](https://vercel.com/docs/frameworks/full-stack/nextjs)。
+
+### Neon：两组持久化责任
+
+Realm 使用 `@neondatabase/serverless` 的 `neon(DATABASE_URL)` 保存访客统计；Realm 的 SQL 表前缀为 `arsvine_visitor_*`，包含匿名 identity、日访问、总计数和 baseline。统计失败只影响 About 的数字，不阻断主站其他页面。
+
+Platform 使用 `pg` 与 Drizzle 的 `node-postgres` driver，Schema 当前包括：
+
+- `users`：唯一 Owner、Editor、账户状态、auth method、session version；
+- `workspace_configs`：每个用户一条 AES-256-GCM 加密配置；
+- `invitations`、`account_events`：成员邀请和安全事件；
+- `webauthn_challenges`、`webauthn_credentials`：认证挑战、credential、公钥、counter、撤销时间和设备 metadata。
+
+Neon 官方 serverless driver 支持在 serverless/edge 环境通过 HTTP 或 WebSocket 查询；当前 Realm/Admin 都选择 HTTP 路径。见 [Neon serverless driver](https://neon.com/docs/serverless/serverless-driver)。Vercel Marketplace 当前显示 Realm 与 Admin 连接的是两条独立 Neon 资源；实际 database/branch 和连接串仍未读取。这让当前代码适合无长连接运行时，也意味着 VPS 迁移时需要重新选择 PostgreSQL driver/pool。
+
+当前 Vercel integration 证据支持两个应用使用分开的 Neon 资源，但没有读取 Neon 后台的 project/branch 详情。迁移前仍应明确选择同库分 schema、同项目分数据库，或完全分离的 PostgreSQL 实例，并分别验证 backup/restore、migration、连接上限和访问权限。
+
+### Upstash：限流状态，不是业务真相
+
+Realm/Admin 都通过 `@upstash/redis` 连接 REST API。限流实现使用固定窗口：`INCR` 后首次 `EXPIRE`，后续用 `PTTL` 修复异常无 TTL 状态。
+
+- 未配置时使用进程内 `Map`。
+- Redis 请求失败时回退到本地 Map，并写错误日志。
+- 这个 fail-open 行为保留用户可用性，但多实例场景下不再有全局限流保证。
+
+Upstash 官方将其 TypeScript client 定义为基于 HTTP/REST 的 Redis client，适合 serverless；Vercel integration 通过 REST URL/token 注入变量。见 [@upstash/redis connection](https://upstash.com/docs/redis/howto/connect-with-upstash-redis) 与 [Vercel integration](https://upstash.com/docs/redis/howto/vercelintegration)。迁移到 VPS 时可使用本地 Redis/Valkey，但应先保留相同的 key、窗口、计数和故障策略。
+
+Vercel Marketplace 此前显示这一条 Upstash resource 同时连接 Realm、Realm Beta、Admin 和临时 `anti-fraud-quiz`；Realm Beta 项目现已不在当前 Vercel 项目清单中，资源本身未做删除操作。quiz 使用 `QUIZ_*` 变量与独立 prefix；活动结束时只能清理 quiz keys/prefix 或解除项目关联，不得删除整个 resource。
+
+### Content service：生产内容读取边界
+
+Realm 生产只读：
+
+- `CONTENT_BASE_URL` 指向 `content.arsvine.com`。
+- 服务端读取已发布 release 的 Blog/Tweet metadata、variant 和 month API。
+- Content API 不直接暴露给浏览器；Realm 负责 visitor TOTP grant，Content 负责 release 读取和正文隔离。
+
+Realm 运行时没有 GitHub 内容读取路径。
+
+Platform 当前的 Console BFF 通过 `API_BASE_URL` 调用 `api.arsvine.com/v1` 的 Core authoring API；API 负责 Core DB 读写，并通过 Content 内部发布端点生成 immutable release。Console 不持有 GitHub、数据库或对象存储凭据。
+
+Realm 还使用 GitHub Actions 在 push/pull request 上运行 Ubuntu `pnpm check` 和 Windows `pnpm build`；Admin、Content、Docs、Lab 当前没有发现同类 workflow。该 CI 是交付验证面，不是 Content 运行时数据源；VPS 迁移时可以保留 GitHub Actions，也可以迁移到其他 CI runner。
+
+独立 `arsvine-content` 仓库不属于当前运行时闭环；其一次性导入信息只应保留在迁移记录中。
+
+### COS + EdgeOne：已有语义化资产边界
+
+Realm 的资产流将稳定 `catalogKey` 写在业务数据中，把 hash `objectKey` 留给 Catalog build。构建阶段由 source manifest 和本地 workspace 生成：
+
+1. 从 `cos-workspace/public-root-legacy` 或本地 staging 读取原始媒体。
+2. 用 `sharp` 处理图片、计算短 hash、写入 `dist/cos-upload/public-root`。
+3. 生成 `dist/cos-upload/private-root/realm/catalog/versions/<version>/*.json`。
+4. 生成 public `realm/site-catalog/versions/<version>/assets.json`。
+5. 用 COSCLI 先同步对象、验证目标对象，再分别切换 public/private `current.json` pointer。
+6. pointer 成功切换后发送签名 `assets.published` 事件到 Realm `/api/internal/revalidate`。
+
+Realm server 通过 `cos-nodejs-sdk-v5` 读取 private Catalog；浏览器使用 public CDN object。当前 public/private pointer-last 语义和 versioned path 是未来替换对象存储时最应该保留的产品语义。
+
+腾讯云控制台快照显示：两个桶都位于香港且 ACL 为私有读写；公共媒体桶约 171 MB，私有 Catalog 桶控制台容量显示为 0 B。公共媒体桶由 EdgeOne 通过桶策略读取，私有 Catalog 桶没有额外 bucket policy 行。两只桶的 CORS 和 Referer 白名单、服务端加密、日志状态见 [`TENCENT_CLOUD_SNAPSHOT.md`](./TENCENT_CLOUD_SNAPSHOT.md)。Realm 浏览器只读公共 CDN，私有 Catalog CORS 没有应用消费者；本次已移除私有桶的浏览器跨域规则，公共桶的开发/Preview 来源保留。
+
+公共媒体桶的多 AZ、对象版本控制、跨地域复制均未开启；私有 Catalog 桶只开启了多 AZ，版本控制与跨地域复制仍未开启。公共桶的 COS 全球加速已关闭，私有桶原本就是关闭；EdgeOne 当前使用 COS 默认源站，代码没有使用全球加速域名。腾讯云传统 CDN 页面显示未开通。资产恢复不能假设 COS 原生版本或复制可用。
+
+COS 官方资料支持自定义 CDN 域名、以 COS 作为源站、COSCLI `sync`/`cp` 和对象版本控制；见 [COS CDN acceleration](https://cloud.tencent.com/document/product/436/18670)、[COSCLI sync](https://cloud.tencent.com/document/product/436/63670) 和 [COS versioning](https://cloud.tencent.com/document/product/43602)。EdgeOne 官方将 `EO-Cache-Status` 定义为边缘缓存命中状态，并识别 `Server: tencent-cos` 为 COS 源站信号；见 [EdgeOne response headers](https://cloud.tencent.com/document/product/1552/87655)。
+
+本地 `cos-workspace/` 当前包含 raw media、Catalog metadata、COSCLI 和历史日志，整体被 Git 忽略。它不是可从单独代码 checkout 自动重建的完整输入面；VPS 迁移必须先决定原始媒体和 Catalog metadata 的持久归档位置。COS 盗刷检测还指出两个桶都没有外网下行流量告警，这属于独立的运维风险记录。
+
+### EdgeOne：资产边缘层和安全策略
+
+EdgeOne 控制台显示 `arsvine.com` 站点已启用，DNSPod 托管接入，全球可用区不含中国大陆，个人版；只有 `cdn.arsvine.com` 已生效并直接回源公共 COS。全局配置包括强制 HTTPS 302、HTTP/2 回源、TLS 1.2/1.3、IPv6、Gzip/Brotli；智能加速和 HTTP/3 关闭。规则引擎有两条已启用的媒体/字体缓存规则，节点缓存最长 30 天，浏览器缓存按资源类型为 1 天或 7 天，并设置字体 CORS 响应头。
+
+站点级 Web 防护使用自适应频控和 AI 爬虫 JavaScript challenge，托管漏洞规则集启用且已退出评估模式；没有域名独立策略、自定义/例外规则、源站防护、实时日志推送或离线日志。客户端认证在当前个人版不可用。这些是供应商控制面快照，不是独立安全测试结论。
+
+### DNSPod：无代码耦合的域名控制面
+
+公开 DNS 的 NS 记录指向 DNSPod；控制台记录显示根域名、`www`、`cdn`、`console` 启用，`docs`、`lab`、`quiz` 记录暂停；`beta`、`fusang`、`mayrain` 和 `private-cdn` 记录已移除。`private-cdn` 的 COS 自定义源站绑定及证书校验 TXT 也已移除，相关证书资源仍保留但未绑定。现有启用记录分别指向 Realm apex/`www`、EdgeOne 和 Console Vercel；Auth/API/Content 使用各自 Vercel 项目域名关联，不把供应商目标名当作应用接口。
+
+DNSPod 的暂停记录、公共 DNS 缓存和 Vercel 项目存在状态是三个独立事实；清理历史项目时必须分别核对记录、缓存和项目关联。
+
+DNSPod 官方 CNAME 文档说明 CNAME 用于将子域指向 CDN 或其他提供域名服务的目标。见 [DNSPod CNAME records](https://docs.dnspod.com/dns/cname-record/)。迁移时 DNS zone、证书和 TTL 是独立切换项，应与应用、数据库、资产发布分开回滚。域名台账显示 `arsvine.com` 状态正常、自动续费开启、到期时间为 2027-06-10；注册商、DNSPod、证书和边缘域名的迁移责任彼此独立。
+
+### X：历史输入边界
+
+历史 X 输入模块固定使用 `https://api.x.com/2`，读取 user post timeline 和按 ID lookup，使用 bearer token、`since_id`、`pagination_token`、`exclude=replies/retweets` 和 `tweet.fields`/`expansions`。X 返回的数据经规范化后进入 published Content archive；Realm 不在访问者请求时调用 X。当前 Platform 不部署该同步模块。
+
+X 官方文档定义 `/2/users/:id/tweets` 为 user posts endpoint，并支持 `since_id`、分页和 exclude；当前 X API v2 按实际使用计费。见 [X timelines](https://docs.x.com/x-api/posts/timelines/introduction)、[X API overview](https://docs.x.com/x-api/overview) 和 [X usage and billing](https://docs.x.com/x-api/fundamentals/post-cap)。
+
+替换 X 时需要保留 external ID 去重、删除/缺失 reconciliation、cursor 持久化和同步错误状态；如果不再需要自动同步，可以关闭 provider，保留现有 Content archive。
+
+### Translation endpoint：历史输入边界
+
+历史实现没有绑定单一 AI SDK，而是保存 `baseUrl` 并对 `${baseUrl}/chat/completions` 发 HTTP 请求。当前 Platform 只保留供维护者手动使用的 prompt，不把翻译 endpoint、key 或 worker 当作运行时配置。
+
+生产 endpoint、账户、价格、保留策略和数据区域均为 `UNKNOWN`。文档只使用 `.env.example` 中的示例，不将 DeepSeek 写成已确认的生产供应商。
+
+### Hitokoto 与 Google Fonts：低优先级外部来源
+
+Realm 通过 `/api/hitokoto` 代理 `v1.hitokoto.cn`，采用 timeout、边缘/进程缓存、限流和预设 fallback。Hitokoto 官方提供句子接口、QPS 说明和自部署指引，见 [Hitokoto sentence API](https://developer.hitokoto.cn/sentence/)。脱离时可以把句库随站点打包，保留代理响应格式和失败 fallback。
+
+字体脚本在构建阶段从 Google Fonts CSS 读取 family/weight/unicode-range，把字体下载并改写到 Realm COS CDN。生产 HTML 加载的是自有 CDN stylesheet，不是浏览器每次直接访问 Google Fonts。Google Fonts CSS API 的行为见 [Google Fonts API](https://developers.google.com/fonts/docs/getting_started)。如果资源授权和归档已满足，未来可以直接从受版本控制的本地字体源构建。
+
+## 供应商中立的目标接口
+
+这些是迁移时的责任边界，不代表本次要立即新增抽象层。优先把现有调用点压缩到已有语义 owner，再在真正迁移前实现适配器。
+
+| 语义接口                 | 当前实现                                                               | 必须保留的语义                                                                   |
+| ------------------------ | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `PublishedContentReader` | Realm `src/shared/lib/content/content-api.ts`；Platform `apps/content` | `CONTENT_BASE_URL`、release pointer、公开/受保护正文隔离                         |
+| `InternalRevalidator`    | Realm `/api/internal/revalidate`；Platform/API + asset publisher       | timestamped HMAC、资源白名单、partial/failed 结果、pointer 后刷新                |
+| `BlobStore`              | COS SDK/COSCLI                                                         | get/put/list/head、metadata、immutable object key、public/private access         |
+| `CatalogPointer`         | COS `current.json` + versioned sections                                | pointer-last、完整版本可读后切换、双层 public/private 一致性                     |
+| `Database`               | Realm Neon driver；Platform `pg` + Drizzle                             | PostgreSQL schema、事务、唯一 Owner、challenge consume、visitor counter 原子更新 |
+| `RateLimiter`            | Upstash REST + local Map fallback                                      | key 生成、窗口、INCR/TTL、fail-open 选择和 `Retry-After`                         |
+| `TimelineProvider`       | 历史 X API v2 输入边界                                                 | page/cursor、since ID、by-ID reconciliation、归档 external ID                    |
+| `TranslationProvider`    | 历史 OpenAI-compatible 输入边界                                        | structured JSON、source/target locale、model metadata、stale marking             |
+| `Scheduler`              | 当前无 Platform scheduler；未来可选 systemd/host scheduler             | authenticated invocation、cadence、idempotency、lock、per-workspace result       |
+| `GeoProvider`            | Vercel `geolocation()` + proxy headers                                 | 只用于 UI/可见性；不参与 locale、授权或安全判断                                  |
+| `TelemetryProvider`      | Vercel Analytics/Speed Insights                                        | 可关闭、失败隔离、production/preview 范围明确                                    |
+| `EdgeDistribution`       | EdgeOne + COS origin                                                   | public HTTPS、origin access、cache TTL、CORS/Referer、WAF、purge 和回源错误边界  |
+| `DomainControl`          | DNSPod + registrar                                                     | zone records、TTL、verification、domain lifecycle；与应用部署独立                |
+| `CertificateManager`     | Tencent SSL + EdgeOne/COS bindings                                     | issuance、renewal、deployment association、expiry observation                    |

@@ -2,7 +2,7 @@
 
 [返回文档组](./README.md)
 
-本文记录 2026-09-13 通过已登录的腾讯云控制台、公开 DNS/HTTP 检查和 Vercel CLI 交叉核验得到的腾讯云侧事实。它是供应商控制面快照，不替代代码中的接口契约；详细的替换边界见 [`SUPPLIER_BOUNDARIES.md`](./SUPPLIER_BOUNDARIES.md)。
+本文记录 2026-09-13 通过已登录的腾讯云控制台、公开 DNS/HTTP 检查和 Vercel CLI 交叉核验得到的腾讯云侧事实，并补充 2026-09-15 的核心服务域名复核。它是供应商控制面快照，不替代代码中的接口契约；详细的替换边界见 [`SUPPLIER_BOUNDARIES.md`](./SUPPLIER_BOUNDARIES.md)。
 
 腾讯云控制台观察按 `CLAIMED` 处理：它们是当前账户控制面状态，不等同于从外部网络得到的独立运行证明。公开 DNS/HTTP 结果按 `LIVE` 处理。证书验证值、账户 ID、COS bucket 全名、Token 和私有对象路径均不记录。
 
@@ -45,13 +45,13 @@
 | `@`           | Vercel Realm apex     | 启用         |
 | `www`         | Vercel Realm 主站别名 | 启用         |
 | `cdn`         | EdgeOne CNAME         | 启用         |
-| `ctrl`        | Vercel Admin          | 启用         |
+| `console`     | Vercel Console        | 启用         |
 | `lab`         | 相邻独立实验项目      | 暂停         |
-| `docs`        | 过时文档项目          | 暂停         |
+| `docs`        | 独立文档项目          | 暂停         |
 | `quiz`        | 临时活动站            | 暂停         |
 | `openai-auth` | 域名验证 TXT          | 启用；值省略 |
 
-`cdn` 记录的备注明确写着由 EO 修改以提供安全加速服务。`private-cdn` CNAME 和 `_dnsauth.private-cdn` 证书校验 TXT 已删除；DNSPod 删除成功提示说明记录变更会实时同步到 DNS 服务器，但各地缓存可能需要最多 24—48 小时刷新。Vercel CLI 当前只列出 `arsvine-realm`、`arsvine-admin` 和临时 `anti-fraud-quiz`；`docs`、`lab`、`quiz` 记录仍在 DNSPod 中但已暂停。控制台暂停状态、DNS 缓存和 Vercel 项目存在状态是三个不同事实，迁移或清理时必须分别核对。
+`cdn` 记录的备注明确写着由 EO 修改以提供安全加速服务。`private-cdn` CNAME 和 `_dnsauth.private-cdn` 证书校验 TXT 已删除；DNSPod 删除成功提示说明记录变更会实时同步到 DNS 服务器，但各地缓存可能需要最多 24—48 小时刷新。2026-09-15 的 Vercel CLI 项目清单为 `arsvine-realm`、`arsvine-admin`、`arsvine-auth`、`arsvine-api` 和 `arsvine-content`；`docs`、`lab`、`quiz` 记录仍在 DNSPod 中但已暂停。控制台暂停状态、DNS 缓存和 Vercel 项目存在状态是三个不同事实，迁移或清理时必须分别核对。
 
 ## COS 存储桶
 
