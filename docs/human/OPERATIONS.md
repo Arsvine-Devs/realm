@@ -169,7 +169,7 @@ pnpm db:migrate
 pnpm db:seed:visitor-stats -- --total 1234
 ```
 
-migration 是幂等的，创建 `arsvine_visitor_*` 表和累计计数初始行。若有上线前的历史访客估算值，在 migration 后执行一次基线命令；基线有唯一名称，重复执行不会重复增加。Preview、localhost 和非 canonical host 不写生产统计。
+migration 是幂等的，创建 `arsvine_visitor_*` 表和累计计数初始行。若需要设置已有统计基线，在 migration 后执行一次基线命令；基线有唯一名称，重复执行不会重复增加。Preview、localhost 和非 canonical host 不写生产统计。
 
 访客统计故障排查顺序：
 

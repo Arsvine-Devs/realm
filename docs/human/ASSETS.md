@@ -151,7 +151,7 @@ REVALIDATE_WEBHOOK_SECRET
 可选：`COS_SESSION_TOKEN`、`COSCLI_PATH`。
 
 发布脚本始终使用 `--init-skip` 和当前进程凭据，不依赖持久化 coscli profile。
-执行中会显示 public/private 阶段、抽样上传结果和心跳。若长时间没有进度或命令被中断，先查看 `coscli_output/` 中本次日志，再只读检查 public/private 两个 `current.json`；旧版本成对存在表示没有发生切换，不要盲目重试、回滚或删除已上传的 immutable object。
+执行中会显示 public/private 阶段、抽样上传结果和心跳。若长时间没有进度或命令被中断，先查看 `coscli_output/` 中本次日志，再只读检查 public/private 两个 `current.json`；两个 pointer 仍保持原值时表示没有发生切换，不要盲目重试、回滚或删除已上传的 immutable object。
 
 ## Pointer-last 保证
 
