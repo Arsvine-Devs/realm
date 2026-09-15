@@ -51,8 +51,6 @@ pm2 start server.js --name arsvine-realm
 ```bash
 docker build -t arsvine-realm:local .
 docker run --rm -p 3000:3000 \\
-  -e NEXT_PUBLIC_SITE_URL=http://localhost:3000 \\
-  -e CONTENT_BASE_URL=http://localhost:3002 \\
   arsvine-realm:local
 ```
 
@@ -63,20 +61,21 @@ GET /api/health/live   # 进程可响应
 GET /api/health/ready  # Realm 进程和必要的当前运行配置可接收请求
 ```
 
-`ready` 不等于 Content release、COS、Neon 或 Upstash 的完整业务验收；生产内容读取通过 `CONTENT_BASE_URL` 指向的 Content service 完成。
+`ready` 不等于 Content release、COS、Neon 或 Upstash 的完整业务验收；Realm 的 Content/Auth origin 由 `config/site-config.mjs` 固定配置。
 
 ## 生产配置
 
-最低配置：
+固定站点和服务 origin：
 
-```env
-NODE_ENV=production
-NEXT_PUBLIC_SITE_URL=https://arsvine.com
-CONTENT_BASE_URL=https://content.arsvine.com
-AUTH_ISSUER=https://auth.arsvine.com
+```text
+config/site-config.mjs
+realm:   https://arsvine.com
+auth:    https://auth.arsvine.com
+content: https://content.arsvine.com
+cdn:     https://cdn.arsvine.com
 ```
 
-受保护文章还需要服务端 `CONTENT_SERVICE_CLIENT_ID`、`CONTENT_SERVICE_CLIENT_SECRET` 和 `REVALIDATE_WEBHOOK_SECRET`。实际功能还可能需要 TOTP、Upstash、COS、Neon 变量。Realm 运行时不依赖 GitHub 内容变量。完整矩阵见 [`API-REF.md`](../ai/API-REF.md)。
+受保护文章还需要服务端 `CONTENT_SERVICE_CLIENT_ID`、`CONTENT_SERVICE_CLIENT_SECRET` 和 `REVALIDATE_WEBHOOK_SECRET`。实际功能还可能需要 TOTP、Upstash、COS、Neon 变量。完整动态变量见 [`CONFIGURATION.md`](./CONFIGURATION.md)，固定拓扑见 `config/site-config.mjs`。
 
 部署环境中的 secret 不得暴露为 `NEXT_PUBLIC_*`。
 
@@ -88,7 +87,7 @@ AUTH_ISSUER=https://auth.arsvine.com
 
 ```bash
 pnpm envctl stats
-pnpm envctl query --key CONTENT_BASE_URL
+pnpm envctl query --key CONTENT_SERVICE_CLIENT_ID
 pnpm env:sync
 pnpm env:check
 ```
@@ -123,15 +122,15 @@ git status --short
 
 ## Published Content service
 
-生产 Function 通过 `CONTENT_BASE_URL` 读取已发布 release。运维检查：
+生产 Function 通过 `config/site-config.mjs` 中的 Content origin 读取已发布 release。运维检查：
 
-1. `CONTENT_BASE_URL` 使用生产 Content URL。
+1. `config/site-config.mjs` 中的 Content origin 为 `https://content.arsvine.com`。
 2. `/health/ready` 能读取当前 pointer 和 manifest。
 3. `/v1/posts` 与 `/v1/tweets/months` 返回当前 release。
 4. 公开 protected variant 返回 `PROTECTED_CONTENT`。
 5. Realm 访客 grant 成功后，server-only service token 才能读取 protected body。
 
-Content release 是生产内容的唯一读取来源；故障处理应检查 Content pointer、manifest 和服务认证，不恢复 GitHub 回退。
+Content release 是生产内容的唯一读取来源；故障处理应检查 Content pointer、manifest 和服务认证。
 
 ## Protected post
 

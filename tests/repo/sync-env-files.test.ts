@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 const execFileAsync = promisify(execFile);
 
 describe('sync-env-files script', () => {
-  it('preserves registered values, fills missing keys, and prunes unregistered keys', async () => {
+  it('preserves registered values, fills missing keys, and prunes static topology overrides', async () => {
     const tempDir = await mkdtemp(path.join(os.tmpdir(), 'arsvine-env-sync-'));
     const localPath = path.join(tempDir, '.env.local');
     const examplePath = path.join(tempDir, '.env.example');
@@ -46,10 +46,10 @@ describe('sync-env-files script', () => {
     const exampleOutput = await readFile(examplePath, 'utf-8');
 
     expect(localOutput).toContain('PORT=4000');
-    expect(localOutput).toContain('NEXT_PUBLIC_SITE_URL=https://dev.arsvine.com');
+    expect(localOutput).not.toContain('NEXT_PUBLIC_SITE_URL=https://dev.arsvine.com');
     expect(localOutput).toContain('ACCESS_GRANT_SECRET=my-secret');
     expect(localOutput).toContain('TOTP_GROUPS_JSON=\'{"friends-a":{"current":"abc"}}\'');
-    expect(localOutput).toContain('NEXT_PUBLIC_CDN_BASE=https://cdn.arsvine.com');
+    expect(localOutput).not.toContain('NEXT_PUBLIC_CDN_BASE=');
     expect(localOutput).toContain('ANALYZE=');
     expect(localOutput).toContain('NEXT_BUILD_DIR=');
     expect(localOutput).not.toContain('LEGACY_PUBLIC_ASSET_ORIGIN=');
@@ -57,7 +57,7 @@ describe('sync-env-files script', () => {
     expect(localOutput).not.toContain('REVALIDATE_SECRET=');
     expect(localOutput).not.toContain('UNREGISTERED_KEY=');
 
-    expect(exampleOutput).toContain('NEXT_PUBLIC_CDN_BASE=https://cdn.arsvine.com');
+    expect(exampleOutput).not.toContain('NEXT_PUBLIC_CDN_BASE=');
     expect(exampleOutput).toContain('# ANALYZE=true');
     expect(exampleOutput).toContain('# NEXT_BUILD_DIR=.next');
     expect(exampleOutput).not.toContain('LEGACY_PUBLIC_ASSET_BASE=');

@@ -17,21 +17,6 @@
       "failureBehavior": "Defaults to 3000."
     },
     {
-      "key": "NEXT_PUBLIC_SITE_URL",
-      "section": "Core",
-      "exampleFiles": [".env.example"],
-      "commented": false,
-      "requiredness": "required",
-      "secret": false,
-      "format": "absolute HTTPS canonical site origin",
-      "example": "https://arsvine.com",
-      "localDefault": "https://arsvine.com",
-      "scopes": ["local", "preview", "production"],
-      "usedBy": ["src/shared/config/site.ts", "scripts/assets/publish.mjs"],
-      "description": "Canonical URL for metadata and asset revalidation.",
-      "failureBehavior": "Site metadata falls back to the built-in Realm URL; asset revalidation refuses an absent value."
-    },
-    {
       "key": "NEXT_PUBLIC_TELEMETRY_PROVIDER",
       "section": "Public",
       "exampleFiles": [".env.example"],
@@ -45,51 +30,6 @@
       "usedBy": ["src/features/telemetry/ui/telemetry/TelemetryRoot.tsx"],
       "description": "Opt-in browser telemetry provider.",
       "failureBehavior": "Telemetry is not mounted when unset or unsupported."
-    },
-    {
-      "key": "NEXT_PUBLIC_CDN_BASE",
-      "section": "Public",
-      "exampleFiles": [".env.example"],
-      "commented": false,
-      "requiredness": "optional",
-      "secret": false,
-      "format": "absolute HTTPS CDN origin without a trailing slash",
-      "example": "https://cdn.arsvine.com",
-      "localDefault": "https://cdn.arsvine.com",
-      "scopes": ["local", "preview", "production"],
-      "usedBy": ["src/shared/lib/cdn.ts"],
-      "description": "Browser-visible origin for immutable media and public catalogs.",
-      "failureBehavior": "Uses the built-in CDN origin."
-    },
-    {
-      "key": "CONTENT_BASE_URL",
-      "section": "Content",
-      "exampleFiles": [".env.example"],
-      "commented": false,
-      "requiredness": "required",
-      "secret": false,
-      "format": "absolute HTTPS Content service origin",
-      "example": "https://content.arsvine.com",
-      "localDefault": "https://content.arsvine.com",
-      "scopes": ["local", "preview", "production"],
-      "usedBy": ["src/shared/lib/content/content-api.ts", "src/app/api/health/ready/route.ts"],
-      "description": "Only runtime origin for published Blog and Tweet reads.",
-      "failureBehavior": "Content client requests fail and Realm readiness reports missing configuration."
-    },
-    {
-      "key": "AUTH_ISSUER",
-      "section": "Content",
-      "exampleFiles": [".env.example"],
-      "commented": false,
-      "requiredness": "conditional",
-      "secret": false,
-      "format": "absolute HTTPS Auth issuer origin",
-      "example": "https://auth.arsvine.com",
-      "localDefault": "https://auth.arsvine.com",
-      "scopes": ["local", "preview", "production"],
-      "usedBy": ["src/shared/lib/content/content-api.ts"],
-      "description": "Issuer used when Realm obtains a protected Content token.",
-      "failureBehavior": "Protected Content reads fail closed when the issuer is absent or invalid."
     },
     {
       "key": "CONTENT_SERVICE_CLIENT_ID",

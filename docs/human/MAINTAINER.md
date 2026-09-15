@@ -34,7 +34,7 @@ pnpm vitest run tests/features/blog/blog-post-state.test.ts
 pnpm vitest run -t "cancels a stale variant actor"
 ```
 
-生产内容读取需要 `CONTENT_BASE_URL`；先按 [`CONFIGURATION.md`](./CONFIGURATION.md) 填写，再运行 `pnpm env:check`。`pnpm env:sync` 以登记契约为准重建本地键集合，并清理未登记键。
+生产内容读取使用 `config/site-config.mjs` 中的 Content origin；动态凭据先按 [`CONFIGURATION.md`](./CONFIGURATION.md) 填写，再运行 `pnpm env:check`。`pnpm env:sync` 以登记契约为准重建本地键集合，并清理未登记键。
 
 ## 目录职责
 

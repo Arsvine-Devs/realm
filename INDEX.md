@@ -10,6 +10,7 @@ ARSVINE REALM 是一个 Next.js App Router 应用，按 feature 组织源码，�
 | `src/features/`   | 领域 UI、状态、server loader、contract 和样式               | [`src/features/README.md`](./src/features/README.md) |
 | `src/shared/`     | 跨 feature 的稳定 hook、helper、UI primitive 和 contract    | [`src/shared/README.md`](./src/shared/README.md)     |
 | `scripts/`        | 本地维护、资产、字体、图像和数据库工具                      | [`scripts/README.md`](./scripts/README.md)           |
+| `config/`         | 固定服务拓扑和动态环境契约                                  | [`config/site-config.mjs`](./config/site-config.mjs) |
 | `tests/`          | app、feature、shared、repository、operations 和 script 测试 | [`tests/README.md`](./tests/README.md)               |
 | `.agents/skills/` | 可复用的审计、Catalog 和 protected content AI 工作流        | `docs/ai/INDEX.md`                                   |
 
@@ -31,5 +32,5 @@ ARSVINE REALM 是一个 Next.js App Router 应用，按 feature 组织源码，�
 
 - Vercel 使用标准 Next.js App Router 输出；`server.js` 只用于本地开发和可选自托管。
 - 公共媒体通过版本化 COS Catalog 解析；生成的 `dist/` 和 `cos-workspace/` 只是本地产物。
-- Blog/Tweet 运行时通过 `CONTENT_BASE_URL` 读取已发布 Content release。
+- Blog/Tweet 运行时通过 `config/site-config.mjs` 中的 Content origin 读取已发布 release。
 - Protected blog 正文只在 grant 验证后运行时获取。

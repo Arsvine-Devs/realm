@@ -85,7 +85,7 @@ function renderComments(entry) {
 }
 
 function renderExampleFile(entries) {
-  const lines = [];
+  const lines = ['# Static service origins are defined in config/site-config.mjs.'];
   for (const section of groupEntries(entries.filter((entry) => entry.exampleFiles.length > 0))) {
     if (lines.length > 0) lines.push('');
     lines.push(`# ${section.title}`);
@@ -100,7 +100,7 @@ function renderExampleFile(entries) {
 }
 
 function renderLocalFile(entries, currentValues) {
-  const lines = [];
+  const lines = ['# Static service origins are defined in config/site-config.mjs.'];
   for (const section of groupEntries(entries)) {
     if (lines.length > 0) lines.push('');
     lines.push(`# ${section.title}`);

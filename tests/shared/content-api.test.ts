@@ -9,8 +9,6 @@ const fetchMock = vi.fn<typeof fetch>();
 
 beforeEach(() => {
   vi.stubGlobal('fetch', fetchMock);
-  vi.stubEnv('CONTENT_BASE_URL', 'https://content.example.com');
-  vi.stubEnv('AUTH_ISSUER', 'https://auth.example.com');
   vi.stubEnv('CONTENT_SERVICE_CLIENT_ID', 'realm-reader');
   vi.stubEnv('CONTENT_SERVICE_CLIENT_SECRET', 'reader-secret');
 });
@@ -29,7 +27,7 @@ function jsonResponse(body: unknown, status = 200) {
 }
 
 describe('published Content client', () => {
-  it('reads public data from the configured Content origin', async () => {
+  it('reads public data from the source-controlled Content origin', async () => {
     fetchMock.mockResolvedValue(
       jsonResponse({ publishedAt: '2026-09-15T00:00:00.000Z', posts: [] }),
     );
@@ -40,7 +38,7 @@ describe('published Content client', () => {
       posts: [],
     });
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://content.example.com/v1/posts',
+      'https://content.arsvine.com/v1/posts',
       expect.objectContaining({
         next: { revalidate: 300 },
         headers: expect.any(Headers),
@@ -48,7 +46,7 @@ describe('published Content client', () => {
     );
   });
 
-  it('obtains protected-content tokens from the stable Auth issuer', async () => {
+  it('obtains protected-content tokens from the source-controlled Auth issuer', async () => {
     fetchMock
       .mockResolvedValueOnce(jsonResponse({ access_token: 'service-token', expires_in: 300 }))
       .mockResolvedValueOnce(
@@ -66,7 +64,7 @@ describe('published Content client', () => {
     ).resolves.toMatchObject({ bodyMdx: '# private' });
 
     const [tokenUrl, tokenInit] = fetchMock.mock.calls[0] ?? [];
-    expect(tokenUrl).toBe('https://auth.example.com/api/auth/oauth2/token');
+    expect(tokenUrl).toBe('https://auth.arsvine.com/api/auth/oauth2/token');
     expect(tokenInit?.method).toBe('POST');
     expect(new Headers(tokenInit?.headers).get('Authorization')).toBe(
       `Basic ${Buffer.from('realm-reader:reader-secret', 'utf8').toString('base64')}`,
@@ -77,7 +75,7 @@ describe('published Content client', () => {
 
     const [contentUrl, contentInit] = fetchMock.mock.calls[1] ?? [];
     expect(contentUrl).toBe(
-      'https://content.example.com/v1/internal/posts/private-post/variants/zh-CN',
+      'https://content.arsvine.com/v1/internal/posts/private-post/variants/zh-CN',
     );
     expect(new Headers(contentInit?.headers).get('Authorization')).toBe('Bearer service-token');
     expect(contentInit?.cache).toBe('no-store');

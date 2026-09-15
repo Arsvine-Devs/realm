@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadProjectEnv, readEnv, requiredEnv } from '../lib/env-provider.mjs';
+import { serviceOrigins } from '../../config/site-config.mjs';
 
 loadProjectEnv();
 
@@ -171,19 +172,16 @@ async function revalidate(releaseId) {
   });
   const secret = required('REVALIDATE_WEBHOOK_SECRET');
   const signature = createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex');
-  const response = await fetch(
-    `${required('NEXT_PUBLIC_SITE_URL').replace(/\/$/, '')}/api/internal/revalidate`,
-    {
-      method: 'POST',
-      headers: {
-        accept: 'application/json',
-        'content-type': 'application/json',
-        'x-arsvine-timestamp': timestamp,
-        'x-arsvine-signature': signature,
-      },
-      body,
+  const response = await fetch(`${serviceOrigins.realm}/api/internal/revalidate`, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      'x-arsvine-timestamp': timestamp,
+      'x-arsvine-signature': signature,
     },
-  );
+    body,
+  });
   let responseBody = {};
   try {
     responseBody = await response.json();

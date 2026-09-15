@@ -143,9 +143,10 @@ COS_PRIVATE_BUCKET
 COS_PRIVATE_REGION
 COS_SECRET_ID
 COS_SECRET_KEY
-NEXT_PUBLIC_SITE_URL
 REVALIDATE_WEBHOOK_SECRET
 ```
+
+资产 revalidation 使用的 Realm 和 CDN origin 来自 `config/site-config.mjs`；它们属于源码拓扑，不是发布环境变量。
 
 可选：`COS_SESSION_TOKEN`、`COSCLI_PATH`。
 

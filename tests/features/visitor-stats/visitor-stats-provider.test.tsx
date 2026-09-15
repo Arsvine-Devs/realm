@@ -2,6 +2,12 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 
+const { getSiteUrlMock } = vi.hoisted(() => ({
+  getSiteUrlMock: vi.fn(() => 'https://arsvine.com'),
+}));
+
+vi.mock('@/shared/config/site', () => ({ getSiteUrl: getSiteUrlMock }));
+
 import {
   useVisitorStats,
   VisitorStatsProvider,
@@ -24,6 +30,8 @@ afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
   vi.unstubAllEnvs();
+  getSiteUrlMock.mockReset();
+  getSiteUrlMock.mockReturnValue('https://arsvine.com');
 });
 
 describe('VisitorStatsProvider', () => {
@@ -37,7 +45,7 @@ describe('VisitorStatsProvider', () => {
   });
 
   it('submits once and exposes validated production counts', async () => {
-    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'http://localhost:3000');
+    getSiteUrlMock.mockReturnValue('http://localhost:3000');
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -61,7 +69,7 @@ describe('VisitorStatsProvider', () => {
   });
 
   it('shows an error state without retrying when the API fails', async () => {
-    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'http://localhost:3000');
+    getSiteUrlMock.mockReturnValue('http://localhost:3000');
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('offline'));
 
     render(<TestTree />);

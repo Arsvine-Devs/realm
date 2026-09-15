@@ -108,13 +108,13 @@ pnpm vitest run tests/app/locale-hot-switch.test.tsx
 - `variants` key 是否一致；
 - `blog/<slug>/<locale>.mdx` 是否存在；
 - `originLocale` 是否为 `zh-CN`、`zh-TW` 或 `en`；
-- `CONTENT_BASE_URL` 是否指向预期的 Content service。
+- `config/site-config.mjs` 中的 Content origin 是否指向预期的 Content service。
 
 UI locale 和 content-only locale 是两个概念；`ja`、`ru`、`fr` 不会切换 UI。
 
 ## 博客或推文没有外部内容
 
-检查 `CONTENT_BASE_URL` 对应的 `/health/ready`、`/v1/posts` 和 `/v1/tweets/months`。受保护文章还需要检查 `AUTH_ISSUER`、`CONTENT_SERVICE_CLIENT_ID` 和 `CONTENT_SERVICE_CLIENT_SECRET`；不要记录 client secret 或 access token。
+检查 `config/site-config.mjs` 中 Content origin 对应的 `/health/ready`、`/v1/posts` 和 `/v1/tweets/months`。受保护文章还需要检查 `CONTENT_SERVICE_CLIENT_ID` 和 `CONTENT_SERVICE_CLIENT_SECRET`；不要记录 client secret 或 access token。
 
 Content release 不可用时，Realm 不恢复 GitHub 读取；应检查 Content pointer、manifest、对象存储和服务认证状态。
 

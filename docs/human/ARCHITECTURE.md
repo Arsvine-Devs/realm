@@ -126,7 +126,7 @@ styles/      feature styles
 
 ### Published Content service
 
-生产服务端通过 `CONTENT_BASE_URL` 读取已发布 release 的 Blog/Tweet metadata、MDX variant 和 tweet month。公开 Content API 不返回受保护正文；Realm 在验证访客 TOTP grant 后使用 Auth client-credentials 和 `content:protected:read` scope 读取正文。
+生产服务端通过 `config/site-config.mjs` 中的 Content origin 读取已发布 release 的 Blog/Tweet metadata、MDX variant 和 tweet month。公开 Content API 不返回受保护正文；Realm 在验证访客 TOTP grant 后使用静态 Auth origin、client-credentials 和 `content:protected:read` scope 读取正文。
 
 Realm 运行时不包含 GitHub 内容读取器；已发布 Content service 是 Blog/Tweet 的唯一运行时来源。
 
@@ -171,7 +171,7 @@ WebGL module 必须允许 lazy load failure、context loss、pause 和能力关�
 
 ## Failure boundary
 
-- Content release/API 不可用：博客和推文按 Content client 的错误边界处理；不得回退到生产 GitHub 内容读取。
+- Content release/API 不可用：博客和推文按 Content client 的错误边界处理；检查静态 service origin 和发布 release。
 - public site manifest 失败：移除可选装饰，不阻断导航。
 - private Catalog 失败：API 返回明确 `502`，server loader 使用定义好的 fallback。
 - telemetry provider 失败：error boundary 隔离，不阻断站点。

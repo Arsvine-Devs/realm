@@ -4,8 +4,8 @@ import type {
   ExternalAssetReference,
   ManagedAssetReference,
 } from '@/shared/types';
+import { cdnOrigin } from '@/shared/config/site-endpoints';
 
-const DEFAULT_CDN_BASE = 'https://cdn.arsvine.com';
 const REALM_NAMESPACE = 'realm/';
 const SHARED_NAMESPACE = 'shared/';
 
@@ -26,7 +26,7 @@ const AVIF_FALLBACK_PRESET: Partial<Record<ImagePreset, ImagePreset>> = {
   large: 'largeAvif',
 };
 
-export function normalizeCdnBase(base = process.env.NEXT_PUBLIC_CDN_BASE || DEFAULT_CDN_BASE) {
+export function normalizeCdnBase(base = cdnOrigin) {
   return base.replace(/\/+$/, '');
 }
 function normalizeObjectKey(objectKey: string) {

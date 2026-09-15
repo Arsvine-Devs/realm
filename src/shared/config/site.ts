@@ -1,4 +1,5 @@
 import type { SiteAssets, SiteFonts, SiteLocale, SitePages } from '@/shared/types';
+import { authOrigin, cdnOrigin, contentOrigin, realmOrigin } from './site-endpoints';
 
 /**
  * 站点集中配置 — 所有"我的"信息的单一信息源。
@@ -26,8 +27,14 @@ export interface SiteConfig {
   author: string;
   /** 联系邮箱。用于联系页文本与点击复制 */
   email: string;
-  /** 站点 URL，无尾斜杠。用于 sitemap/rss/og:url。空字符串时回退到 'https://arsvine.com' */
+  /** 站点 URL，无尾斜杠。用于 sitemap/rss/og:url。 */
   url: string;
+  /** 跨服务固定 origin，由 config/site-config.mjs 统一拥有 */
+  serviceOrigins: {
+    auth: string;
+    content: string;
+    cdn: string;
+  };
   /** 版权起始年份 */
   copyrightYearStart: number;
   /** 用于 <title>、og:title 的简短标题 */
@@ -62,7 +69,12 @@ export const siteConfig: SiteConfig = {
   name: 'ARSVINE REALM',
   author: 'Arsvine Zhu',
   email: 'arsvinezhu@gmail.com',
-  url: 'https://arsvine.com',
+  url: realmOrigin,
+  serviceOrigins: {
+    auth: authOrigin,
+    content: contentOrigin,
+    cdn: cdnOrigin,
+  },
   copyrightYearStart: 2026,
   metaTitle: 'ARSVINE REALM',
   metaDescription:
@@ -87,7 +99,7 @@ export const siteConfig: SiteConfig = {
     // 自有 CDN preconnect。所有访客都走 cdn.arsvine.com（腾讯云 COS 香港桶）：
     //   - 国内：Google Fonts 基本不可达，CDN 是唯一可行选项
     //   - 国外：HK COS 多 80-150ms 延迟，但保持单一字体源更简单可靠
-    cdnPreconnect: [{ href: 'https://cdn.arsvine.com', crossOrigin: 'anonymous' }],
+    cdnPreconnect: [{ href: cdnOrigin, crossOrigin: 'anonymous' }],
     // 真理之源：所有字体 family + 权重都在这一行配置。
     // - Dosis: 300/400/500 (HUD UI 文字主力)
     // - Noto Sans SC: 300/400/500/700 (中文正文 + 部分粗体)
@@ -104,7 +116,7 @@ export const siteConfig: SiteConfig = {
     // 对应 COS 上的改写版 CSS。fetch-google-fonts.mjs 会解析 Google 返回的 CSS、
     // 下载每段 unicode-range 的 woff2、把 url 改写为
     // cdn.arsvine.com/shared/fonts/<family>/<file>。
-    cdnStylesheet: 'https://cdn.arsvine.com/shared/fonts/google-fonts.css',
+    cdnStylesheet: `${cdnOrigin}/shared/fonts/google-fonts.css`,
   },
   locale: {
     htmlLang: 'zh',
@@ -138,6 +150,4 @@ export const siteConfig: SiteConfig = {
   },
 };
 
-/** 站点 URL，若 siteConfig.url 与 NEXT_PUBLIC_SITE_URL 均未设置则回退占位 */
-export const getSiteUrl = (): string =>
-  process.env.NEXT_PUBLIC_SITE_URL || siteConfig.url || 'https://arsvine.com';
+export const getSiteUrl = (): string => siteConfig.url;

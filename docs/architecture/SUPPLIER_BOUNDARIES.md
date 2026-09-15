@@ -96,7 +96,7 @@ Vercel Marketplace 此前显示这一条 Upstash resource 同时连接 Realm、R
 
 Realm 生产只读：
 
-- `CONTENT_BASE_URL` 指向 `content.arsvine.com`。
+- `config/site-config.mjs` 中的 Content origin 指向 `content.arsvine.com`。
 - 服务端读取已发布 release 的 Blog/Tweet metadata、variant 和 month API。
 - Content API 不直接暴露给浏览器；Realm 负责 visitor TOTP grant，Content 负责 release 读取和正文隔离。
 
@@ -169,7 +169,7 @@ Realm 通过 `/api/hitokoto` 代理 `v1.hitokoto.cn`，采用 timeout、边缘/�
 
 | 语义接口                 | 当前实现                                                               | 必须保留的语义                                                                   |
 | ------------------------ | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `PublishedContentReader` | Realm `src/shared/lib/content/content-api.ts`；Platform `apps/content` | `CONTENT_BASE_URL`、release pointer、公开/受保护正文隔离                         |
+| `PublishedContentReader` | Realm `src/shared/lib/content/content-api.ts`；Platform `apps/content` | 静态 Content origin、release pointer、公开/受保护正文隔离                        |
 | `InternalRevalidator`    | Realm `/api/internal/revalidate`；Platform/API + asset publisher       | timestamped HMAC、资源白名单、partial/failed 结果、pointer 后刷新                |
 | `BlobStore`              | COS SDK/COSCLI                                                         | get/put/list/head、metadata、immutable object key、public/private access         |
 | `CatalogPointer`         | COS `current.json` + versioned sections                                | pointer-last、完整版本可读后切换、双层 public/private 一致性                     |

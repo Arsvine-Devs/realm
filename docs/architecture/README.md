@@ -47,4 +47,4 @@ Vercel CLI 当前团队为 `arsvine-realm`，当前核心项目清单为 `arsvin
 
 本目录不保存真实密钥、Token、Cookie、TOTP secret、数据库连接串、COS bucket 名称或私有对象路径。供应商文档只记录字段名、职责、调用方向和迁移约束。
 
-普通 npm/pnpm 依赖不列为外部供应商；只有当依赖代表远端平台、外部数据源、托管运行时或供应商协议时，才在供应商文档中出现。
+普通 npm/pnpm 依赖不列为外部供应商；只有当依赖代表远端平台、外部数据源、托管运行时或供应商协议时，才在供应商文档中出现。Realm 固定服务 origin 见 `config/site-config.mjs`，动态环境变量见 [`../human/CONFIGURATION.md`](../human/CONFIGURATION.md)。

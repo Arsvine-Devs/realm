@@ -115,7 +115,6 @@ describe('visitor stats handler', () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('DATABASE_URL', 'postgresql://test.invalid/visitor-stats');
     vi.stubEnv('VISITOR_STATS_SECRET', SECRET);
-    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://arsvine.com');
   }
 
   it('records an eligible canonical request and sets a signed HttpOnly cookie', async () => {

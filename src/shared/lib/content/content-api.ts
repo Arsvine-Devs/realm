@@ -1,5 +1,6 @@
 import type { ContentBlogIndex, ContentTweetIndexItem } from './types';
 import { readEnv } from '@/shared/config/env-provider';
+import { authOrigin, contentOrigin } from '@/shared/config/site-endpoints';
 
 const FETCH_TIMEOUT_MS = 8000;
 const PUBLIC_CONTENT_REVALIDATE_SECONDS = 300;
@@ -27,38 +28,32 @@ class ContentServiceError extends Error {
 const AUTH_TOKEN_PATH = '/api/auth/oauth2/token';
 
 function getBaseUrl() {
-  const value = readEnv('CONTENT_BASE_URL');
-  if (!value) throw new ContentServiceError('Content service is not configured.');
   let url: URL;
   try {
-    url = new URL(value);
+    url = new URL(contentOrigin);
   } catch {
-    throw new ContentServiceError('CONTENT_BASE_URL must be an absolute URL.');
+    throw new ContentServiceError('Configured Content origin must be an absolute URL.');
   }
   if (url.protocol !== 'https:' && !LOOPBACK_HOSTS.has(url.hostname)) {
-    throw new ContentServiceError('CONTENT_BASE_URL must use HTTPS outside localhost.');
+    throw new ContentServiceError('Configured Content origin must use HTTPS outside localhost.');
   }
   return url.toString().replace(/\/$/, '');
 }
 
 function getProtectedContentAuthConfig() {
-  const issuer = readEnv('AUTH_ISSUER');
   const clientId = readEnv('CONTENT_SERVICE_CLIENT_ID');
   const clientSecret = readEnv('CONTENT_SERVICE_CLIENT_SECRET');
-  if (!issuer) {
-    throw new ContentServiceError('AUTH_ISSUER is not configured.');
-  }
   if (!clientId || !clientSecret) {
     throw new ContentServiceError('Protected content service credentials are not configured.');
   }
   let issuerUrl: URL;
   try {
-    issuerUrl = new URL(issuer);
+    issuerUrl = new URL(authOrigin);
   } catch {
-    throw new ContentServiceError('AUTH_ISSUER must be an absolute URL.');
+    throw new ContentServiceError('Configured Auth issuer must be an absolute URL.');
   }
   if (issuerUrl.protocol !== 'https:' && !LOOPBACK_HOSTS.has(issuerUrl.hostname)) {
-    throw new ContentServiceError('AUTH_ISSUER must use HTTPS outside localhost.');
+    throw new ContentServiceError('Configured Auth issuer must use HTTPS outside localhost.');
   }
   const tokenUrl = new URL(AUTH_TOKEN_PATH, issuerUrl).toString();
   return { tokenUrl, clientId, clientSecret };

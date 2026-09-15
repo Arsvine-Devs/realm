@@ -58,14 +58,13 @@ Only `assets:publish` can perform remote COS writes. Credentials are process env
 ## Configuration sources
 
 - Public/basic environment examples: `.env.example`
-- Runtime site identity and font URLs: `src/shared/config/site.ts`
+- Runtime site identity, service origins, and font URLs: `config/site-config.mjs` and `src/shared/config/site.ts`
 - Runtime locale registry: `src/app/i18n/data.ts`
 - Catalog source manifests: `src/features/*/contracts/source-manifest.json`
 - Dependency overrides and patches: `pnpm-workspace.yaml`, `patches/`
 
 ## Platform service configuration
 
-- `CONTENT_BASE_URL` is the only Realm runtime origin for published Blog/Tweet reads.
-- `AUTH_ISSUER` is the stable issuer used for protected Content service access.
-- `CONTENT_SERVICE_CLIENT_ID` and `CONTENT_SERVICE_CLIENT_SECRET` are server-only OAuth client credentials; the client derives the token endpoint from `AUTH_ISSUER`.
-- `NEXT_PUBLIC_CDN_BASE` is the browser-visible immutable media origin and must remain separate from Content/API/Auth origins.
+- The Content and Auth origins are source-controlled in `config/site-config.mjs`; they are the only Realm service origins for published Blog/Tweet and protected-content reads.
+- `CONTENT_SERVICE_CLIENT_ID` and `CONTENT_SERVICE_CLIENT_SECRET` are server-only OAuth client credentials; the client derives the token endpoint from the static Auth origin.
+- The CDN origin is source-controlled separately from Content/Auth in `config/site-config.mjs` and `src/shared/config/site.ts`.

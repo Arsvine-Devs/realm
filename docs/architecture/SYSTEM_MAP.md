@@ -48,7 +48,7 @@ flowchart TB
 
 图中的“Vercel”表示当前公开运行证据或仓库配置；它不是未来部署的必要组成部分。`Content`、`COS`、`Neon` 和 `Upstash` 分别属于不同的数据/基础设施边界，不能因为都由 Admin 或 Realm 调用就合并成一个存储层。
 
-Realm 对 Content 的读取发生在 Next.js 服务端：浏览器请求 Realm 页面，Realm 的 server component/route handler 再请求 `CONTENT_BASE_URL`。因此浏览器 F12 的 Network 面板通常只看到 `arsvine.com`，看不到 `content.arsvine.com`；这并不表示页面没有使用 Content API，验证应检查服务端源码、Content release header、Function 日志或受控 HTTP 探针。
+Realm 对 Content 的读取发生在 Next.js 服务端：浏览器请求 Realm 页面，Realm 的 server component/route handler 再请求 `config/site-config.mjs` 中的 Content origin。因此浏览器 F12 的 Network 面板通常只看到 `arsvine.com`，看不到 `content.arsvine.com`；这并不表示页面没有使用 Content API，验证应检查服务端源码、Content release header、Function 日志或受控 HTTP 探针。
 
 ## 运行单元与责任
 
@@ -117,7 +117,7 @@ Vercel CLI 当前项目与历史关联：
 
 ### Vercel integration 与环境变量证据
 
-Realm、Console、Auth、API 和 Content 的 Vercel 环境变量按各自 `.env.example` 与当前读取器维护。未由代码读取的 provider 别名不属于应用配置；Vercel 环境变量的具体键、格式、作用域和填写来源分别见 Realm [`human/CONFIGURATION.md`](../human/CONFIGURATION.md) 与 Platform [`CONFIGURATION.md`](https://github.com/Arsvine-Devs/platform/blob/main/docs/CONFIGURATION.md)。
+动态 secret、凭据和运行时开关按各自 `.env.example` 与 provider 维护；固定 service origin、resource、OIDC endpoint 和 publication pointer 由 Realm `config/site-config.mjs` 与 Platform `@arsvine/site-config` 拥有。具体键、格式、作用域和填写来源分别见 Realm [`human/CONFIGURATION.md`](../human/CONFIGURATION.md) 与 Platform [`CONFIGURATION.md`](https://github.com/Arsvine-Devs/platform/blob/main/docs/CONFIGURATION.md)。
 
 ### 已验证的公开运行信号
 
