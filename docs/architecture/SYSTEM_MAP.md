@@ -8,7 +8,7 @@
 
 ## 一句话模型
 
-系统由公共展示面、Console 控制面、Auth 身份面、API 控制面、Content 发布读面和 CDN 资产面组成：Realm 负责展示，Console 通过 API 写入，Auth 提供 OIDC，Content 读取已发布 release，COS/EdgeOne 保存和分发媒体；Neon 与 Upstash 只承担各自明确的持久状态和限流状态。
+系统由公共展示面、Console 控制面、Auth 身份面、API 控制面、Content 发布读面、CDN 资产面和 Status 运维观测面组成：Realm 负责展示，Console 通过 API 写入，Auth 提供 OIDC，Content 读取已发布 release，COS/EdgeOne 保存和分发媒体；Neon 与 Upstash 只承担各自明确的持久状态和限流状态。Status 负责外部健康检测与状态展示，检测配置由其独立部署维护。
 
 ## 全局拓扑
 
@@ -22,6 +22,7 @@ flowchart TB
   DNS --> API[api.arsvine.com\nControl API]
   DNS --> CONTENT[content.arsvine.com\nPublished Content]
   DNS --> CDN[cdn.arsvine.com\nTencent EdgeOne edge layer]
+  DNS --> STATUS[status.arsvine.com\nOperational monitoring]
 
   MAIN --> PROXY[src/proxy.ts\nlocale + geo cookie]
   PROXY --> PAGES[Next App Router pages\nSSR / ISR / client shell]
@@ -48,21 +49,24 @@ flowchart TB
 
 图中的“Vercel”表示当前公开运行证据或仓库配置；它不是未来部署的必要组成部分。`Content`、`COS`、`Neon` 和 `Upstash` 分别属于不同的数据/基础设施边界，不能因为都由 Admin 或 Realm 调用就合并成一个存储层。
 
+`status.arsvine.com` 是独立部署的运维检测与状态展示面。它的探针目标、通知渠道和页面内容由 Status 站点维护；核心业务服务不依赖 Status 站点才能处理请求。
+
 Realm 对 Content 的读取发生在 Next.js 服务端：浏览器请求 Realm 页面，Realm 的 server component/route handler 再请求 `config/site-config.mjs` 中的 Content origin。因此浏览器 F12 的 Network 面板通常只看到 `arsvine.com`，看不到 `content.arsvine.com`；这并不表示页面没有使用 Content API，验证应检查服务端源码、Content release header、Function 日志或受控 HTTP 探针。
 
 ## 运行单元与责任
 
-| 单元            | 仓库/入口                                               | 运行位置                                     | 主要责任                                                                                   | 当前状态                                                                               |
-| --------------- | ------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
-| Realm 主站      | `arsvine-realm`、`src/app/`、`src/proxy.ts`             | `arsvine.com`，当前为 Vercel                 | 首页、作品、经历、Life、博客展示、推文展示、RSS、sitemap、robots、受保护内容验证和资产读取 | `CURRENT`；公开请求本次被 Vercel Bot Protection challenge 拦截，不能据此评价页面可用性 |
-| Console 管理台  | `arsvine-platform`、`apps/console`                      | `console.arsvine.com`                        | OIDC BFF、Blog/Tweet 管理 UI 和 API 请求代理                                               | `CURRENT` + `LIVE`；health 与未授权 BFF 边界已验证                                     |
-| Auth 身份面     | `arsvine-auth`、`apps/auth`                             | `auth.arsvine.com`                           | Better Auth identity、OIDC/OAuth、WebAuthn/Passkey、TOTP、owner/editor role                | `CURRENT` + `LIVE`；Discovery/JWKS/health 可读                                         |
-| API 控制面      | `arsvine-platform`、`apps/api`                          | `api.arsvine.com`                            | JWT/JWKS resource verification、Core authoring `/v1/*` 和 Content publish                  | `CURRENT` + `LIVE`；无 Token 请求正确拒绝，OpenAPI 与 health 可读                      |
-| Content 内容面  | `arsvine-platform`、`apps/content`                      | `content.arsvine.com`                        | 已发布 release、Blog/Tweet read API、protected internal variant                            | `CURRENT` + `LIVE`；release、公开 protected 403、内部 scope 校验已验证                 |
-| Asset 资产面    | Realm `scripts/assets/*`、COS bucket、`cdn.arsvine.com` | 腾讯云 COS 源站 + EdgeOne/CDN 观测到的边缘层 | 原始媒体、哈希对象、私有 Catalog、公有 site catalog、字体、音频和图片分发                  | `CURRENT` + `LIVE`；公共 pointer 可读                                                  |
-| Realm 数据面    | `src/features/visitor-stats/`、`db/migrations/`         | Neon Postgres                                | 匿名访客 HMAC key、总计数、日计数和基线                                                    | `CURRENT`；数据库项目/分支未知                                                         |
-| Platform 数据面 | `arsvine-platform/packages/core-db`、`apps/auth`        | PostgreSQL                                   | Auth identity/session 与 Core authoring/publication state                                  | `CURRENT`；生产 database/branch 和凭据归属仍需外部配置确认                             |
-| 相邻站点与活动  | 外部项目与独立域名                                      | 不属于 Realm/Platform 核心拓扑               | 由各自仓库和供应商配置独立维护                                                             | 本文不以其状态推导核心系统可用性                                                       |
+| 单元              | 仓库/入口                                               | 运行位置                                     | 主要责任                                                                                   | 当前状态                                                                               |
+| ----------------- | ------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| Realm 主站        | `arsvine-realm`、`src/app/`、`src/proxy.ts`             | `arsvine.com`，当前为 Vercel                 | 首页、作品、经历、Life、博客展示、推文展示、RSS、sitemap、robots、受保护内容验证和资产读取 | `CURRENT`；公开请求本次被 Vercel Bot Protection challenge 拦截，不能据此评价页面可用性 |
+| Console 管理台    | `arsvine-platform`、`apps/console`                      | `console.arsvine.com`                        | OIDC BFF、Blog/Tweet 管理 UI 和 API 请求代理                                               | `CURRENT` + `LIVE`；health 与未授权 BFF 边界已验证                                     |
+| Auth 身份面       | `arsvine-auth`、`apps/auth`                             | `auth.arsvine.com`                           | Better Auth identity、OIDC/OAuth、WebAuthn/Passkey、TOTP、owner/editor role                | `CURRENT` + `LIVE`；Discovery/JWKS/health 可读                                         |
+| API 控制面        | `arsvine-platform`、`apps/api`                          | `api.arsvine.com`                            | JWT/JWKS resource verification、Core authoring `/v1/*` 和 Content publish                  | `CURRENT` + `LIVE`；无 Token 请求正确拒绝，OpenAPI 与 health 可读                      |
+| Content 内容面    | `arsvine-platform`、`apps/content`                      | `content.arsvine.com`                        | 已发布 release、Blog/Tweet read API、protected internal variant                            | `CURRENT` + `LIVE`；release、公开 protected 403、内部 scope 校验已验证                 |
+| Asset 资产面      | Realm `scripts/assets/*`、COS bucket、`cdn.arsvine.com` | 腾讯云 COS 源站 + EdgeOne/CDN 观测到的边缘层 | 原始媒体、哈希对象、私有 Catalog、公有 site catalog、字体、音频和图片分发                  | `CURRENT` + `LIVE`；公共 pointer 可读                                                  |
+| Status 运维观测面 | 独立部署的 Status 站点                                  | `status.arsvine.com`                         | 核心站点和服务的外部健康检测、状态展示                                                     | `CLAIMED`；用户已手动部署，具体检测项未由本仓库复核                                    |
+| Realm 数据面      | `src/features/visitor-stats/`、`db/migrations/`         | Neon Postgres                                | 匿名访客 HMAC key、总计数、日计数和基线                                                    | `CURRENT`；数据库项目/分支未知                                                         |
+| Platform 数据面   | `arsvine-platform/packages/core-db`、`apps/auth`        | PostgreSQL                                   | Auth identity/session 与 Core authoring/publication state                                  | `CURRENT`；生产 database/branch 和凭据归属仍需外部配置确认                             |
+| 相邻站点与活动    | 外部项目与独立域名                                      | 不属于 Realm/Platform 核心拓扑               | 由各自仓库和供应商配置独立维护                                                             | 本文不以其状态推导核心系统可用性                                                       |
 
 ## Realm 主站内部边界
 

@@ -63,6 +63,10 @@ GET /api/health/ready  # Realm 进程和必要的当前运行配置可接收请�
 
 `ready` 不等于 Content release、COS、Neon 或 Upstash 的完整业务验收；Realm 的 Content/Auth origin 由 `config/site-config.mjs` 固定配置。
 
+## Status 运维检测
+
+[status.arsvine.com](https://status.arsvine.com) 是独立部署的运维检测和状态展示站点。它可将本节列出的 Realm 健康路由作为公开探针目标；Status 的检测项、通知渠道和状态页内容由该站点维护，不属于 Realm 运行时配置。
+
 ## 生产配置
 
 固定站点和服务 origin：
