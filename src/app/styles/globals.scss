@@ -329,6 +329,13 @@ button {
   text-shadow: none;
 }
 
+html[data-theme-mode='inverted'] ::selection,
+html[data-theme-mode='inverted'] ::-moz-selection {
+  background: #e08fff;
+  color: #222222;
+  text-shadow: none;
+}
+
 /* 统一footer背景色 */
 .footer {
   background-color: var(--ark-dark-blue) !important;
