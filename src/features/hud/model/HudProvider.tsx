@@ -140,6 +140,7 @@ export function HudProvider({ children }: { children: ReactNode }) {
   const typingValue = useMemo<HudTypingState>(
     () => ({
       displayedFateText: fateTyping.displayedFateText,
+      accessibleFateText: fateTyping.accessibleFateText,
       isFateTypingActive: fateTyping.isFateTypingActive,
       displayedEnvParams: envTyping.displayedEnvParams,
       isEnvParamsTyping: envTyping.isEnvParamsTyping,
@@ -154,6 +155,7 @@ export function HudProvider({ children }: { children: ReactNode }) {
       envTyping.envDataVersion,
       envTyping.isEnvParamsTyping,
       fateTyping.displayedFateText,
+      fateTyping.accessibleFateText,
       fateTyping.isFateTypingActive,
     ],
   );

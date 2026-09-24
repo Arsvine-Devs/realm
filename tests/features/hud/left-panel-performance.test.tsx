@@ -40,6 +40,7 @@ function buildProps(overrides: Record<string, unknown> = {}) {
     powerLevel: 67,
     isFateTypingActive: false,
     displayedFateText: '',
+    accessibleFateText: '',
     isEnvParamsTyping: false,
     displayedEnvParams: '',
     envArtifactStage: 0,
