@@ -61,6 +61,7 @@ describe('AboutSection adaptive performance', () => {
       <AboutSection aboutSectionRef={{ current: null }} aboutContentRef={{ current: null }} />,
     );
     expect(screen.getByTestId('noise-effect')).toBeTruthy();
+    expect(screen.getByText('简中')).toBeTruthy();
     const aboutSection = container.querySelector('#about-section');
     expect(aboutSection?.classList.contains(styles.contentSection)).toBe(true);
     expect(aboutSection?.classList.contains(styles.aboutSection)).toBe(true);
