@@ -1,6 +1,6 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import enMessages from '@/app/locales/en.json';
 import zhCNMessages from '@/app/locales/zh-CN.json';
@@ -9,7 +9,10 @@ import MDXComponents from '@/features/blog/ui/mdx/MDXComponents';
 import Spoiler, { SpoilerProvider } from '@/features/blog/ui/mdx/Spoiler';
 import spoilerStyles from '@/features/blog/styles/Spoiler.module.scss';
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 const localeMessages = {
   'zh-CN': zhCNMessages,
@@ -51,6 +54,68 @@ describe('Spoiler MDX component', () => {
     expect(spoiler.getAttribute('data-cursor-label')).toBe('Click to reveal');
     expect(spoiler.getAttribute('data-cursor-magnetic')).toBe('true');
     expect(screen.getByText('secret-1').getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('remeasures rendered text fragments after fonts load without a container resize', async () => {
+    const makeRect = (left: number, top: number, width: number, height: number) =>
+      new DOMRect(left, top, width, height);
+    let clientRects = [makeRect(12, 10, 20, 10), makeRect(32, 10, 18, 10)];
+    const rangeSpy = vi.spyOn(document, 'createRange').mockImplementation(
+      () =>
+        ({
+          selectNodeContents: vi.fn(),
+          getClientRects: () => clientRects,
+        }) as unknown as Range,
+    );
+    const fontListeners = new Map<string, EventListener>();
+    const fonts = {
+      ready: Promise.resolve({} as FontFaceSet),
+      addEventListener: (type: string, listener: EventListener) => {
+        fontListeners.set(type, listener);
+      },
+      removeEventListener: vi.fn(),
+    } as unknown as FontFaceSet;
+    const originalFontsDescriptor = Object.getOwnPropertyDescriptor(document, 'fonts');
+    Object.defineProperty(document, 'fonts', { configurable: true, value: fonts });
+
+    try {
+      render(
+        <NextIntlClientProvider locale="en" messages={enMessages}>
+          <SpoilerProvider>
+            <Spoiler>
+              <strong>secret-1</strong>
+            </Spoiler>
+          </SpoilerProvider>
+        </NextIntlClientProvider>,
+      );
+
+      const spoiler = getSpoilers()[0];
+      await waitFor(() => expect(spoiler.getAttribute('data-spoiler-lines')).toBe('ready'));
+      let covers = spoiler.querySelectorAll(`.${spoilerStyles.spoilerCover}`);
+      expect(covers).toHaveLength(1);
+      expect((covers[0] as HTMLElement).style.width).toBe('42px');
+
+      act(() => fontListeners.get('loading')?.(new Event('loading')));
+      expect(spoiler.getAttribute('data-spoiler-lines')).toBe('pending');
+      expect(spoiler.getAttribute('data-spoiler-state')).toBe('concealed');
+      expect((covers[0] as HTMLElement).style.width).toBe('42px');
+
+      clientRects = [makeRect(12, 10, 35, 10), makeRect(47, 11, 30, 8), makeRect(12, 30, 25, 10)];
+      act(() => fontListeners.get('loadingdone')?.(new Event('loadingdone')));
+
+      await waitFor(() => expect(spoiler.getAttribute('data-spoiler-lines')).toBe('ready'));
+      covers = spoiler.querySelectorAll(`.${spoilerStyles.spoilerCover}`);
+      expect(covers).toHaveLength(2);
+      expect((covers[0] as HTMLElement).style.width).toBe('69px');
+      expect((covers[1] as HTMLElement).style.width).toBe('29px');
+    } finally {
+      if (originalFontsDescriptor) {
+        Object.defineProperty(document, 'fonts', originalFontsDescriptor);
+      } else {
+        Reflect.deleteProperty(document, 'fonts');
+      }
+      rangeSpy.mockRestore();
+    }
   });
 
   it('previews on hover and focus, then restores concealment', () => {

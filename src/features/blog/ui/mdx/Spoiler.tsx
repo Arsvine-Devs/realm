@@ -27,6 +27,11 @@ interface SpoilerLineRect {
   height: number;
 }
 
+interface SpoilerGeometry {
+  lineRects: SpoilerLineRect[];
+  pending: boolean;
+}
+
 interface SpoilerContextValue {
   isRevealed: (id: string) => boolean;
   register: (id: string) => () => void;
@@ -309,7 +314,7 @@ export default function Spoiler({ children }: SpoilerProps) {
   const contentId = useId();
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const [lineRects, setLineRects] = useState<SpoilerLineRect[]>([]);
+  const [geometry, setGeometry] = useState<SpoilerGeometry>({ lineRects: [], pending: true });
   const revealed = isRevealed(id);
   const previewVisible = revealed || isHovered || isFocused;
 
@@ -322,8 +327,8 @@ export default function Spoiler({ children }: SpoilerProps) {
 
     const wrapperRect = trigger.getBoundingClientRect();
     const range = document.createRange();
-    if (typeof range.getBoundingClientRect !== 'function') {
-      setLineRects([]);
+    if (typeof range.getClientRects !== 'function') {
+      setGeometry((current) => ({ ...current, pending: true }));
       return;
     }
 
@@ -331,20 +336,18 @@ export default function Spoiler({ children }: SpoilerProps) {
     const rects: DOMRect[] = [];
     let textNode = walker.nextNode();
     while (textNode) {
-      const text = textNode.textContent ?? '';
-      for (let offset = 0; offset < text.length; offset += 1) {
-        if (/\s/.test(text[offset] ?? '')) continue;
-        range.setStart(textNode, offset);
-        range.setEnd(textNode, offset + 1);
-        const rect = range.getBoundingClientRect();
-        if (rect.width > 0 && rect.height > 0) rects.push(rect);
-      }
+      range.selectNodeContents(textNode);
+      rects.push(
+        ...Array.from(range.getClientRects()).filter((rect) => rect.width > 0 && rect.height > 0),
+      );
       textNode = walker.nextNode();
     }
     const groups: Array<{ left: number; right: number; top: number; bottom: number }> = [];
 
     rects.forEach((rect) => {
-      const existing = groups.find((group) => Math.abs(group.top - rect.top) < 1.5);
+      const existing = groups.find(
+        (group) => rect.top < group.bottom + 1.5 && rect.bottom > group.top - 1.5,
+      );
       if (existing) {
         existing.left = Math.min(existing.left, rect.left);
         existing.right = Math.max(existing.right, rect.right);
@@ -360,30 +363,47 @@ export default function Spoiler({ children }: SpoilerProps) {
       });
     });
 
-    setLineRects(
-      groups.map((group) => ({
-        left: group.left - wrapperRect.left - 2,
-        top: group.top - wrapperRect.top - 1,
-        width: group.right - group.left + 4,
-        height: group.bottom - group.top + 2,
-      })),
-    );
+    const lineRects = groups.map((group) => ({
+      left: group.left - wrapperRect.left - 2,
+      top: group.top - wrapperRect.top - 1,
+      width: group.right - group.left + 4,
+      height: group.bottom - group.top + 2,
+    }));
+
+    if (lineRects.length === 0 && content.textContent?.trim()) {
+      setGeometry((current) => ({ ...current, pending: true }));
+      return;
+    }
+
+    setGeometry({ lineRects, pending: false });
   }, []);
 
   useLayoutEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- line geometry is synchronized from the measured DOM range.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- geometry is synchronized from the measured DOM range.
     measureLineRects();
     const content = contentRef.current;
     const trigger = triggerRef.current;
+    const fonts = document.fonts;
+    const handleFontsLoading = () => {
+      setGeometry((current) => (current.pending ? current : { ...current, pending: true }));
+    };
+    const handleFontsSettled = () => measureLineRects();
     const observer =
       typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measureLineRects) : null;
     if (observer) {
       if (content) observer.observe(content);
       if (trigger) observer.observe(trigger);
     }
+    fonts?.addEventListener('loading', handleFontsLoading);
+    fonts?.addEventListener('loadingdone', handleFontsSettled);
+    fonts?.addEventListener('loadingerror', handleFontsSettled);
+    if (fonts) void fonts.ready.then(handleFontsSettled);
     window.addEventListener('resize', measureLineRects);
     return () => {
       observer?.disconnect();
+      fonts?.removeEventListener('loading', handleFontsLoading);
+      fonts?.removeEventListener('loadingdone', handleFontsSettled);
+      fonts?.removeEventListener('loadingerror', handleFontsSettled);
       window.removeEventListener('resize', measureLineRects);
     };
   }, [measureLineRects]);
@@ -410,7 +430,7 @@ export default function Spoiler({ children }: SpoilerProps) {
       aria-describedby={revealed ? contentId : undefined}
       data-cursor-label={revealed ? '' : t('clickToReveal')}
       data-cursor-magnetic
-      data-spoiler-lines={lineRects.length > 0 ? 'ready' : 'pending'}
+      data-spoiler-lines={geometry.pending ? 'pending' : 'ready'}
       data-spoiler-state={revealed ? 'revealed' : previewVisible ? 'preview' : 'concealed'}
       onClick={activate}
       onMouseEnter={() => setIsHovered(true)}
@@ -432,7 +452,7 @@ export default function Spoiler({ children }: SpoilerProps) {
       >
         {children}
       </span>
-      {lineRects.map((rect, index) => (
+      {geometry.lineRects.map((rect, index) => (
         <span
           key={`${id}-line-${index}`}
           className={styles.spoilerCover}
