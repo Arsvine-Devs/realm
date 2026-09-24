@@ -10,9 +10,10 @@ import {
   findClosestInteractiveElement,
   getCursorTargetBounds,
   getInteractiveCursorTarget,
-  isCursorInteractive,
+  getVisibleCursorRect,
   lerp,
   resolveCursorLabel,
+  type CursorTargetRect,
 } from './customCursorShared';
 
 const CustomCursor = () => {
@@ -88,8 +89,8 @@ const CustomCursor = () => {
     const el = hoverEl.current;
     if (!el) return null;
 
-    const rect = el.getBoundingClientRect();
-    if (!isCursorInteractive(el, rect)) return null;
+    const rect = getVisibleCursorRect(el);
+    if (!rect) return null;
     const target = getCursorTargetBounds(el, 12, rect);
 
     snapTarget.current = target;
@@ -157,7 +158,7 @@ const CustomCursor = () => {
         }
       }
 
-      let hoverRect: DOMRect | null = null;
+      let hoverRect: CursorTargetRect | null = null;
       if (isHovering.current) {
         hoverRect = syncHoverTarget();
         if (!hoverRect) {
@@ -212,11 +213,12 @@ const CustomCursor = () => {
 
   const handleRegisteredEnter = useCallback(
     (el: HTMLElement) => {
-      if (!isCursorInteractive(el)) return;
+      const rect = getVisibleCursorRect(el);
+      if (!rect) return;
 
       hoverEl.current = el;
       isHovering.current = true;
-      snapTarget.current = getCursorTargetBounds(el);
+      snapTarget.current = getCursorTargetBounds(el, 0, rect);
 
       const label = resolveCursorLabel(el);
       syncHoverTarget();

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import {
   findClosestInteractiveElement,
+  getVisibleCursorRect,
   resolveCursorLabel,
 } from '@/features/hud/ui/cursor/customCursorShared';
 
@@ -27,8 +28,28 @@ describe('custom cursor magnetic target lookup', () => {
     expect(result?.element).toBe(near);
     expect(getComputedStyle.mock.calls.some(([element]) => element === near)).toBe(true);
     expect(getComputedStyle.mock.calls.some(([element]) => element === far)).toBe(false);
+    getComputedStyle.mockRestore();
     near.remove();
     far.remove();
+  });
+
+  it('ignores playlist items clipped by a scroll container and uses the visible part of a row', () => {
+    const scroller = document.createElement('div');
+    scroller.style.overflowX = 'hidden';
+    scroller.style.overflowY = 'auto';
+    const row = document.createElement('button');
+    scroller.append(row);
+    document.body.append(scroller);
+    scroller.getBoundingClientRect = () => mockRect(0, 100, 100, 60);
+    row.getBoundingClientRect = () => mockRect(0, 70, 100, 30);
+
+    expect(findClosestInteractiveElement([row], 10, 95)).toBeNull();
+
+    row.getBoundingClientRect = () => mockRect(0, 140, 100, 40);
+    expect(getVisibleCursorRect(row)).toMatchObject({ top: 140, bottom: 160, height: 20 });
+    expect(findClosestInteractiveElement([row], 10, 150)?.element).toBe(row);
+
+    scroller.remove();
   });
 
   it('honors an explicit empty cursor label without falling back to aria-label', () => {
