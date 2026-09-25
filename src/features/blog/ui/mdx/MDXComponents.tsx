@@ -1,17 +1,43 @@
 import React from 'react';
 import styles from '../../styles/MDXContent.module.scss';
 import { getSafeMdxHref } from '@/features/blog/model/mdxHref';
+import { BlogScrambleBlock } from './BlogContentReveal';
 import Term from './Term';
 import Explain from './Explain';
 import Spoiler from './Spoiler';
 
 type MDXComponentsType = Record<string, React.ComponentType<any>>;
 
+function CodeBlock({ children }: { children?: React.ReactNode }) {
+  return <pre className={styles.codeBlock}>{children}</pre>;
+}
+
+Object.assign(CodeBlock, { blogContentScrambleExcluded: true });
+
 const MDXComponents: MDXComponentsType = {
-  h1: ({ children }) => <h1 className={styles.h1}>{children}</h1>,
-  h2: ({ children }) => <h2 className={styles.h2}>{children}</h2>,
-  h3: ({ children }) => <h3 className={styles.h3}>{children}</h3>,
-  p: ({ children }) => <p className={styles.p}>{children}</p>,
+  h1: ({ children }) => (
+    <BlogScrambleBlock as="h1" className={styles.h1}>
+      {children}
+    </BlogScrambleBlock>
+  ),
+  h2: ({ children }) => (
+    <BlogScrambleBlock as="h2" className={styles.h2}>
+      {children}
+    </BlogScrambleBlock>
+  ),
+  h3: ({ children }) => (
+    <BlogScrambleBlock as="h3" className={styles.h3}>
+      {children}
+    </BlogScrambleBlock>
+  ),
+  h4: ({ children }) => <BlogScrambleBlock as="h4">{children}</BlogScrambleBlock>,
+  h5: ({ children }) => <BlogScrambleBlock as="h5">{children}</BlogScrambleBlock>,
+  h6: ({ children }) => <BlogScrambleBlock as="h6">{children}</BlogScrambleBlock>,
+  p: ({ children }) => (
+    <BlogScrambleBlock as="p" className={styles.p}>
+      {children}
+    </BlogScrambleBlock>
+  ),
   blockquote: ({ children }) => <blockquote className={styles.blockquote}>{children}</blockquote>,
   a: ({ href, children }) => {
     const safeHref = getSafeMdxHref(href);
@@ -27,7 +53,11 @@ const MDXComponents: MDXComponentsType = {
   },
   ul: ({ children }) => <ul className={styles.ul}>{children}</ul>,
   ol: ({ children }) => <ol className={styles.ol}>{children}</ol>,
-  li: ({ children }) => <li className={styles.li}>{children}</li>,
+  li: ({ children }) => (
+    <BlogScrambleBlock as="li" className={styles.li}>
+      {children}
+    </BlogScrambleBlock>
+  ),
   strong: ({ children }: { children?: React.ReactNode }) => {
     const text = typeof children === 'string' ? children : '';
     const isShort = text.length > 0 && text.length <= 5;
@@ -42,8 +72,12 @@ const MDXComponents: MDXComponentsType = {
   em: ({ children }) => <em className={styles.em}>{children}</em>,
   hr: () => <hr className={styles.hr} />,
   code: ({ children }) => <code className={styles.inlineCode}>{children}</code>,
-  pre: ({ children }) => <pre className={styles.codeBlock}>{children}</pre>,
-  Lead: ({ children }: { children?: React.ReactNode }) => <p className={styles.lead}>{children}</p>,
+  pre: CodeBlock,
+  Lead: ({ children }: { children?: React.ReactNode }) => (
+    <BlogScrambleBlock as="p" className={styles.lead}>
+      {children}
+    </BlogScrambleBlock>
+  ),
   Aside: ({ children }: { children?: React.ReactNode }) => (
     <aside className={styles.aside}>{children}</aside>
   ),

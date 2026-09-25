@@ -9,6 +9,7 @@ import { useHudPerformance, useHudStats } from '../../hud/model/HudProvider';
 import { useSiteAssets } from '../../assets/model/SiteAssetsProvider';
 import { useVisitorStats } from '@/features/visitor-stats/model/VisitorStatsProvider';
 import useVisitorLanguageCode from '@/shared/hooks/useVisitorLanguageCode';
+import { getVisitorLanguageLabel } from '../model/visitorLanguageLabel';
 import type { RefObject } from 'react';
 import { useNavigationRuntime } from '@/features/navigation/model/NavigationRuntime';
 
@@ -25,7 +26,7 @@ export default function AboutSection({ aboutSectionRef, aboutContentRef }: About
   const { totalVisitors, todayVisitors } = useVisitorStats();
   const { allowDecorativeMotion } = useHudPerformance();
   const { getSiteAssetUrl } = useSiteAssets();
-  const visitorLanguageCode = useVisitorLanguageCode();
+  const visitorLanguage = getVisitorLanguageLabel(useVisitorLanguageCode());
   const queryLocale = query.locale;
   const locale = isLocale(queryLocale) ? queryLocale : defaultLocale;
   const formatVisitorCount = (value: number | null) =>
@@ -58,7 +59,7 @@ export default function AboutSection({ aboutSectionRef, aboutContentRef }: About
           </p>
           <p>
             {t('visitorLanguage')}:{' '}
-            <span className={styles.statValue}>{visitorLanguageCode ?? '--'}</span>
+            <span className={styles.statValue}>{visitorLanguage ?? '--'}</span>
           </p>
         </div>
         <div className={styles.footerInfo}>

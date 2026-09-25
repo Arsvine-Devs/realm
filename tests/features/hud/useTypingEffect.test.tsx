@@ -28,10 +28,24 @@ import {
   useEnvParamsTypingEffect,
   useFateTypingEffect,
 } from '@/features/hud/model/useTypingEffect';
+import { DEFAULT_TYPEWRITER_DURATION_MS } from '@/shared/lib/typewriter';
 
 describe('typing effect hooks', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn((query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    );
   });
 
   afterEach(() => {
@@ -56,7 +70,13 @@ describe('typing effect hooks', () => {
     );
 
     act(() => {
-      vi.advanceTimersByTime(6000);
+      vi.advanceTimersByTime(DEFAULT_TYPEWRITER_DURATION_MS);
+    });
+
+    expect(result.current.displayedFateText).toBe('A');
+
+    act(() => {
+      vi.advanceTimersByTime(9000 - DEFAULT_TYPEWRITER_DURATION_MS);
     });
 
     expect(fetchMock).toHaveBeenCalledWith('/api/hitokoto', expect.anything());
@@ -68,6 +88,7 @@ describe('typing effect hooks', () => {
     expect(requestSignal?.aborted).toBe(true);
     expect(result.current).toEqual({
       displayedFateText: '',
+      accessibleFateText: '',
       isFateTypingActive: false,
     });
   });
@@ -86,7 +107,7 @@ describe('typing effect hooks', () => {
     );
 
     act(() => {
-      vi.advanceTimersByTime(6000);
+      vi.advanceTimersByTime(9000);
     });
 
     expect(fetchMock).toHaveBeenCalledWith('/api/hitokoto', expect.anything());

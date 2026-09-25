@@ -56,7 +56,7 @@ export default function NavigationColumns({
     powerLevel,
   } = useHudPower();
   const { leversVisible, mainVisible } = useHudAnimation();
-  const { displayedFateText, isFateTypingActive } = useHudTyping();
+  const { displayedFateText, accessibleFateText, isFateTypingActive } = useHudTyping();
   const { isMobile } = useResponsive();
   const reducedMotion = useReducedMotion();
 
@@ -162,7 +162,12 @@ export default function NavigationColumns({
             <div
               className={`${styles.mobilePanelFate} ${isFateTypingActive ? styles.mobilePanelTyping : ''}`}
             >
-              <span className={styles.mobilePanelFateText}>{displayedFateText}</span>
+              <span className={styles.mobilePanelFateText} aria-hidden="true">
+                {displayedFateText}
+              </span>
+              {accessibleFateText ? (
+                <span className="visually-hidden">{accessibleFateText}</span>
+              ) : null}
             </div>
           </div>
         </div>

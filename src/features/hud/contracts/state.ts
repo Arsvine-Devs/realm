@@ -38,6 +38,7 @@ export interface RealtimeStatsState {
 
 export interface FateTypingState {
   displayedFateText: string;
+  accessibleFateText: string;
   isFateTypingActive: boolean;
 }
 

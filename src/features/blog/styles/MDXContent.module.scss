@@ -50,6 +50,38 @@
   letter-spacing: 0.04em;
 }
 
+.scrambleBlock {
+  position: relative;
+}
+
+.scrambleRichContent {
+  opacity: 1;
+  transition: opacity 240ms ease-out;
+}
+
+.scrambleRichHidden {
+  opacity: 0;
+}
+
+.scrambleOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  height: 100%;
+  box-sizing: border-box;
+  opacity: 1;
+  line-height: inherit;
+  white-space: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 240ms ease-out;
+}
+
+.scrambleOverlayFading {
+  opacity: 0;
+}
+
 .blockquote {
   font-family: var(--font-reading);
   font-size: var(--fs-sub);

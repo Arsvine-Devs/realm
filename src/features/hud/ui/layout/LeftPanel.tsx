@@ -32,6 +32,7 @@ interface LeftPanelProps {
   powerLevel: number;
   isFateTypingActive: boolean;
   displayedFateText: string;
+  accessibleFateText: string;
   isEnvParamsTyping: boolean;
   displayedEnvParams: string;
   envArtifactStage?: 0 | 1 | 2 | 3 | 4;
@@ -113,6 +114,7 @@ export default function LeftPanel({
   powerLevel,
   isFateTypingActive,
   displayedFateText,
+  accessibleFateText,
   isEnvParamsTyping,
   displayedEnvParams,
   envArtifactStage = 0,
@@ -245,7 +247,10 @@ export default function LeftPanel({
       <div
         className={`${styles.fateTextContainer} ${isFateTypingActive ? styles.typingActive : ''}`}
       >
-        <span className={styles.fateText}>{displayedFateText}</span>
+        <span className={styles.fateText} aria-hidden="true">
+          {displayedFateText}
+        </span>
+        {accessibleFateText ? <span className="visually-hidden">{accessibleFateText}</span> : null}
         <div className={styles.fateLine}></div>
       </div>
       <div

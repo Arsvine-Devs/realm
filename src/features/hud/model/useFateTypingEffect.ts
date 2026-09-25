@@ -2,6 +2,13 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { FateTypingState } from '@/features/hud/contracts/state';
 import { formatFateTextForWrap, getTypingDelays } from '@/features/hud/model/typing-effect';
+import {
+  createTypewriterSequence,
+  getTypewriterStepAtProgress,
+  splitTypewriterText,
+  TYPEWRITER_FRAME_INTERVAL_MS,
+} from '@/shared/lib/typewriter';
+import { useReducedMotion } from '@/shared/hooks/useMediaQuery';
 
 /**
  * Fate text typing effect — 节奏：
@@ -25,7 +32,9 @@ const HITOKOTO_PAUSE_AFTER_TYPE = 4000; // ms，比预设的 1500 长，给短�
 export function useFateTypingEffect(textVisible: boolean): FateTypingState {
   const tSite = useTranslations('pages.site');
   const [displayedFateText, setDisplayedFateText] = useState('');
+  const [accessibleFateText, setAccessibleFateText] = useState('');
   const isFateTypingActive = textVisible;
+  const reducedMotion = useReducedMotion();
 
   // 标签页隐藏时暂停整个打字循环（含 hitokoto 轮询）。visibilitychange 在客户端
   // 才有意义；effect 仅在客户端运行，访问 document 安全。mount 时 sync() 一次
@@ -59,24 +68,58 @@ export function useFateTypingEffect(textVisible: boolean): FateTypingState {
       timeouts.push(id);
     };
 
-    const typeString = (str: string, index: number, delay: number, callback?: () => void) => {
+    const typeString = (str: string, callback?: () => void) => {
       if (cancelled) return;
-      if (index < str.length) {
-        setDisplayedFateText((prev) => prev + str[index]);
-        schedule(() => typeString(str, index + 1, delay, callback), delay);
-      } else if (callback) {
-        schedule(callback, 0);
+      setAccessibleFateText(str);
+      const sequence = createTypewriterSequence(str, 'plain');
+      if (reducedMotion || sequence.stepCount === 0) {
+        setDisplayedFateText(str);
+        if (callback) schedule(callback, 0);
+        return;
       }
+
+      const startedAt = Date.now();
+      const animate = () => {
+        if (cancelled) return;
+        const elapsed = Math.min(sequence.durationMs, Date.now() - startedAt);
+        const step = getTypewriterStepAtProgress(sequence, elapsed / sequence.durationMs);
+        setDisplayedFateText(sequence.frameAt(step));
+        if (elapsed >= sequence.durationMs) {
+          if (callback) schedule(callback, 0);
+          return;
+        }
+        schedule(animate, Math.min(TYPEWRITER_FRAME_INTERVAL_MS, sequence.durationMs - elapsed));
+      };
+      schedule(animate, TYPEWRITER_FRAME_INTERVAL_MS);
     };
 
     const deleteString = (currentStr: string, delay: number, callback?: () => void) => {
       if (cancelled) return;
-      if (currentStr.length > 0) {
-        setDisplayedFateText((prev) => prev.slice(0, -1));
-        schedule(() => deleteString(currentStr.slice(0, -1), delay, callback), delay);
-      } else if (callback) {
-        schedule(callback, 0);
+      setAccessibleFateText('');
+      const initialGraphemes = splitTypewriterText(currentStr);
+      if (reducedMotion || !initialGraphemes) {
+        setDisplayedFateText('');
+        if (callback) schedule(callback, 0);
+        return;
       }
+
+      const remaining = [...initialGraphemes];
+      const removeNext = () => {
+        if (cancelled) return;
+        if (remaining.length === 0) {
+          if (callback) schedule(callback, 0);
+          return;
+        }
+
+        remaining.pop();
+        setDisplayedFateText(remaining.join(''));
+        if (remaining.length === 0) {
+          if (callback) schedule(callback, 0);
+          return;
+        }
+        schedule(removeNext, delay);
+      };
+      schedule(removeNext, delay);
     };
 
     // 一轮预设：en (英文节奏) → zh (中文节奏)
@@ -84,11 +127,11 @@ export function useFateTypingEffect(textVisible: boolean): FateTypingState {
       const primaryProfile = getTypingDelays(englishText);
       const secondaryProfile = getTypingDelays(chineseText);
 
-      typeString(englishText, 0, primaryProfile.typeDelay, () => {
+      typeString(englishText, () => {
         schedule(() => {
           deleteString(englishText, primaryProfile.deleteDelay, () => {
             schedule(() => {
-              typeString(chineseText, 0, secondaryProfile.typeDelay, () => {
+              typeString(chineseText, () => {
                 schedule(() => {
                   deleteString(chineseText, secondaryProfile.deleteDelay, () => {
                     schedule(onDone, pauseAfterDelete);
@@ -117,7 +160,7 @@ export function useFateTypingEffect(textVisible: boolean): FateTypingState {
           if (cancelled) return;
           const wrappedText = formatFateTextForWrap(text);
           const textProfile = getTypingDelays(wrappedText);
-          typeString(wrappedText, 0, textProfile.typeDelay, () => {
+          typeString(wrappedText, () => {
             schedule(() => {
               deleteString(wrappedText, textProfile.deleteDelay, () => {
                 schedule(onDone, pauseAfterDelete);
@@ -175,8 +218,9 @@ export function useFateTypingEffect(textVisible: boolean): FateTypingState {
       abortControllers.forEach((c) => c.abort());
       timeouts = [];
       setDisplayedFateText('');
+      setAccessibleFateText('');
     };
-  }, [active, tSite]);
+  }, [active, reducedMotion, tSite]);
 
-  return { displayedFateText, isFateTypingActive };
+  return { displayedFateText, accessibleFateText, isFateTypingActive };
 }

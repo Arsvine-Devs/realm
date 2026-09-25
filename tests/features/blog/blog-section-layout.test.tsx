@@ -5,6 +5,10 @@ vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
 }));
 
+vi.mock('@/shared/hooks/useMediaQuery', () => ({
+  useReducedMotion: () => false,
+}));
+
 import BlogSection from '@/features/blog/ui/blog/BlogSection';
 import styles from '@/features/blog/styles/BlogSection.module.scss';
 

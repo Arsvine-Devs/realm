@@ -12,14 +12,26 @@ export interface CursorTargetBounds {
   h: number;
 }
 
+export interface CursorTargetRect {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+  width: number;
+  height: number;
+}
+
+const CLIPPING_OVERFLOW = new Set(['auto', 'scroll', 'hidden', 'clip']);
+
 export { lerp, clamp };
 
-export function isCursorInteractive(el: HTMLElement | null, rect?: DOMRect) {
-  if (!el || !el.isConnected) return false;
+export function getVisibleCursorRect(el: HTMLElement, rect = el.getBoundingClientRect()) {
+  if (!el.isConnected || rect.width <= 0 || rect.height <= 0) return null;
 
-  const targetRect = rect ?? el.getBoundingClientRect();
-  if (targetRect.width <= 0 || targetRect.height <= 0) return false;
-
+  let left = Math.max(rect.left, 0);
+  let top = Math.max(rect.top, 0);
+  let right = Math.min(rect.left + rect.width, window.innerWidth);
+  let bottom = Math.min(rect.top + rect.height, window.innerHeight);
   let current: HTMLElement | null = el;
   while (current) {
     const style = window.getComputedStyle(current);
@@ -28,12 +40,33 @@ export function isCursorInteractive(el: HTMLElement | null, rect?: DOMRect) {
       style.visibility === 'hidden' ||
       parseFloat(style.opacity || '1') === 0
     ) {
-      return false;
+      return null;
     }
+
+    if (current !== el) {
+      const clipsX = CLIPPING_OVERFLOW.has(style.overflowX);
+      const clipsY = CLIPPING_OVERFLOW.has(style.overflowY);
+      if (clipsX || clipsY) {
+        const clipRect = current.getBoundingClientRect();
+        if (clipsX) {
+          left = Math.max(left, clipRect.left);
+          right = Math.min(right, clipRect.left + clipRect.width);
+        }
+        if (clipsY) {
+          top = Math.max(top, clipRect.top);
+          bottom = Math.min(bottom, clipRect.top + clipRect.height);
+        }
+      }
+    }
+    if (right <= left || bottom <= top) return null;
     current = current.parentElement;
   }
 
-  return true;
+  return { left, top, right, bottom, width: right - left, height: bottom - top };
+}
+
+function isCursorInteractive(el: HTMLElement | null, rect?: DOMRect) {
+  return el ? getVisibleCursorRect(el, rect) !== null : false;
 }
 
 export function getInteractiveCursorTarget(target: EventTarget | null): HTMLElement | null {
@@ -78,7 +111,7 @@ export function collectInteractiveElements() {
 export function getCursorTargetBounds(
   el: HTMLElement,
   padding = 0,
-  rect?: DOMRect,
+  rect?: Pick<DOMRect, 'left' | 'top' | 'width' | 'height'>,
 ): CursorTargetBounds {
   const targetRect = rect ?? el.getBoundingClientRect();
   const customPadding = Number(el.getAttribute('data-cursor-padding'));
@@ -102,7 +135,7 @@ export function findClosestInteractiveElement(
   pointerY: number,
 ) {
   let closestElement: HTMLElement | null = null;
-  let closestRect: DOMRect | null = null;
+  let closestRect: CursorTargetRect | null = null;
   let closestDistance = Infinity;
 
   for (const el of elements) {
@@ -114,14 +147,18 @@ export function findClosestInteractiveElement(
     const dy = Math.max(Math.abs(pointerY - bounds.y) - bounds.h / 2, 0);
     const distance = Math.hypot(dx, dy);
 
-    if (
-      distance < MAGNETIC_DISTANCE &&
-      distance < closestDistance &&
-      isCursorInteractive(el, rect)
-    ) {
-      closestDistance = distance;
+    if (distance >= MAGNETIC_DISTANCE || distance >= closestDistance) continue;
+
+    const visibleRect = getVisibleCursorRect(el, rect);
+    if (!visibleRect) continue;
+    const visibleBounds = getCursorTargetBounds(el, 0, visibleRect);
+    const visibleDx = Math.max(Math.abs(pointerX - visibleBounds.x) - visibleBounds.w / 2, 0);
+    const visibleDy = Math.max(Math.abs(pointerY - visibleBounds.y) - visibleBounds.h / 2, 0);
+    const visibleDistance = Math.hypot(visibleDx, visibleDy);
+    if (visibleDistance < MAGNETIC_DISTANCE && visibleDistance < closestDistance) {
+      closestDistance = visibleDistance;
       closestElement = el;
-      closestRect = rect;
+      closestRect = visibleRect;
     }
   }
 

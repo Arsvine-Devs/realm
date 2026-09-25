@@ -4,6 +4,7 @@ import { startTransition, useState, useEffect, useRef, useCallback } from 'react
 import { useTranslations } from 'next-intl';
 import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote';
 import MDXComponents from '../mdx/MDXComponents';
+import { BlogContentRevealProvider } from '../mdx/BlogContentReveal';
 import { SpoilerProvider } from '../mdx/Spoiler';
 import LocaleFallbackBanner from '../../../../shared/ui/LocaleFallbackBanner';
 import { AnimatedTitleChars } from '../../../../shared/ui/AnimatedTitleChars';
@@ -240,47 +241,6 @@ function BlogDetailContent({
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    if (!titleDone) return;
-    const body = contentBodyRef.current;
-    const wrapper = wrapperRef.current;
-    if (!body || !wrapper) return;
-
-    const children = Array.from(body.children) as HTMLElement[];
-    if (children.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entering = entries.filter((e) => e.isIntersecting);
-        entering.forEach((entry, i) => {
-          const el = entry.target as HTMLElement;
-          el.style.transitionDelay = `${i * 0.07}s`;
-          el.style.opacity = '1';
-          el.style.transform = 'translateY(0)';
-          el.addEventListener(
-            'transitionend',
-            () => {
-              el.style.transitionDelay = '';
-              el.style.transform = 'none';
-            },
-            { once: true },
-          );
-          observer.unobserve(el);
-        });
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px', root: wrapper },
-    );
-
-    const timer = setTimeout(() => {
-      children.forEach((child) => observer.observe(child));
-    }, 200);
-
-    return () => {
-      clearTimeout(timer);
-      observer.disconnect();
-    };
-  }, [titleDone, selectedContentLocale]);
-
   const handleContentLocaleChange = useCallback(
     (nextContentLocale: BlogContentLocale) => {
       if (loadingLang) {
@@ -380,9 +340,17 @@ function BlogDetailContent({
               </div>
             )}
             <div key={selectedContentLocale} ref={contentBodyRef} className={styles.contentBody}>
-              <SpoilerProvider>
-                <MDXRemote {...mdxSource} components={MDXComponents} />
-              </SpoilerProvider>
+              <BlogContentRevealProvider
+                key={selectedContentLocale}
+                bodyRef={contentBodyRef}
+                scrollRootRef={wrapperRef}
+                enabled={titleDone}
+                locale={selectedContentLocale}
+              >
+                <SpoilerProvider>
+                  <MDXRemote {...mdxSource} components={MDXComponents} />
+                </SpoilerProvider>
+              </BlogContentRevealProvider>
             </div>
           </>
         }

@@ -1,0 +1,41 @@
+.frame {
+  display: block;
+  line-height: inherit;
+  white-space: inherit;
+}
+
+.wordBox {
+  position: relative;
+  display: inline-block;
+  line-height: inherit;
+  vertical-align: top;
+  white-space: pre;
+}
+
+.wordMeasure {
+  position: absolute;
+  inset: 0 auto auto 0;
+  visibility: hidden;
+  pointer-events: none;
+  white-space: pre;
+}
+
+.wordVisual {
+  display: block;
+  width: 100%;
+  min-width: 100%;
+  line-height: inherit;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.line {
+  display: block;
+  line-height: inherit;
+  white-space: inherit;
+}
+
+.lineFixed {
+  white-space: nowrap;
+}

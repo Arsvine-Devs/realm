@@ -24,8 +24,14 @@
   outline-color: transparent;
 }
 
-.spoiler[data-spoiler-lines='pending'] .spoilerContent {
-  color: transparent;
+.spoiler[data-spoiler-lines='pending'][data-spoiler-state='concealed'] .spoilerContent,
+.spoiler[data-spoiler-lines='pending'][data-spoiler-state='concealed'] .spoilerContent * {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  text-shadow: none !important;
+  text-decoration-color: transparent !important;
+  background: none !important;
+  border-color: transparent !important;
 }
 
 .spoilerCover {

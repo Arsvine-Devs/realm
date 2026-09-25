@@ -102,6 +102,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const {
     isFateTypingActive,
     displayedFateText,
+    accessibleFateText,
     isEnvParamsTyping,
     displayedEnvParams,
     envData,
@@ -276,6 +277,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             powerLevel={powerLevel}
             isFateTypingActive={isFateTypingActive}
             displayedFateText={displayedFateText}
+            accessibleFateText={accessibleFateText}
             isEnvParamsTyping={isEnvParamsTyping}
             displayedEnvParams={displayedEnvParams}
             envData={envData}
