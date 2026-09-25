@@ -138,7 +138,7 @@ describe('blog content scramble reveal', () => {
     act(() => vi.advanceTimersByTime(DEFAULT_TYPEWRITER_DURATION_MS));
     overlay = paragraph.querySelector(`.${styles.scrambleOverlay}`);
     expect(overlay?.classList.contains(styles.scrambleOverlayFading)).toBe(true);
-    expect(richContent.classList.contains(styles.scrambleRichHidden)).toBe(true);
+    expect(richContent.classList.contains(styles.scrambleRichHidden)).toBe(false);
     expect(paragraph.querySelector('a')?.getAttribute('href')).toBe('https://example.com/target');
 
     act(() => vi.advanceTimersByTime(240));

@@ -446,10 +446,8 @@ function AnimatedBlogScrambleBlock({ as, className, children }: BlogScrambleBloc
   const RichContent = as === 'li' ? 'div' : 'span';
   const ScrambleOverlay = as === 'li' ? 'div' : 'span';
   const active = phase === 'scrambling' || phase === 'handoff';
-  const richClassName = [
-    styles.scrambleRichContent,
-    phase !== 'complete' ? styles.scrambleRichHidden : '',
-  ]
+  const richHidden = phase === 'waiting' || phase === 'scrambling';
+  const richClassName = [styles.scrambleRichContent, richHidden ? styles.scrambleRichHidden : '']
     .filter(Boolean)
     .join(' ');
   const overlayClassName = [
