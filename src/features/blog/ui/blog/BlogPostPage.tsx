@@ -341,6 +341,7 @@ function BlogDetailContent({
             )}
             <div key={selectedContentLocale} ref={contentBodyRef} className={styles.contentBody}>
               <BlogContentRevealProvider
+                key={selectedContentLocale}
                 bodyRef={contentBodyRef}
                 scrollRootRef={wrapperRef}
                 enabled={titleDone}

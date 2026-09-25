@@ -8,6 +8,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useLayoutEffect,
   useRef,
   useState,
   type ReactNode,
@@ -18,6 +19,7 @@ import { useReducedMotion } from '@/shared/hooks/useMediaQuery';
 import {
   createTypewriterSequence,
   getTypewriterStepAtProgress,
+  splitTypewriterText,
   TYPEWRITER_FRAME_INTERVAL_MS,
   type TypewriterFramePart,
 } from '@/shared/lib/typewriter';
@@ -197,6 +199,110 @@ function StaticMdxBlock({ as, className, children }: BlogScrambleBlockProps) {
   return createElement(as, className ? { className } : null, children);
 }
 
+const SCRAMBLE_MEASUREMENT_EXCLUDED_SELECTOR =
+  '[data-spoiler-state], pre, img, picture, video, audio, iframe, svg, object, embed, rt, rp';
+
+interface ScrambleRect {
+  offset: number;
+  top: number;
+}
+
+function measureScrambleLineBreaks(
+  root: HTMLElement,
+  text: string,
+  parts: readonly TypewriterFramePart[],
+): readonly number[] | undefined {
+  if (
+    typeof document === 'undefined' ||
+    typeof document.createTreeWalker !== 'function' ||
+    typeof NodeFilter === 'undefined'
+  ) {
+    return undefined;
+  }
+
+  const range = document.createRange();
+  if (typeof range.getClientRects !== 'function') return undefined;
+
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const rects: ScrambleRect[] = [];
+  let textOffset = 0;
+  let node = walker.nextNode();
+
+  while (node) {
+    const textNode = node as Text;
+    const parent = textNode.parentElement;
+    const value = textNode.data;
+    const graphemes = splitTypewriterText(value);
+
+    if (!parent?.closest(SCRAMBLE_MEASUREMENT_EXCLUDED_SELECTOR) && graphemes) {
+      let localOffset = 0;
+      graphemes.forEach((grapheme) => {
+        const start = localOffset;
+        const end = start + grapheme.length;
+        localOffset = end;
+        range.setStart(textNode, start);
+        range.setEnd(textNode, end);
+        const rect = Array.from(range.getClientRects()).find(
+          (candidate) => candidate.width > 0 && candidate.height > 0,
+        );
+        if (rect) rects.push({ offset: textOffset + start, top: rect.top });
+      });
+    }
+
+    if (!parent?.closest(SCRAMBLE_MEASUREMENT_EXCLUDED_SELECTOR)) {
+      textOffset += value.length;
+    }
+    node = walker.nextNode();
+  }
+
+  if (textOffset !== text.length || rects.length === 0) return undefined;
+
+  const lineByOffset = new Map<number, number>();
+  let line = -1;
+  let previousTop = Number.NaN;
+  rects.forEach(({ offset, top }) => {
+    if (!Number.isFinite(previousTop) || Math.abs(top - previousTop) > 2) {
+      line += 1;
+      previousTop = top;
+    }
+    lineByOffset.set(offset, line);
+  });
+
+  const getPartLine = (start: number, end: number) => {
+    const direct = rects.find((rect) => rect.offset >= start && rect.offset < end);
+    if (direct) return lineByOffset.get(direct.offset);
+
+    const following = rects.find((rect) => rect.offset >= end);
+    if (following) return lineByOffset.get(following.offset);
+
+    const preceding = [...rects].reverse().find((rect) => rect.offset < start);
+    return preceding ? lineByOffset.get(preceding.offset) : undefined;
+  };
+
+  const lineBreaks: number[] = [];
+  let offset = 0;
+  let lastContentLine: number | undefined;
+  parts.forEach((part, index) => {
+    const partText = part.kind === 'word' ? part.anchor : part.text;
+    const start = offset;
+    offset += partText.length;
+    const partLine = getPartLine(start, offset);
+    const whitespaceOnly = part.kind === 'literal' && /^\s*$/u.test(part.text);
+
+    if (
+      partLine !== undefined &&
+      lastContentLine !== undefined &&
+      partLine > lastContentLine &&
+      !whitespaceOnly
+    ) {
+      lineBreaks.push(index);
+    }
+    if (!whitespaceOnly && partLine !== undefined) lastContentLine = partLine;
+  });
+
+  return lineBreaks;
+}
+
 export function BlogScrambleBlock(props: BlogScrambleBlockProps) {
   const nested = useContext(ScrambleBlockNestingContext);
   return nested ? <StaticMdxBlock {...props} /> : <AnimatedBlogScrambleBlock {...props} />;
@@ -216,10 +322,15 @@ function AnimatedBlogScrambleBlock({ as, className, children }: BlogScrambleBloc
     supportsIntersectionObserver && !reducedMotion ? 'waiting' : 'complete',
   );
   const [frameParts, setFrameParts] = useState<readonly TypewriterFramePart[]>([]);
+  const [lineBreaks, setLineBreaks] = useState<readonly number[] | undefined>();
   const timerRef = useRef<number | null>(null);
   const blockRef = useRef<HTMLElement | null>(null);
+  const richContentRef = useRef<HTMLElement | null>(null);
   const setBlockRef = useCallback((element: HTMLElement | null) => {
     blockRef.current = element;
+  }, []);
+  const setRichContentRef = useCallback((element: HTMLElement | null) => {
+    richContentRef.current = element;
   }, []);
 
   const clearTimer = useCallback(() => {
@@ -273,6 +384,49 @@ function AnimatedBlogScrambleBlock({ as, className, children }: BlogScrambleBloc
     return register(element, reveal);
   }, [register, reveal, supportsIntersectionObserver]);
 
+  const measureLineBreaks = useCallback(() => {
+    const element = richContentRef.current;
+    const finalParts = sequence?.framePartsAt(sequence.stepCount);
+    const next =
+      element && sequence && finalParts
+        ? measureScrambleLineBreaks(element, text, finalParts)
+        : undefined;
+
+    setLineBreaks((current) => {
+      if (
+        current?.length === next?.length &&
+        current?.every((value, index) => value === next?.[index])
+      ) {
+        return current;
+      }
+      return next;
+    });
+  }, [sequence, text]);
+
+  useLayoutEffect(() => {
+    measureLineBreaks();
+    const element = richContentRef.current;
+    const observer =
+      typeof ResizeObserver !== 'undefined' && element
+        ? new ResizeObserver(measureLineBreaks)
+        : null;
+    if (observer && element) observer.observe(element);
+
+    const fonts = document.fonts;
+    fonts?.addEventListener('loading', measureLineBreaks);
+    fonts?.addEventListener('loadingdone', measureLineBreaks);
+    fonts?.addEventListener('loadingerror', measureLineBreaks);
+    if (fonts) void fonts.ready.then(measureLineBreaks);
+    window.addEventListener('resize', measureLineBreaks);
+    return () => {
+      observer?.disconnect();
+      fonts?.removeEventListener('loading', measureLineBreaks);
+      fonts?.removeEventListener('loadingdone', measureLineBreaks);
+      fonts?.removeEventListener('loadingerror', measureLineBreaks);
+      window.removeEventListener('resize', measureLineBreaks);
+    };
+  }, [measureLineBreaks]);
+
   useEffect(() => {
     if (!reducedMotion || (phase !== 'scrambling' && phase !== 'handoff')) return;
     clearTimer();
@@ -306,13 +460,13 @@ function AnimatedBlogScrambleBlock({ as, className, children }: BlogScrambleBloc
     .join(' ');
 
   const richContent = (
-    <RichContent className={richClassName}>
+    <RichContent ref={setRichContentRef} className={richClassName}>
       <ScrambleBlockNestingContext.Provider value>{children}</ScrambleBlockNestingContext.Provider>
     </RichContent>
   );
   const scrambleOverlay = active ? (
     <ScrambleOverlay className={overlayClassName} aria-hidden="true">
-      <TypewriterFrame parts={frameParts} />
+      <TypewriterFrame parts={frameParts} lineBreaks={lineBreaks} />
     </ScrambleOverlay>
   ) : null;
 

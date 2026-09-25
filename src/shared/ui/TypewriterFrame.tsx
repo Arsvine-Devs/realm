@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { TypewriterFramePart } from '@/shared/lib/typewriter';
 import styles from './TypewriterFrame.module.scss';
 
 interface TypewriterFrameProps {
   parts: readonly TypewriterFramePart[];
+  lineBreaks?: readonly number[];
 }
 
 function sameWidths(left: Readonly<Record<number, number>>, right: Record<number, number>) {
@@ -15,13 +16,15 @@ function sameWidths(left: Readonly<Record<number, number>>, right: Record<number
   return rightKeys.every((key) => left[Number(key)] === right[Number(key)]);
 }
 
-export default function TypewriterFrame({ parts }: TypewriterFrameProps) {
+export default function TypewriterFrame({ parts, lineBreaks }: TypewriterFrameProps) {
   const [widths, setWidths] = useState<Record<number, number>>({});
   const measureRefs = useRef(new Map<number, HTMLSpanElement>());
   const frameRef = useRef<HTMLSpanElement>(null);
   const wordAnchorsKey = parts
     .map((part, index) => (part.kind === 'word' ? `${index}:${part.anchor}` : ''))
     .join('\u0000');
+  const lineBreakSet = new Set(lineBreaks ?? []);
+  const hasMeasuredLines = lineBreaks !== undefined;
 
   const setMeasureRef = useCallback(
     (index: number) => (element: HTMLSpanElement | null) => {
@@ -64,25 +67,54 @@ export default function TypewriterFrame({ parts }: TypewriterFrameProps) {
     };
   }, [measure]);
 
+  const renderPart = (part: TypewriterFramePart, index: number) => {
+    if (part.kind === 'literal') return <span key={`literal-${index}`}>{part.text}</span>;
+
+    const width = widths[index];
+    return (
+      <span
+        key={`word-${index}`}
+        className={styles.wordBox}
+        style={width ? { width: `${width}px` } : undefined}
+      >
+        <span ref={setMeasureRef(index)} className={styles.wordMeasure} aria-hidden="true">
+          {part.anchor}
+        </span>
+        <span className={styles.wordVisual}>{part.text}</span>
+      </span>
+    );
+  };
+
+  const renderedLines: ReactNode[] = [];
+  let currentLine: ReactNode[] = [];
+  parts.forEach((part, index) => {
+    if (lineBreakSet.has(index) && currentLine.length > 0) {
+      renderedLines.push(
+        <span
+          key={`line-${renderedLines.length}`}
+          className={`${styles.line} ${hasMeasuredLines ? styles.lineFixed : ''}`}
+        >
+          {currentLine}
+        </span>,
+      );
+      currentLine = [];
+    }
+    currentLine.push(renderPart(part, index));
+  });
+  if (currentLine.length > 0) {
+    renderedLines.push(
+      <span
+        key={`line-${renderedLines.length}`}
+        className={`${styles.line} ${hasMeasuredLines ? styles.lineFixed : ''}`}
+      >
+        {currentLine}
+      </span>,
+    );
+  }
+
   return (
     <span ref={frameRef} className={styles.frame}>
-      {parts.map((part, index) => {
-        if (part.kind === 'literal') return <span key={`literal-${index}`}>{part.text}</span>;
-
-        const width = widths[index];
-        return (
-          <span
-            key={`word-${index}`}
-            className={styles.wordBox}
-            style={width ? { width: `${width}px` } : undefined}
-          >
-            <span ref={setMeasureRef(index)} className={styles.wordMeasure} aria-hidden="true">
-              {part.anchor}
-            </span>
-            <span className={styles.wordVisual}>{part.text}</span>
-          </span>
-        );
-      })}
+      {renderedLines}
     </span>
   );
 }

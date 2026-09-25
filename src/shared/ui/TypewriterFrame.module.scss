@@ -8,7 +8,7 @@
   position: relative;
   display: inline-block;
   line-height: inherit;
-  vertical-align: baseline;
+  vertical-align: top;
   white-space: pre;
 }
 
@@ -21,11 +21,21 @@
 }
 
 .wordVisual {
-  display: inline-block;
+  display: block;
   width: 100%;
   min-width: 100%;
   line-height: inherit;
   white-space: pre;
   overflow: hidden;
   text-overflow: clip;
+}
+
+.line {
+  display: block;
+  line-height: inherit;
+  white-space: inherit;
+}
+
+.lineFixed {
+  white-space: nowrap;
 }

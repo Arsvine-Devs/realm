@@ -41,4 +41,24 @@ describe('TypewriterFrame', () => {
 
     expect(boxes().map((box) => box.style.width)).toEqual(['50px', '50px']);
   });
+
+  it('can render measured line breaks without changing the frame parts', () => {
+    const { container } = render(
+      <TypewriterFrame
+        lineBreaks={[2]}
+        parts={[
+          { kind: 'word', text: 'Hello', anchor: 'Hello' },
+          { kind: 'literal', text: ' ' },
+          { kind: 'word', text: 'world', anchor: 'world' },
+        ]}
+      />,
+    );
+
+    expect(container.querySelectorAll('[class*="line"]').length).toBe(2);
+    expect(
+      [...container.querySelectorAll('[class*="wordVisual"]')]
+        .map((element) => element.textContent)
+        .join(' '),
+    ).toBe('Hello world');
+  });
 });
