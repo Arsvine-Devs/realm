@@ -24,7 +24,9 @@ export default function TypewriterFrame({ parts, lineBreaks }: TypewriterFramePr
     .map((part, index) => (part.kind === 'word' ? `${index}:${part.anchor}` : ''))
     .join('\u0000');
   const lineBreakSet = new Set(lineBreaks ?? []);
-  const hasMeasuredLines = lineBreaks !== undefined;
+  // An empty list means that no part-level break can be represented. Keep the
+  // normal inline wrapping path for grapheme/CJK frames in that case.
+  const hasMeasuredLines = lineBreaks !== undefined && lineBreaks.length > 0;
 
   const setMeasureRef = useCallback(
     (index: number) => (element: HTMLSpanElement | null) => {

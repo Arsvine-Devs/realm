@@ -55,10 +55,22 @@ describe('TypewriterFrame', () => {
     );
 
     expect(container.querySelectorAll('[class*="line"]').length).toBe(2);
+    expect(container.querySelectorAll('[class*="lineFixed"]').length).toBe(2);
     expect(
       [...container.querySelectorAll('[class*="wordVisual"]')]
         .map((element) => element.textContent)
         .join(' '),
     ).toBe('Hello world');
+  });
+
+  it('keeps grapheme frames wrappable when no part-level break is available', () => {
+    const { container } = render(
+      <TypewriterFrame
+        lineBreaks={[]}
+        parts={[{ kind: 'literal', text: '這是一段需要換行的中文正文' }]}
+      />,
+    );
+
+    expect(container.querySelector('[class*="lineFixed"]')).toBeNull();
   });
 });
