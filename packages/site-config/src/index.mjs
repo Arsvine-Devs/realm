@@ -7,6 +7,7 @@ const origins = Object.freeze({
   content: "https://content.arsvine.com",
   cdn: "https://cdn.arsvine.com",
   status: "https://status.arsvine.com",
+  docs: "https://docs.arsvine.com",
 });
 
 /** Stable public origins used by every Arsvine site. */
@@ -93,4 +94,15 @@ export const siteConfig = Object.freeze({
   }),
   cdn: Object.freeze({ origin: origins.cdn }),
   status: Object.freeze({ origin: origins.status }),
+  docs: Object.freeze({
+    origin: origins.docs,
+    healthLivePath: "/health/live",
+    healthReadyPath: "/health/ready",
+    oidc: Object.freeze({
+      redirectUri: `${origins.docs}/auth/callback`,
+      postLogoutRedirectUri: origins.docs,
+      resource: origins.docs,
+      scope: "openid profile email",
+    }),
+  }),
 });

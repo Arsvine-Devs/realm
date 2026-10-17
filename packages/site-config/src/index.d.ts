@@ -7,6 +7,7 @@ export type ServiceOrigins = {
   readonly content: string;
   readonly cdn: string;
   readonly status: string;
+  readonly docs: string;
 };
 
 export type CatalogNamespaces = {
@@ -79,6 +80,17 @@ export type SiteConfig = {
   };
   readonly status: {
     readonly origin: string;
+  };
+  readonly docs: {
+    readonly origin: string;
+    readonly healthLivePath: string;
+    readonly healthReadyPath: string;
+    readonly oidc: {
+      readonly redirectUri: string;
+      readonly postLogoutRedirectUri: string;
+      readonly resource: string;
+      readonly scope: string;
+    };
   };
 };
 
