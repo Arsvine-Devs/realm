@@ -1,5 +1,6 @@
 pnpm-lock.yaml
 patches/
+packages/
 public/
 cos-workspace/
 db/**/*.sql
