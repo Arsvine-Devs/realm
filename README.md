@@ -20,6 +20,8 @@
 
 它把项目档案、多语言写作、生活记录、音乐、WebGL 氛围和受保护文章访问流程组合在一个持续演进的界面中。
 
+English: personal HUD-style portfolio and blog for Arsvine Zhu. Part of the Arsvine site system (Platform control plane + Ripple product site). Maintainer docs: [`docs/`](./docs/README.md). AI entry: [`AGENTS.md`](./AGENTS.md).
+
 ## 内容与能力
 
 - 五列 HUD 首页和响应式内容中心。

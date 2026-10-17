@@ -1,3 +1,7 @@
+packages:
+  - '.'
+  - 'packages/*'
+
 allowBuilds:
   '@parcel/watcher': true
   '@swc/core': true
@@ -13,8 +17,8 @@ overrides:
   js-yaml@4: 4.3.2
   postcss: 8.5.23
   qs: 6.16.0
-  sharp: 0.35.4
+  sharp: 0.35.5
   three-mesh-bvh: ^0.8.3
 patchedDependencies:
-  '@react-three/fiber@9.7.0': patches/@react-three__fiber@9.7.0.patch
+  '@react-three/fiber@9.8.2': patches/@react-three__fiber@9.8.2.patch
   cos-request@1.3.3: patches/cos-request@1.3.3.patch

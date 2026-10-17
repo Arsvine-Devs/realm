@@ -4,13 +4,19 @@
 
 本文面向准备修改代码、内容、测试、脚本或部署配置的维护者。
 
+## 分支策略
+
+- 默认分支 `master`：线性历史，可部署目标。
+- 功能工作在 `dev/<topic>`，通过 PR（建议 squash）合入默认分支。
+- 合入默认分支不等于已上线：生产部署、COS pointer 切换与远程 publish 需要单独授权。
+
 ## 日常流程
 
-1. `git status --short`，确认没有覆盖已有工作。
+1. `git status --short`，确认没有覆盖已有工作；从最新 `master` 拉出 `dev/<topic>`。
 2. 阅读对应领域文档和 `../ai/GOTCHAS.md`。
 3. 搜索现有 component、hook、server handler、type 和测试。
 4. 先做最小范围修改，运行能最快否定当前改动的检查。
-5. 非平凡变更完成后运行 `pnpm lint`、`pnpm typecheck`、`pnpm test`；需要时再运行 `pnpm build`。
+5. 非平凡变更完成后运行 `pnpm lint`、`pnpm typecheck`、`pnpm test`；需要时再运行 `pnpm build`。若改动 Platform site-config，先在 Platform 运行 `pnpm packages:sync`。
 6. 视觉或交互变更补充桌面、移动端、route transition、protected blog、音乐、hash 和 cursor 手工验证。
 
 ## 常用命令

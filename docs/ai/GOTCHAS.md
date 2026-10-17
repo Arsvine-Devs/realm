@@ -33,4 +33,6 @@ Only active constraints belong here. Historical reasons are omitted unless they 
 
 - COS publishing uploads immutable objects and Catalog versions before switching pointers.
 - `@react-three/fiber` and `cos-request` exact versions remain synchronized with their patches.
+- Fixed topology comes from `@arsvine/site-config` (synced from Platform `packages/`). Run `pnpm packages:check` after Platform site-config edits.
+- TypeScript stays on the 6.x line until `typescript-eslint` / `eslint-config-next` support TypeScript 7.
 - Generated `dist/`, `.next/`, COS workspace files, local env files, and generated API output are not source artifacts.

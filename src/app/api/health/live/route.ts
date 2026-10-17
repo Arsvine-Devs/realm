@@ -1,6 +1,5 @@
+import { liveJsonResponse } from '@arsvine/service-health';
+
 export function GET() {
-  return Response.json(
-    { status: 'live', service: 'realm' },
-    { headers: { 'Cache-Control': 'no-store' } },
-  );
+  return liveJsonResponse('realm');
 }

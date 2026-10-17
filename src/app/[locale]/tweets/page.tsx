@@ -42,6 +42,8 @@ export default async function Tweets({ params }: { params: Promise<{ locale: Loc
       monthGroups={monthGroups}
       totalMonths={totalMonths}
       monthBatchSize={INITIAL_MONTH_BATCH_SIZE}
+      // Server render timestamp for client cache keys; intentional per-request Date.
+      // oxlint-disable-next-line react/purity
       generatedAt={new Date().toISOString()}
       sourceUnavailable={sourceUnavailable}
       sourceError={sourceError}
