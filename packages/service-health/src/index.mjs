@@ -1,11 +1,11 @@
-const NO_STORE = Object.freeze({ 'Cache-Control': 'no-store' });
+const NO_STORE = Object.freeze({ "Cache-Control": "no-store" });
 
 /**
  * @param {string} service
  * @param {Record<string, unknown>} [extra]
  */
 export function liveBody(service, extra = {}) {
-  return Object.freeze({ status: 'live', service, ...extra });
+  return Object.freeze({ status: "live", service, ...extra });
 }
 
 /**
@@ -13,7 +13,7 @@ export function liveBody(service, extra = {}) {
  * @param {Record<string, unknown>} [extra]
  */
 export function readyBody(service, extra = {}) {
-  return Object.freeze({ status: 'ready', service, ...extra });
+  return Object.freeze({ status: "ready", service, ...extra });
 }
 
 /**
