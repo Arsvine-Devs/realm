@@ -25,7 +25,7 @@ const authPaths = Object.freeze({
   authorization: `${authOrigin}/api/auth/oauth2/authorize`,
   token: `${authOrigin}/api/auth/oauth2/token`,
   userinfo: `${authOrigin}/api/auth/oauth2/userinfo`,
-  jwks: `${authOrigin}/jwks`,
+  jwks: `${authOrigin}/api/auth/jwks`,
   endSession: `${authOrigin}/api/auth/oauth2/end-session`,
 });
 

@@ -1,4 +1,8 @@
-export { catalogNamespaces, serviceOrigins, siteConfig } from "@arsvine/site-config";
+export {
+  catalogNamespaces,
+  serviceOrigins,
+  siteConfig,
+} from "@arsvine/site-config";
 export {
   healthHeaders,
   liveBody,
@@ -9,7 +13,11 @@ export {
 
 export declare function catalogPointer(namespace: string): string;
 
-export declare function signRevalidate(secret: string, timestamp: string, body: string): string;
+export declare function signRevalidate(
+  secret: string,
+  timestamp: string,
+  body: string,
+): string;
 
 export declare function verifyRevalidate(input: {
   secret: string;

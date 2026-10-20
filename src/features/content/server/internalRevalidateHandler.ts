@@ -1,10 +1,10 @@
-import { createHmac } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
+import { verifyRevalidate } from '@arsvine/site-kit';
 import { readEnv } from '@/shared/config/env-provider';
 import { locales } from '@/shared/contracts/locale';
 import { getAssetRevalidationPaths as getPortfolioPaths } from '@/features/portfolio/contracts/data';
 import { getAssetRevalidationPaths as getLifePaths } from '@/features/life/contracts/data';
-import { jsonResponse, secureStringEqual } from '@/shared/server/http';
+import { jsonResponse } from '@/shared/server/http';
 
 const MAX_TIMESTAMP_SKEW_MS = 5 * 60 * 1000;
 const TIMESTAMP_HEADER = 'x-arsvine-timestamp';
@@ -75,12 +75,21 @@ function verifyRequest(request: Request, rawBody: string) {
   const timestampHeader = request.headers.get(TIMESTAMP_HEADER);
   const timestamp = readTimestamp(timestampHeader);
   const signature = request.headers.get(SIGNATURE_HEADER)?.trim() ?? '';
-  if (!secret || timestamp === null || !/^[a-f0-9]{64}$/.test(signature)) return false;
+  if (
+    !secret ||
+    timestamp === null ||
+    timestampHeader === null ||
+    !/^[a-f0-9]{64}$/.test(signature)
+  )
+    return false;
 
-  const expected = createHmac('sha256', secret)
-    .update(`${timestampHeader}.${rawBody}`)
-    .digest('hex');
-  return secureStringEqual(signature, expected);
+  return verifyRevalidate({
+    secret,
+    timestamp: timestampHeader,
+    body: rawBody,
+    signature,
+    maxSkewMs: MAX_TIMESTAMP_SKEW_MS,
+  });
 }
 
 function pathsForEvent(event: RevalidationEvent) {

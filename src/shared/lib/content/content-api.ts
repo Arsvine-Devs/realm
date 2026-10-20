@@ -1,3 +1,4 @@
+import { fetchClientCredentialsToken } from '@arsvine/site-kit';
 import type { ContentBlogIndex, ContentTweetIndexItem } from './types';
 import { readEnv } from '@/shared/config/env-provider';
 import { authOrigin, contentOrigin } from '@/shared/config/site-endpoints';
@@ -66,38 +67,29 @@ async function getProtectedContentToken() {
 
   const { tokenUrl, clientId, clientSecret } = getProtectedContentAuthConfig();
   const resource = new URL(getBaseUrl()).origin;
-  const clientCredentials = Buffer.from(`${clientId}:${clientSecret}`, 'utf8').toString('base64');
-  const response = await fetch(tokenUrl, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Basic ${clientCredentials}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      grant_type: 'client_credentials',
+  try {
+    const token = await fetchClientCredentialsToken({
+      tokenUrl,
+      clientId,
+      clientSecret,
       scope: PROTECTED_SCOPE,
       resource,
-    }),
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-    cache: 'no-store',
-  });
-  const body = (await response.json().catch(() => null)) as {
-    access_token?: string;
-    expires_in?: number;
-    error?: string;
-    error_description?: string;
-  } | null;
-  if (!response.ok || typeof body?.access_token !== 'string') {
+      timeoutMs: FETCH_TIMEOUT_MS,
+    });
+    serviceToken = {
+      accessToken: token.accessToken,
+      expiresAt: Date.now() + Math.max(60, token.expiresIn) * 1000,
+    };
+  } catch (error) {
+    const status =
+      typeof error === 'object' && error !== null && 'status' in error
+        ? (error as { status?: unknown }).status
+        : undefined;
     throw new ContentServiceError(
-      body?.error_description ?? body?.error ?? `Auth service returned ${response.status}.`,
-      response.status,
+      error instanceof Error ? error.message : 'Auth service token request failed.',
+      typeof status === 'number' ? status : undefined,
     );
   }
-  serviceToken = {
-    accessToken: body.access_token,
-    expiresAt: Date.now() + Math.max(60, body.expires_in ?? 300) * 1000,
-  };
   return serviceToken.accessToken;
 }
 

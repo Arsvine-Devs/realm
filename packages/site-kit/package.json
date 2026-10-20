@@ -14,6 +14,9 @@
   "files": [
     "src"
   ],
+  "scripts": {
+    "test": "node --test src/index.test.mjs"
+  },
   "dependencies": {
     "@arsvine/service-health": "workspace:*",
     "@arsvine/site-config": "workspace:*"
@@ -21,6 +24,11 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "restricted"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Arsvine-Devs/platform.git",
+    "directory": "packages/site-kit"
   },
   "license": "MIT",
   "_arsvineSource": "platform/packages/site-kit@0.1.0"

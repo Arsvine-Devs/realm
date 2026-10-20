@@ -12,6 +12,8 @@ describe('canonical site-config contract', () => {
     expect(serviceOrigins.content).toBe('https://content.arsvine.com');
     expect(serviceOrigins.cdn).toBe('https://cdn.arsvine.com');
     expect(serviceOrigins.status).toBe('https://status.arsvine.com');
+    expect(siteConfig.auth.jwksUrl).toBe('https://auth.arsvine.com/api/auth/jwks');
+    expect(siteConfig.console.oidc.jwksUrl).toBe(siteConfig.auth.jwksUrl);
   });
 
   it('keeps catalog namespaces and Content pointer aligned', () => {
