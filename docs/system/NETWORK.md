@@ -48,4 +48,4 @@
 - end session `https://auth.arsvine.com/api/auth/oauth2/end-session`
 - `jwks_uri` `https://auth.arsvine.com/api/auth/jwks`（200，`alg=EdDSA`，`crv=Ed25519`）
 
-`GET https://auth.arsvine.com/jwks` 是 404，`x-matched-path: /jwks`。发现文档才是线上验证地址。源码里的 `/jwks` 路由会把路径重写成 `/api/auth/jwks`，但这次线上别名没有生效。`@arsvine/site-config` 因此改为发现文档上的 `/api/auth/jwks`。
+`GET https://auth.arsvine.com/jwks` 是 404，`x-matched-path: /jwks`。发现文档才是线上验证地址。`apps/auth/app/jwks/route.ts` 与 `apps/auth/app/oauth2/[...path]/route.ts` 把 `/jwks` 和 `/oauth2/*` 前缀改写到 `/api/auth` 下的同一处理器，但这次线上 `/jwks` 别名没有生效。JWT 校验使用发现文档上的 `https://auth.arsvine.com/api/auth/jwks`，不使用别名。

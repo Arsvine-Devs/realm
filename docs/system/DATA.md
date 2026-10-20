@@ -33,8 +33,9 @@ Content 使用 S3 兼容接口：`S3_ENDPOINT`、`S3_REGION`、`S3_FORCE_PATH_ST
 两条指针形式不同，不要合成一个：
 
 - Content 指针是 `realm-content/current.json`（`siteConfig.content.pointerKey`）。CDN 上该键 404，符合私有发布。
-- Catalog 指针助手 `catalogPointer(namespace)` 生成 `{namespace}/catalog/current.json`。Ripple 的 `musicPointer` 是 `ripple/catalog/current.json`，与这个助手一致，而且 CDN 上可读。
-- 公网还有 `realm/site-catalog/current.json`（`LIVE`，version `20260912T144508Z`）。`realm/catalog/current.json` 在 CDN 上 404。私有 Catalog 由 Realm 服务端读取，前缀可由 `COS_PRIVATE_CATALOG_PREFIX` 附加。
+- 不可变 release 先写在 `realm-content/releases/<releaseId>/`（含 `manifest.json`）。Content 逐个校验对象之后才写指针。中途失败时旧指针保持可读。
+- `catalogPointer("realm-content")` 返回内容指针，不返回 `realm-content/catalog/current.json`。`catalogPointer("ripple")` 返回 `siteConfig.ripple.musicPointer`（`ripple/catalog/current.json`），CDN 上可读。其他单个路径段才是 `{namespace}/catalog/current.json`，所以 `catalogPointer("realm")` 是 `realm/catalog/current.json`。
+- 公网还有 `realm/site-catalog/current.json`（`LIVE`，version `20260912T144508Z`）。这个键不由 `catalogPointer` 生成。`realm/catalog/current.json` 在 CDN 上 404。私有 Catalog 由 Realm 服务端读取，前缀可由 `COS_PRIVATE_CATALOG_PREFIX` 附加。
 
 Ripple `/api/music` 在 2026-10-20 返回 version `20261015T152226Z`，`sourceCatalogVersion` `20260912T144508Z`，8 首曲目。曲目 URL 位于 `cdn.arsvine.com/realm/audio/...` 与 `cdn.arsvine.com/ripple/releases/20261015T152226Z/...`。发布顺序仍是先写不可变对象，最后切指针。Ripple 发布不得写 Realm 键。这次没有执行发布。
 

@@ -1,6 +1,6 @@
 # ARSVINE 站点体系知识包
 
-捕获日期：2026-10-20。预定的唯一长文在 `Arsvine-Devs/docs` 的 `system/`。2026-10-20 这次 `cursor[bot]` 推送该仓库返回 403，所以同一份正文也在已推送的 Realm 分支 `docs/system/`。两处内容相同。在 docs 分支推上去之前，以 GitHub 上的 Realm 副本为准。
+捕获日期：2026-10-20。预定的唯一长文在 `Arsvine-Devs/docs`。当天 `cursor[bot]` 推送 `Arsvine-Devs/platform` 和 `Arsvine-Devs/docs` 都返回 403。本地克隆、分支和提交记在 [`REPOS.md`](./REPOS.md)。在那些分支推上去之前，以 GitHub 上这个 Realm 分支的 `docs/system/` 为准。
 
 ## 怎么读
 

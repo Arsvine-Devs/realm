@@ -18,6 +18,10 @@ export function catalogPointer(namespace) {
   if (!namespace || namespace.includes("/") || namespace.includes("..")) {
     throw new Error("Catalog namespace must be a single path segment.");
   }
+  if (namespace === catalogNamespaces.realmContent)
+    return siteConfig.content.pointerKey;
+  if (namespace === catalogNamespaces.ripple)
+    return siteConfig.ripple.musicPointer;
   return `${namespace}/catalog/current.json`;
 }
 
