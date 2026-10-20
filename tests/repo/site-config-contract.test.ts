@@ -13,6 +13,8 @@ describe('canonical site-config contract', () => {
     expect(serviceOrigins.cdn).toBe('https://cdn.arsvine.com');
     expect(serviceOrigins.status).toBe('https://status.arsvine.com');
     expect(siteConfig.auth.jwksUrl).toBe('https://auth.arsvine.com/api/auth/jwks');
+    expect(siteConfig.auth.oauthResources).toContain('https://docs.arsvine.com');
+    expect(siteConfig.auth.audience).not.toContain('https://docs.arsvine.com');
     expect(siteConfig.console.oidc.jwksUrl).toBe(siteConfig.auth.jwksUrl);
   });
 

@@ -1,6 +1,8 @@
 # `@arsvine/site-kit` scope
 
-- Platform `packages/site-kit` is the source. `pnpm packages:sync` copies it to sibling repos that exist.
-- Re-export site topology and health helpers. Do not copy origin strings into this package.
-- Catalog, client-credentials, and revalidation HMAC are the only extra behaviors.
+- Re-export `@arsvine/site-config` and `@arsvine/service-health`. Do not copy origin strings here.
+- Own catalog pointer resolution, browser-login PKCE, OAuth `client_credentials` token fetch, and revalidation HMAC sign/verify.
+- A new login site registers itself in `@arsvine/site-config` and calls `oidcClient`, `createPkceLogin`, and `exchangeAuthorizationCode`. Do not copy the token exchange.
+- Published content pointer is `siteConfig.content.pointerKey` (`realm-content/current.json`).
 - Do not add Core DB, object storage, or Console session code here.
+- This package is workspace-private. Do not publish it. `pnpm packages:sync` copies it only into sibling clones that already exist.

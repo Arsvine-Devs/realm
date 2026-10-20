@@ -4,7 +4,7 @@
 
 ## 拓扑所有者
 
-`@arsvine/site-config`（Platform `packages/site-config`，这次版本 `0.3.1`）导出 `serviceOrigins` 与 `siteConfig`：
+`@arsvine/site-config`（Platform `packages/site-config`，这次版本 `0.4.0`）导出 `sites`、`serviceOrigins` 与 `siteConfig`：
 
 | 键      | Origin                        |
 | ------- | ----------------------------- |
@@ -24,6 +24,10 @@ Realm `config/site-config.mjs` 只再导出这个包。不要在 dotenv 里覆�
 
 Auth 是唯一身份源。Better Auth 加 OAuth provider、Passkey、TOTP、JWT。发现文档见 [`NETWORK.md`](./NETWORK.md)。
 
+站点登记在 `@arsvine/site-config` 的 `sites`。带 `identity` 的站点进入 `identityOrigins`，Auth 把它和 `AUTH_TRUSTED_ORIGINS` 合并，不再为新域名改 Auth 源码。带 `login.resourceId` 的站点把解析后的 origin 放进 `siteConfig.auth.oauthResources`。Docs 的 resource 是它自己的 origin，因此这张表包含 `https://docs.arsvine.com`。JWT `audience` 仍只有 API 与 Content。
+
+浏览器登录走 `@arsvine/site-kit` 的 `oidcClient`、`createPkceLogin`、`authorizationUrl`、`exchangeAuthorizationCode`。Console 和 Docs 只保留自己的 cookie。新登录站加一条 `sites` 记录并调用这四个函数。OIDC 客户端记录仍在 Auth 数据库，源码不代为插入。
+
 Console OIDC：redirect `https://console.arsvine.com/auth/callback`，登出回跳 `https://console.arsvine.com/auth/signed-out`，resource 是 API origin。scope 含 `openid profile email` 以及 `content:read|write|publish`、`assets:read|write`、`integrations:read|write`、`jobs:read|run`。换票是授权码加 PKCE：`grant_type=authorization_code`，表单带 `code_verifier`。`AUTH_OIDC_CLIENT_ID` 与 `AUTH_OIDC_CLIENT_SECRET` 只留在 BFF。浏览器只打 Console 自己的 BFF，不接收 access token、数据库连接、发布 token、对象存储凭据或 session secret。变更请求带 `x-csrf-token`，对应 cookie 名 `arsvine_admin_csrf`。
 
 API 与 Content 用 Auth JWT。`siteConfig.auth.audience` 与 `oauthResources` 是 API origin 和 Content origin。JWKS 使用 `https://auth.arsvine.com/api/auth/jwks`。API 写入路由要求 `content:write`，发布要求 `content:publish`。Core schema 带 `revision`，文章修订在 `post_revisions`。
@@ -38,7 +42,7 @@ Docs 若启用登录，resource 是 `https://docs.arsvine.com`，scope 只有 `o
 2. API 写 Core。写入需要 `content:write`，发布需要 `content:publish`。
 3. API 用头 `X-Publication-Token`（键名 `CONTENT_PUBLISH_TOKEN`）把不可变对象 POST 到 `siteConfig.content.publicationUrl`（`https://content.arsvine.com/v1/internal/publications`）。
 4. Content 逐个校验对象后才切换 `realm-content/current.json`。
-5. 指针写成功后，API 用 `signRevalidate` 对 `` `${毫秒时间戳}.${原始body}` `` 做 SHA-256 HMAC，输出 hex，POST 到 `siteConfig.realm.revalidateUrl`（`https://arsvine.com/api/internal/revalidate`）。头是 `X-Arsvine-Timestamp`（毫秒数字符串）与 `X-Arsvine-Signature`。事件体字段是 `event`（`content.published`）、`releaseId`、`resources`、`timestamp`（ISO）。通知失败时 release 可能已经发布。
+5. 指针写成功后，API 用 `signRevalidate` 对 `` `${毫秒时间戳}.${原始body}` `` 做 SHA-256 HMAC，输出 hex，POST 到 `revalidateUrls("realm-content")` 列出的订阅者。当前订阅者只有 Realm（`https://arsvine.com/api/internal/revalidate`）。新的缓存站要收到通知，就在 `distributionChannels["realm-content"].subscribers` 里写上自己的 site id，并在该记录上提供 `revalidatePath`。头是 `X-Arsvine-Timestamp`（毫秒数字符串）与 `X-Arsvine-Signature`。事件体字段是 `event`（`content.published`）、`releaseId`、`resources`、`timestamp`（ISO）。通知失败时 release 可能已经发布。
 6. Realm 用 `verifyRevalidate` 校验，默认允许 5 分钟偏差，再按事件 `revalidatePath`。
 
 Realm 资产发布脚本走同一把 `REVALIDATE_WEBHOOK_SECRET` 和同一个签名函数。访客统计 HMAC 和 TOTP HMAC 不是这把密钥，仍留在各自模块。

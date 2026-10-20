@@ -16,6 +16,54 @@ export type CatalogNamespaces = {
   readonly ripple: string;
 };
 
+export type SiteCapability =
+  | "identity"
+  | "identity-provider"
+  | "resource"
+  | "revalidate"
+  | "content-read"
+  | "distribution";
+
+export type SiteLogin = {
+  readonly redirectPath: string;
+  readonly postLogoutPath: string;
+  readonly resourceId: string;
+  readonly scope: string;
+};
+
+export type SiteRecord = {
+  readonly id: string;
+  readonly origin: string;
+  readonly capabilities: readonly SiteCapability[];
+  readonly displayName?: string;
+  readonly healthLivePath?: string;
+  readonly healthReadyPath?: string;
+  readonly revalidatePath?: string;
+  readonly musicApiPath?: string;
+  readonly login?: SiteLogin;
+};
+
+export type OidcClient = {
+  readonly issuer: string;
+  readonly authorizationUrl: string;
+  readonly tokenUrl: string;
+  readonly userinfoUrl: string;
+  readonly jwksUrl: string;
+  readonly endSessionUrl: string;
+  readonly redirectUri: string;
+  readonly postLogoutRedirectUri: string;
+  readonly resource: string;
+  readonly scope: string;
+};
+
+export type DistributionChannel = {
+  readonly id: string;
+  readonly namespace: string;
+  readonly pointerKey: string;
+  readonly releasePrefix: string;
+  readonly subscribers: readonly string[];
+};
+
 export type SiteConfig = {
   readonly realm: {
     readonly origin: string;
@@ -34,18 +82,7 @@ export type SiteConfig = {
     readonly origin: string;
     readonly healthLivePath: string;
     readonly healthReadyPath: string;
-    readonly oidc: {
-      readonly issuer: string;
-      readonly authorizationUrl: string;
-      readonly tokenUrl: string;
-      readonly userinfoUrl: string;
-      readonly jwksUrl: string;
-      readonly endSessionUrl: string;
-      readonly redirectUri: string;
-      readonly postLogoutRedirectUri: string;
-      readonly resource: string;
-      readonly scope: string;
-    };
+    readonly oidc: OidcClient;
   };
   readonly auth: {
     readonly origin: string;
@@ -85,15 +122,15 @@ export type SiteConfig = {
     readonly origin: string;
     readonly healthLivePath: string;
     readonly healthReadyPath: string;
-    readonly oidc: {
-      readonly redirectUri: string;
-      readonly postLogoutRedirectUri: string;
-      readonly resource: string;
-      readonly scope: string;
-    };
+    readonly oidc: OidcClient;
   };
 };
 
 export declare const serviceOrigins: ServiceOrigins;
 export declare const catalogNamespaces: CatalogNamespaces;
 export declare const siteConfig: SiteConfig;
+export declare const sites: Readonly<Record<string, SiteRecord>>;
+export declare const identityOrigins: readonly string[];
+export declare const distributionChannels: Readonly<Record<string, DistributionChannel>>;
+export declare function oidcClient(siteId: string): OidcClient;
+export declare function revalidateUrls(channelId: string): readonly string[];

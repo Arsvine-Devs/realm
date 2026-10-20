@@ -28,7 +28,7 @@ Realm、Platform 的 Next 应用、Docs 都在这条 Next 16 / React 19 / TypeSc
 
 ## 未推送 Platform 分支上的其余钉扎
 
-来源是 `/tmp/arsvine-parallel/platform` 的 `b4cd586`，不是 Realm 的 `package.json`。`pnpm-workspace.yaml` 的 `minimumReleaseAge` 是 `1440`，`overrides.typescript` 是精确的 `6.0.3`。`@arsvine/site-config@0.3.1`、`@arsvine/service-health@0.1.0`、`@arsvine/site-kit@0.1.0` 在该分支是 `private: true`。没有 publish。
+来源是 `/tmp/arsvine-parallel/platform` 的 `b4cd586`，不是 Realm 的 `package.json`。`pnpm-workspace.yaml` 的 `minimumReleaseAge` 是 `1440`，`overrides.typescript` 是精确的 `6.0.3`。`@arsvine/site-config@0.4.0`、`@arsvine/service-health@0.1.0`、`@arsvine/site-kit@0.2.0` 在 Platform 分支是 `private: true`。没有 publish。`0.4.0` 起，登录站和分发订阅者来自 `sites` 与 `distributionChannels`，不再在 Auth 或发布器里各写一份 origin。
 
 | 声明                                                  | 版本                                        |
 | ----------------------------------------------------- | ------------------------------------------- |
