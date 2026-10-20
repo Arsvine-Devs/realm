@@ -1,11 +1,11 @@
-import { createHmac } from 'node:crypto';
 import { spawn } from 'node:child_process';
+import { signRevalidate } from '@arsvine/site-kit';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadProjectEnv, readEnv, requiredEnv } from '../lib/env-provider.mjs';
-import { serviceOrigins } from '../../config/site-config.mjs';
+import { siteConfig } from '../../config/site-config.mjs';
 
 loadProjectEnv();
 
@@ -171,8 +171,8 @@ async function revalidate(releaseId) {
     timestamp: new Date(Number(timestamp)).toISOString(),
   });
   const secret = required('REVALIDATE_WEBHOOK_SECRET');
-  const signature = createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex');
-  const response = await fetch(`${serviceOrigins.realm}/api/internal/revalidate`, {
+  const signature = signRevalidate(secret, timestamp, body);
+  const response = await fetch(siteConfig.realm.revalidateUrl, {
     method: 'POST',
     headers: {
       accept: 'application/json',

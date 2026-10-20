@@ -1,0 +1,36 @@
+{
+  "name": "@arsvine/site-kit",
+  "version": "0.2.0",
+  "description": "Shared helpers for a new Arsvine site: topology, health, catalog pointers, client-credentials, and revalidation HMAC",
+  "type": "module",
+  "main": "src/index.mjs",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.mjs"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "node --test src/index.test.mjs"
+  },
+  "dependencies": {
+    "@arsvine/service-health": "workspace:*",
+    "@arsvine/site-config": "workspace:*",
+    "jose": "^6.2.12"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Arsvine-Devs/platform.git",
+    "directory": "packages/site-kit"
+  },
+  "license": "MIT",
+  "_arsvineSource": "platform/packages/site-kit@0.2.0"
+}

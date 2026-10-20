@@ -1,6 +1,5 @@
+import { readyJsonResponse } from '@arsvine/service-health';
+
 export function GET() {
-  return Response.json(
-    { status: 'ready', service: 'realm' },
-    { headers: { 'Cache-Control': 'no-store' } },
-  );
+  return readyJsonResponse('realm');
 }

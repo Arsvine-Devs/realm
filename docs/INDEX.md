@@ -18,7 +18,7 @@
 - [`human/OPERATIONS.md`](./human/OPERATIONS.md)：部署、自托管、数据库、发布和回滚。
 - [`human/CONFIGURATION.md`](./human/CONFIGURATION.md)：每个环境变量的格式、来源、作用域和失败行为。
 - [`human/TROUBLESHOOTING.md`](./human/TROUBLESHOOTING.md)：按症状排查常见问题。
-- [`architecture/SYSTEM_MAP.md`](./architecture/SYSTEM_MAP.md)：全网站跨仓库架构拓扑与数据流。
+- [`system/README.md`](./system/README.md)：跨仓知识包。[`architecture/SYSTEM_MAP.md`](./architecture/SYSTEM_MAP.md) 说明它和 docs 仓库的关系。
 
 ## 阅读顺序
 

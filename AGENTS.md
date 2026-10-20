@@ -2,6 +2,12 @@
 
 ARSVINE REALM is a Next.js 16 App Router portfolio/blog site using React 19, TypeScript, SCSS Modules, Three.js, MDX, next-intl, Vitest, Tencent COS Catalog assets, and optional protected posts.
 
+## Branch and delivery
+
+- Default branch is `master` (linear history). Develop on `dev/<topic>` and integrate via PR.
+- The default branch is the deploy target. Do not promote production, switch Catalog pointers, or publish COS from a task unless the user explicitly authorizes it.
+- Prefer squash merge. Do not rewrite shared default-branch history.
+
 ## Authority and scope
 
 - Read `docs/ai/INDEX.md` for AI task routing and `docs/INDEX.md` for human documentation.

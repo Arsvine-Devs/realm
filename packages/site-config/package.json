@@ -1,0 +1,28 @@
+{
+  "name": "@arsvine/site-config",
+  "version": "0.4.0",
+  "description": "Canonical Arsvine service origins, OIDC topology, and catalog namespaces",
+  "type": "module",
+  "main": "src/index.mjs",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.mjs"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Arsvine-Devs/platform.git",
+    "directory": "packages/site-config"
+  },
+  "license": "MIT",
+  "_arsvineSource": "platform/packages/site-config@0.4.0"
+}

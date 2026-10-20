@@ -19,7 +19,7 @@ ARSVINE REALM 是一个 Next.js App Router 应用，按 feature 组织源码，�
 - 人类主页：[`README.md`](./README.md)
 - 人类文档：[`docs/README.md`](./docs/README.md)
 - 人类文档目录：[`docs/INDEX.md`](./docs/INDEX.md)
-- 全网站架构拓扑：[`docs/architecture/SYSTEM_MAP.md`](./docs/architecture/SYSTEM_MAP.md)
+- 全网站知识包：[`docs/system/README.md`](./docs/system/README.md)
 - AI 仓库规则：[`AGENTS.md`](./AGENTS.md)
 - AI 工作流目录：[`docs/ai/INDEX.md`](./docs/ai/INDEX.md)
 

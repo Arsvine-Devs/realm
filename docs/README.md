@@ -17,8 +17,16 @@ AI editing rules for this directory live in [`AGENTS.md`](./AGENTS.md).
 
 ## Audience and language
 
-人类文档使用简体中文。命令、路径、标识符、API 名称、环境变量和错误消息保持权威英文形式。`docs/ai/` 与 `.agents/skills/` 下的 AI 操作文档使用简洁的技术英语。
+| 受众            | 位置                                                        | 语言                   |
+| --------------- | ----------------------------------------------------------- | ---------------------- |
+| 访客 / GitHub   | 根 [`README.md`](../README.md)                              | 中文为主，附短英文导读 |
+| 维护者 / 开发者 | 本目录 `human/`、`architecture/`                            | 简体中文               |
+| AI              | [`AGENTS.md`](../AGENTS.md)、[`ai/`](./ai/INDEX.md)、Skills | 技术英语               |
+
+命令、路径、标识符、API 名称、环境变量和错误消息保持权威英文形式。
 
 ## Maintenance policy
 
 每个重要事实只保留一个权威所有者。命令、路由、配置键、范围边界或运维流程发生变化时，更新对应的人类参考文档和 AI 目录。文档只收录当前约束、操作步骤和运行风险。
+
+跨仓知识包在 [`system/README.md`](./system/README.md)。docs 仓库是预定位置，这次没能推送。固定服务 origin 以 Platform `@arsvine/site-config` 为准。

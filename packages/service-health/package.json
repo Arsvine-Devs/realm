@@ -1,0 +1,28 @@
+{
+  "name": "@arsvine/service-health",
+  "version": "0.1.0",
+  "description": "Shared live/ready health payload helpers for Arsvine services",
+  "type": "module",
+  "main": "src/index.mjs",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.mjs"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Arsvine-Devs/platform.git",
+    "directory": "packages/service-health"
+  },
+  "license": "MIT",
+  "_arsvineSource": "platform/packages/service-health@0.1.0"
+}

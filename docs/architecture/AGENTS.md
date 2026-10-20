@@ -1,10 +1,10 @@
 # Cross-system architecture documentation scope
 
-This directory owns additive, cross-repository architecture documentation for ARSVINE REALM.
+This directory keeps the pointer to cross-repository architecture documentation. The pack itself is not stored here.
 
 - Keep human-facing documents in Simplified Chinese. Keep this file in concise technical English.
 - Read `README.md` before editing this scope.
-- This scope owns relationships between Realm, Admin, Content, deployment units, external suppliers, and migration seams. Existing `docs/human/*` documents remain the owners of single-repository implementation procedures.
+- The cross-site pack that this token could push is `docs/system/`. `Arsvine-Devs/docs` `system/` is the same text and remains the intended owner, but this session could not push that repository. Existing `docs/human/*` documents remain the owners of single-repository implementation procedures.
 - Do not edit existing repository documents, application code, content, assets, or deployment configuration as part of this scope unless the user explicitly expands the request.
 - Treat current source, schemas, manifests, scripts, repository state, and verified live probes as evidence. Mark prose-only or dashboard-only claims as `CLAIMED` or `UNKNOWN`.
 - Never include secrets, tokens, cookies, TOTP material, database URLs, private bucket names, or private object paths.
