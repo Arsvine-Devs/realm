@@ -304,6 +304,15 @@ importers:
 
   packages/site-config: {}
 
+  packages/site-kit:
+    dependencies:
+      '@arsvine/service-health':
+        specifier: workspace:*
+        version: link:../service-health
+      '@arsvine/site-config':
+        specifier: workspace:*
+        version: link:../site-config
+
 packages:
 
   '@asamuzakjp/css-color@7.1.5':
