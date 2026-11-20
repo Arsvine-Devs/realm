@@ -4,6 +4,7 @@ import { mkdir, writeFile, readFile, rm } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { spawn } from 'node:child_process';
+import { splitFontStylesheets } from './lib/font-stylesheets.mjs';
 
 const STAGING_DIR = 'public/_fonts-staging';
 const SITE_CONFIG_PATH = 'src/shared/config/site.ts';
@@ -61,17 +62,13 @@ function familyToSlug(family) {
 // Extract enough metadata from a single @font-face block to name the local file.
 // Google's CSS always emits exactly: font-family, font-style, font-weight,
 // font-display, src, unicode-range — in that order.
-function parseFontFaceBlock(block, index) {
+function parseFontFaceBlock(block) {
   const family = block.match(/font-family:\s*['"]([^'"]+)['"]/)?.[1];
-  const style = block.match(/font-style:\s*(\w+)/)?.[1] || 'normal';
-  const weight = block.match(/font-weight:\s*(\d+)/)?.[1] || '400';
   const urlMatch = block.match(/url\((https:\/\/fonts\.gstatic\.com\/[^)]+)\)/);
   if (!family || !urlMatch) return null;
   const url = urlMatch[1];
   const slug = familyToSlug(family);
-  // Pad index to 3 digits so files sort naturally (Noto SC has ~100+ segments).
-  const filename = `${slug}-${weight}-${style}-${String(index).padStart(3, '0')}.woff2`;
-  return { family, slug, weight, style, url, filename };
+  return { family, slug, url };
 }
 
 // Simple promise-pool to cap concurrent fetches.
@@ -89,14 +86,17 @@ async function pool(items, limit, worker) {
   return results;
 }
 
-async function downloadFontFile(url, destPath) {
+async function downloadFontFile(url, slug) {
   let lastErr;
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const buf = await curlFetch(url, { binary: true });
+      const digest = createHash('sha256').update(buf).digest('hex').slice(0, 12);
+      const relativePath = `${slug}/font.${digest}.woff2`;
+      const destPath = join(STAGING_DIR, relativePath);
       await mkdir(dirname(destPath), { recursive: true });
       await writeFile(destPath, buf);
-      return buf.length;
+      return { bytes: buf.length, relativePath };
     } catch (err) {
       lastErr = err;
       if (attempt < MAX_RETRIES) {
@@ -146,26 +146,20 @@ async function main() {
   }
 
   const tasks = [];
-  const rewrites = new Map(); // original gstatic url → cdn url
+  const fontUrls = new Set();
   for (let i = 0; i < blocks.length; i++) {
-    const parsed = parseFontFaceBlock(blocks[i], i);
+    const parsed = parseFontFaceBlock(blocks[i]);
     if (!parsed) {
       console.warn(`[fonts] Skipping unparseable block #${i}`);
       continue;
     }
     // Google reuses the same underlying woff2 across different weight blocks
-    // (e.g. weight 300 and 500 may point to identical glyph data for some
-    // unicode-ranges). Dedupe by source URL so we download each file once
-    // and the rewrites Map stays consistent. The first block to claim a URL
-    // sets its filename; later blocks pointing to the same URL get the same
-    // cdn target via the existing rewrites entry.
-    if (rewrites.has(parsed.url)) {
+    // (e.g. different weights). Download each source once.
+    if (fontUrls.has(parsed.url)) {
       continue;
     }
-    const destPath = join(STAGING_DIR, parsed.slug, parsed.filename);
-    const fontPath = `./${parsed.slug}/${parsed.filename}`;
-    rewrites.set(parsed.url, fontPath);
-    tasks.push({ ...parsed, destPath });
+    fontUrls.add(parsed.url);
+    tasks.push(parsed);
   }
   console.log(
     `[fonts] After dedup: ${tasks.length} unique woff2 files (from ${blocks.length} @font-face blocks)`,
@@ -176,20 +170,21 @@ async function main() {
   );
   let totalBytes = 0;
   let done = 0;
-  await pool(tasks, DOWNLOAD_CONCURRENCY, async (t) => {
-    const bytes = await downloadFontFile(t.url, t.destPath);
+  const downloads = await pool(tasks, DOWNLOAD_CONCURRENCY, async (task) => {
+    const { bytes, relativePath } = await downloadFontFile(task.url, task.slug);
     totalBytes += bytes;
     done++;
     if (done % 25 === 0 || done === tasks.length) {
       console.log(`[fonts]   ${done}/${tasks.length} done, ${(totalBytes / 1024).toFixed(0)} KB`);
     }
+    return { url: task.url, relativePath };
   });
 
   // Rewrite the original CSS by simple string replace — keeps comment markers
   // (e.g. /* [42] */) and unicode-range exactly as Google emitted them.
   let rewrittenCss = originalCss;
-  for (const [from, to] of rewrites) {
-    rewrittenCss = rewrittenCss.split(from).join(to);
+  for (const { url, relativePath } of downloads) {
+    rewrittenCss = rewrittenCss.split(url).join(`./${relativePath}`);
   }
   const cssOutPath = join(STAGING_DIR, 'google-fonts.css');
   await writeFile(cssOutPath, rewrittenCss);
@@ -203,12 +198,16 @@ async function main() {
     fontFiles: tasks.length,
     totalFontBytes: totalBytes,
     families: [...new Set(tasks.map((t) => t.family))],
+    stylesheets: splitFontStylesheets(rewrittenCss).map(({ layer, filename }) => ({
+      layer,
+      filename,
+    })),
   };
   await writeFile(join(STAGING_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2));
 
   console.log(`[fonts] Prepared ${tasks.length} files in ${STAGING_DIR}`);
   console.log(
-    '[fonts] Copy the stylesheet and font directories into the media workspace shared/fonts tree.',
+    '[fonts] Copy google-fonts.css and the font directories into the media workspace. assets:build writes the versioned stylesheets.',
   );
 }
 

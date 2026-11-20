@@ -31,6 +31,33 @@ afterEach(() => {
 });
 
 describe('/api/hitokoto', () => {
+  it('keeps the upstream deadline active until the response body finishes', async () => {
+    const deadline = new AbortController();
+    const timeout = vi.spyOn(AbortSignal, 'timeout').mockReturnValueOnce(deadline.signal);
+    const fetchMock = vi.fn((_url, { signal }: { signal: AbortSignal }) => {
+      const response = {
+        ok: true,
+        json: () =>
+          Promise.reject(
+            signal === deadline.signal && deadline.signal.aborted
+              ? deadline.signal.reason
+              : new Error('unexpected signal'),
+          ),
+      };
+      deadline.abort(new DOMException('Body deadline expired', 'TimeoutError'));
+      return Promise.resolve(response);
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    try {
+      const response = await handler(request());
+      expect(timeout).toHaveBeenCalledExactlyOnceWith(5000);
+      expect(fetchMock).toHaveBeenCalledWith(expect.any(String), { signal: deadline.signal });
+      expect(response.status).toBe(502);
+    } finally {
+      timeout.mockRestore();
+      vi.unstubAllGlobals();
+    }
+  });
   it('rate-limits by client IP and returns the sentence on success', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,

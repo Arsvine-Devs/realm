@@ -1,8 +1,10 @@
 /* eslint-disable @next/next/no-img-element -- lightbox animation needs direct control over the rendered image element */
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useId, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import ReactDOM from 'react-dom';
+import { useTranslations } from 'next-intl';
 import styles from './Lightbox.module.scss';
 import { useSafeTimeouts } from '@/shared/hooks/useSafeTimeouts';
+import { useReducedMotion } from '@/shared/hooks/useMediaQuery';
 import { resolveAssetAlt, resolveRawAssetUrl } from '@/shared/lib/media';
 import type { GalleryImage } from '@/shared/types';
 
@@ -30,7 +32,11 @@ const Lightbox = ({
   getClosingRectForIndex,
 }: LightboxProps) => {
   const imageRef = useRef<HTMLImageElement | null>(null);
-  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const overlayRef = useRef<HTMLDialogElement | null>(null);
+  const backdropPress = useRef(false);
+  const captionId = useId();
+  const t = useTranslations('lightbox');
+  const reducedMotion = useReducedMotion();
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const prevSrcRef = useRef<string | null>(null);
@@ -38,7 +44,20 @@ const Lightbox = ({
   const [isCrossfading, setIsCrossfading] = useState(false);
   const safeTimers = useSafeTimeouts();
 
+  useLayoutEffect(() => {
+    const dialog = overlayRef.current;
+    if (!dialog) return;
+    dialog.showModal();
+    return () => {
+      if (dialog.open) dialog.close();
+    };
+  }, []);
+
   const handleInternalNext = useCallback(() => {
+    if (reducedMotion && !isAnimatingOut) {
+      onNext?.();
+      return;
+    }
     if (onNext && !isAnimatingOut && !isCrossfading) {
       setIsCrossfading(true);
       const imgElement = imageRef.current;
@@ -50,9 +69,13 @@ const Lightbox = ({
         onNext();
       }
     }
-  }, [onNext, isAnimatingOut, isCrossfading, safeTimers]);
+  }, [onNext, isAnimatingOut, isCrossfading, reducedMotion, safeTimers]);
 
   const handleInternalPrev = useCallback(() => {
+    if (reducedMotion && !isAnimatingOut) {
+      onPrev?.();
+      return;
+    }
     if (onPrev && !isAnimatingOut && !isCrossfading) {
       setIsCrossfading(true);
       const imgElement = imageRef.current;
@@ -64,7 +87,7 @@ const Lightbox = ({
         onPrev();
       }
     }
-  }, [onPrev, isAnimatingOut, isCrossfading, safeTimers]);
+  }, [onPrev, isAnimatingOut, isCrossfading, reducedMotion, safeTimers]);
 
   useEffect(() => {
     const imgElement = imageRef.current;
@@ -83,6 +106,13 @@ const Lightbox = ({
     const imageUrl = resolveRawAssetUrl(image.src);
     const isNavigation = prevSrcRef.current && prevSrcRef.current !== imageUrl;
     prevSrcRef.current = imageUrl;
+    if (reducedMotion) {
+      imgElement.style.transition = 'none';
+      imgElement.style.transform = 'none';
+      imgElement.style.visibility = 'visible';
+      imgElement.style.opacity = '1';
+      return;
+    }
 
     if (isNavigation) {
       imgElement.style.transition = 'none';
@@ -183,10 +213,19 @@ const Lightbox = ({
         imgElement.onerror = null;
       }
     };
-  }, [image, thumbnailRect]);
+  }, [image, thumbnailRect, reducedMotion]);
+
+  const finishClose = useCallback(() => {
+    overlayRef.current?.close();
+    onClose();
+  }, [onClose]);
 
   const handleClose = useCallback(() => {
     if (isAnimatingOut) return;
+    if (reducedMotion) {
+      finishClose();
+      return;
+    }
     setIsAnimatingOut(true);
 
     const imgElement = imageRef.current;
@@ -199,7 +238,12 @@ const Lightbox = ({
 
     const targetRectForClose = getClosingRectForIndex ? getClosingRectForIndex() : null;
 
-    if (imgElement && targetRectForClose) {
+    if (
+      imgElement &&
+      targetRectForClose &&
+      imgElement.offsetWidth > 0 &&
+      imgElement.offsetHeight > 0
+    ) {
       const finalRect = imgElement.getBoundingClientRect();
       const scaleX = targetRectForClose.width / finalRect.width;
       const scaleY = targetRectForClose.height / finalRect.height;
@@ -212,10 +256,7 @@ const Lightbox = ({
       imgElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`;
       imgElement.style.opacity = '0';
 
-      safeTimers.setTimeout(() => {
-        onClose();
-        setIsAnimatingOut(false);
-      }, 450);
+      safeTimers.setTimeout(finishClose, 450);
     } else if (imgElement) {
       imgElement.style.transition =
         'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out';
@@ -223,15 +264,11 @@ const Lightbox = ({
       imgElement.style.transform = 'scale(0.5)';
       imgElement.style.opacity = '0';
 
-      safeTimers.setTimeout(() => {
-        onClose();
-        setIsAnimatingOut(false);
-      }, 350);
+      safeTimers.setTimeout(finishClose, 350);
     } else {
-      onClose();
-      setIsAnimatingOut(false);
+      finishClose();
     }
-  }, [isAnimatingOut, getClosingRectForIndex, onClose, safeTimers]);
+  }, [isAnimatingOut, getClosingRectForIndex, finishClose, reducedMotion, safeTimers]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length !== 1 || isAnimatingOut) return;
@@ -250,112 +287,90 @@ const Lightbox = ({
   };
 
   useEffect(() => {
-    const disableScroll = () => {
-      document.documentElement.style.overflow = 'hidden';
-      document.documentElement.style.height = '100%';
-      document.body.style.overflow = 'hidden';
-      document.body.style.height = '100%';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-    };
-
-    const enableScroll = () => {
-      document.documentElement.style.overflow = '';
-      document.documentElement.style.height = '';
-      document.body.style.overflow = '';
-      document.body.style.height = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (isAnimatingOut) return;
-      if (event.key === 'Escape') handleClose();
-      if (event.key === 'ArrowLeft') handleInternalPrev();
-      if (event.key === 'ArrowRight') handleInternalNext();
-    };
+    const dialog = overlayRef.current;
+    if (!dialog) return;
 
     const handleWheel = (event: WheelEvent) => {
-      if (isAnimatingOut) return;
+      if (isAnimatingOut || event.ctrlKey || event.metaKey || event.deltaY === 0) return;
       event.preventDefault();
-      event.stopPropagation();
       if (event.deltaY > 0) handleInternalNext();
-      else if (event.deltaY < 0) handleInternalPrev();
+      else handleInternalPrev();
     };
 
-    disableScroll();
-    window.addEventListener('keydown', handleKeyDown);
-    const lightboxElement = overlayRef.current;
-    if (lightboxElement) {
-      lightboxElement.addEventListener('wheel', handleWheel, { passive: false });
-    }
-
-    return () => {
-      enableScroll();
-      window.removeEventListener('keydown', handleKeyDown);
-      if (lightboxElement) {
-        lightboxElement.removeEventListener('wheel', handleWheel);
-      }
-    };
-  }, [isAnimatingOut, handleClose, handleInternalPrev, handleInternalNext]);
-
+    dialog.addEventListener('wheel', handleWheel, { passive: false });
+    return () => dialog.removeEventListener('wheel', handleWheel);
+  }, [isAnimatingOut, handleInternalPrev, handleInternalNext]);
   if (!image) return null;
 
   return ReactDOM.createPortal(
-    // The dialog backdrop owns pointer dismissal; Escape and the document key handler own keyboard dismissal.
-    // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- a dialog container owns backdrop dismissal and cannot be replaced by a button.
-    <div
+    <dialog
       ref={overlayRef}
       className={`${styles.lightboxOverlay} ${isAnimatingOut ? styles.fadeOut : ''}`}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) handleClose();
+      onPointerDown={(event) => {
+        backdropPress.current = event.target === event.currentTarget;
       }}
-      /* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- a dialog container is the correct accessible role for this lightbox surface. */
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="lightbox-caption"
-      tabIndex={-1}
+      onPointerUp={(event) => {
+        if (backdropPress.current && event.target === event.currentTarget) handleClose();
+        backdropPress.current = false;
+      }}
+      aria-label={t('gallery')}
+      aria-describedby={image.caption ? captionId : undefined}
+      onCancel={(event) => {
+        event.preventDefault();
+        handleClose();
+      }}
       onKeyDown={(event) => {
-        if (event.key === 'Escape') handleClose();
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        if (event.key === 'ArrowLeft') handleInternalPrev();
+        else handleInternalNext();
       }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
+      <button
+        type="button"
+        className={styles.closeButton}
+        onClick={handleClose}
+        aria-label={t('close')}
+      >
+        <span aria-hidden="true">×</span>
+      </button>
       <div className={styles.lightboxContainer}>
         {onPrev && (
           <button
+            type="button"
             className={`${styles.lightboxButton} ${styles.prevButton}`}
             onClick={(e) => {
               e.stopPropagation();
               handleInternalPrev();
             }}
-            aria-label="Previous image"
-            data-cursor-label="PREVIOUS IMAGE"
+            aria-label={t('previous')}
           />
         )}
 
         <img
           ref={imageRef}
           src={resolveRawAssetUrl(image.src)}
-          alt={resolveAssetAlt(image.src, image.caption || 'Lightbox image')}
+          alt={resolveAssetAlt(image.src, image.caption || t('image'))}
           className={styles.lightboxImage}
           style={{ willChange: 'transform, opacity' }}
         />
         {image.caption && (
-          <div id="lightbox-caption" className={styles.lightboxCaption}>
+          <div id={captionId} className={styles.lightboxCaption}>
             {image.caption}
           </div>
         )}
 
         {onNext && (
           <button
+            type="button"
             className={`${styles.lightboxButton} ${styles.nextButton}`}
             onClick={(e) => {
               e.stopPropagation();
               handleInternalNext();
             }}
-            aria-label="Next image"
-            data-cursor-label="NEXT IMAGE"
+            aria-label={t('next')}
           />
         )}
 
@@ -370,7 +385,7 @@ const Lightbox = ({
           </div>
         )}
       </div>
-    </div>,
+    </dialog>,
     document.body,
   );
 };

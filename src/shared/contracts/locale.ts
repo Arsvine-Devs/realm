@@ -3,6 +3,7 @@ export const locales = ['zh-CN', 'zh-TW', 'en'] as const;
 export type Locale = (typeof locales)[number];
 
 export const defaultLocale: Locale = 'zh-CN';
+export const ROUTE_LOCALE_HEADER = 'x-arsvine-locale';
 
 export const htmlLangMap: Record<Locale, string> = {
   'zh-CN': 'zh-Hans-CN',

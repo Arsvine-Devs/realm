@@ -1,7 +1,8 @@
 import React from 'react';
+import Link from 'next/link';
 import styles from './ProjectCard.module.scss';
 import { resolveRawAssetUrl } from '@/shared/lib/media';
-import type { KeyboardEvent, MouseEvent } from 'react';
+import { getSafeExternalHref } from '@/shared/lib/safe-external-href';
 import type { AssetReference } from '@/shared/types';
 
 interface ProjectCardItem {
@@ -20,13 +21,15 @@ interface ProjectCardItem {
 
 interface ProjectCardProps<T extends ProjectCardItem> {
   project: T;
-  onClick?: (project: T, event: MouseEvent<HTMLElement>) => void;
+  href?: string;
+  onClick?: (project: T) => void;
   onNavigateIntent?: (project: T) => void;
   isInverted: boolean;
 }
 
 function ProjectCard<T extends ProjectCardItem>({
   project,
+  href,
   onClick,
   onNavigateIntent,
   isInverted,
@@ -48,42 +51,67 @@ function ProjectCard<T extends ProjectCardItem>({
   const backgroundImageUrl = resolveRawAssetUrl(resolvedImageUrl);
   const imageStyle = backgroundImageUrl ? { backgroundImage: `url(${backgroundImageUrl})` } : {};
 
-  const handleCardClick = (e: MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>) => {
-    if (onClick) {
-      onClick(project, e as MouseEvent<HTMLElement>);
-    } else if (link && link !== '#') {
-      window.open(link, '_blank', 'noopener noreferrer');
-    }
-  };
-
-  const isClickable = !!onClick || (link && link !== '#');
+  const externalCardHref = !href && !onClick ? getSafeExternalHref(link) : null;
+  const visitHref = getSafeExternalHref(liveUrl) ?? externalCardHref;
 
   return (
-    // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- the card contains nested external anchors and keeps its documented keyboard handler.
-    <div
-      className={`${styles.projectCard} ${isClickable ? styles.clickable : ''} ${isConfidential ? styles.confidentialCard : ''}`}
-      onClick={isClickable ? handleCardClick : undefined}
-      role={isClickable ? 'button' : undefined}
-      tabIndex={isClickable ? 0 : undefined}
-      data-cursor-no-magnetic
-      onPointerDown={
-        isClickable && onNavigateIntent
-          ? (event) => {
-              if (event.button === 0) onNavigateIntent(project);
+    <div className={`${styles.projectCard} ${isConfidential ? styles.confidentialCard : ''}`}>
+      {href ? (
+        <Link
+          href={href}
+          prefetch={false}
+          className={styles.cardAction}
+          aria-label={title}
+          data-cursor-no-magnetic
+          onNavigate={
+            onClick
+              ? (event) => {
+                  event.preventDefault();
+                  onClick(project);
+                }
+              : undefined
+          }
+          onPointerDown={(event) => {
+            if (
+              event.button === 0 &&
+              !event.ctrlKey &&
+              !event.metaKey &&
+              !event.shiftKey &&
+              !event.altKey
+            ) {
+              onNavigateIntent?.(project);
             }
-          : undefined
-      }
-      onKeyDown={
-        isClickable
-          ? (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                onNavigateIntent?.(project);
-                handleCardClick(e);
-              }
+          }}
+          onKeyDown={(event) => {
+            if (
+              event.key === 'Enter' &&
+              !event.ctrlKey &&
+              !event.metaKey &&
+              !event.shiftKey &&
+              !event.altKey
+            ) {
+              onNavigateIntent?.(project);
             }
-          : undefined
-      }
-    >
+          }}
+        />
+      ) : onClick ? (
+        <button
+          type="button"
+          className={styles.cardAction}
+          aria-label={title}
+          data-cursor-no-magnetic
+          onClick={() => onClick(project)}
+        />
+      ) : externalCardHref ? (
+        <a
+          href={externalCardHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.cardAction}
+          aria-label={title}
+          data-cursor-no-magnetic
+        />
+      ) : null}
       <div className={styles.cardBorderTopLeft}></div>
       <div className={styles.cardBorderBottomRight}></div>
 
@@ -121,25 +149,12 @@ function ProjectCard<T extends ProjectCardItem>({
           ))}
         </div>
       </div>
-      {liveUrl && (
+      {visitHref && (
         <a
-          href={liveUrl}
+          href={visitHref}
           target="_blank"
           rel="noopener noreferrer"
           className={styles.projectLink}
-          onClick={(e) => e.stopPropagation()}
-          data-cursor-magnetic
-        >
-          Visit
-        </a>
-      )}
-      {!liveUrl && !onClick && link && link !== '#' && (
-        <a
-          href={link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.projectLink}
-          onClick={(e) => e.stopPropagation()}
           data-cursor-magnetic
         >
           Visit

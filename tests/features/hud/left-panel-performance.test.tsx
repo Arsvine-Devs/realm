@@ -45,7 +45,6 @@ function buildProps(overrides: Record<string, unknown> = {}) {
     displayedEnvParams: '',
     envArtifactStage: 0,
     isInverted: false,
-    drawerOpen: false,
     isStandalone: false,
     isTesseractDragging: false,
     powerDisplayRef: { current: null },

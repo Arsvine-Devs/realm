@@ -46,7 +46,7 @@ describe('BlogSection excerpt typewriter', () => {
       <BlogSection
         blogSectionRef={{ current: null }}
         locale="en"
-        handleBlogItemClick={vi.fn()}
+        navigateTo={vi.fn()}
         posts={[
           {
             slug: 'introduction',

@@ -1,6 +1,5 @@
 @use '../../shared/styles/breakpoints';
-// Google Fonts (Dosis + Noto Sans SC + Noto Serif SC) 通过根布局
-// 的 <link rel="stylesheet"> 加载，避免 @import 的串行阻塞。
+// The root layout loads Dosis first. Noto families load after the page.
 
 @font-face {
   font-family: 'ZELDA Free';

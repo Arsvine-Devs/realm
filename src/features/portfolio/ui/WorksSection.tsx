@@ -1,4 +1,4 @@
-import { useEffect, useState, type RefObject } from 'react';
+import { useEffect, useId, useState, type RefObject } from 'react';
 import { useTranslations } from 'next-intl';
 import styles from '../styles/WorksSection.module.scss';
 import { useSafeTimeouts } from '../../../shared/hooks/useSafeTimeouts';
@@ -20,7 +20,8 @@ interface WorksSectionProps {
   webProjects: Project[];
   gameProjects: Project[];
   earlyProjects: Project[];
-  handleWorkItemClick: (project: Project, e: React.MouseEvent) => void;
+  getWorkHref: (project: Project) => string | undefined;
+  handleWorkItemClick: (project: Project) => void;
   handleWorkItemIntent?: (project: Project) => void;
   skillCategories: SkillCategory[];
 }
@@ -35,11 +36,14 @@ function WorksSection({
   webProjects,
   gameProjects,
   earlyProjects,
+  getWorkHref,
   handleWorkItemClick,
   handleWorkItemIntent,
   skillCategories,
 }: WorksSectionProps) {
   const { isInverted } = useHudPower();
+  const earlyWorksId = useId();
+  const skillsId = useId();
   const [earlyExpanded, setEarlyExpanded] = useLocaleStableState(
     'content.works.early-expanded',
     false,
@@ -115,6 +119,7 @@ function WorksSection({
               <ProjectCard
                 key={project.id}
                 project={project}
+                href={getWorkHref(project)}
                 onClick={handleWorkItemClick}
                 onNavigateIntent={handleWorkItemIntent}
                 isInverted={isInverted}
@@ -128,6 +133,9 @@ function WorksSection({
       {earlyProjects.length > 0 && (
         <div className={styles.earlySection}>
           <button
+            type="button"
+            aria-expanded={earlyExpanded}
+            aria-controls={earlyWorksId}
             className={`${styles.earlySectionToggle} ${earlyExpanded ? styles.expanded : ''}`}
             onClick={() => setEarlyExpanded((prev) => !prev)}
           >
@@ -135,12 +143,17 @@ function WorksSection({
             <span>{t('earlyWorks')}</span>
             <span className={styles.earlySectionCount}>{earlyProjects.length}</span>
           </button>
-          <div className={`${styles.earlySectionContent} ${earlyExpanded ? styles.expanded : ''}`}>
+          <div
+            id={earlyWorksId}
+            inert={!earlyExpanded}
+            className={`${styles.earlySectionContent} ${earlyExpanded ? styles.expanded : ''}`}
+          >
             <div className={styles.projectGrid}>
               {earlyProjects.map((project) => (
                 <ProjectCard
                   key={project.id}
                   project={project}
+                  href={getWorkHref(project)}
                   onClick={handleWorkItemClick}
                   onNavigateIntent={handleWorkItemIntent}
                   isInverted={isInverted}
@@ -153,6 +166,9 @@ function WorksSection({
 
       <div className={styles.earlySection}>
         <button
+          type="button"
+          aria-expanded={skillsExpanded}
+          aria-controls={skillsId}
           className={`${styles.earlySectionToggle} ${skillsExpanded ? styles.expanded : ''}`}
           onClick={() => setSkillsExpanded((prev) => !prev)}
         >
@@ -162,7 +178,11 @@ function WorksSection({
             {skillCategories.reduce((sum, cat) => sum + cat.skills.length, 0)}
           </span>
         </button>
-        <div className={`${styles.earlySectionContent} ${skillsExpanded ? styles.expanded : ''}`}>
+        <div
+          id={skillsId}
+          inert={!skillsExpanded}
+          className={`${styles.earlySectionContent} ${skillsExpanded ? styles.expanded : ''}`}
+        >
           <SkillTree categories={skillCategories} expanded={skillsExpanded} />
         </div>
       </div>

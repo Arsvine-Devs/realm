@@ -2,7 +2,7 @@
 // ===== 响应式: 移动端抽屉进一步精简 (<768px) =====
 @include breakpoints.mobile {
   .leftPanel {
-    padding: 56px 16px calc(56px + env(safe-area-inset-bottom, 0) + 16px) 16px;
+    padding: max(0.75rem, env(safe-area-inset-top)) 16px max(1rem, env(safe-area-inset-bottom)) 16px;
   }
 
   // 移动端隐藏纯装饰元素，只保留导航+拉杆+电源

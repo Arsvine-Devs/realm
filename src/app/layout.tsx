@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { connection } from 'next/server';
+import { headers } from 'next/headers';
 import type { ReactNode } from 'react';
 
 import '@/app/styles/globals.scss';
@@ -7,8 +7,9 @@ import '@/app/styles/globals.scss';
 // it in the stable root so Next does not emit a preload-only stylesheet.
 import '@/features/navigation/styles/NotFoundPage.module.scss';
 import DocumentBootstrapScript from '@/app/providers/DocumentBootstrapScript';
+import DeferredFontStyles from '@/app/providers/DeferredFontStyles';
 import LocaleClientProviders from '@/app/providers/LocaleClientProviders';
-import { defaultLocale, htmlLangMap } from '@/app/i18n/config';
+import { htmlLangMap, resolveLocale, ROUTE_LOCALE_HEADER } from '@/shared/contracts/locale';
 import { siteConfig, getSiteUrl } from '@/shared/config/site';
 import { buildDocumentBootstrapScript } from '@/shared/lib/document-bootstrap';
 import { buildManagedAssetUrl, getPublicMediaBase } from '@/shared/lib/media';
@@ -43,7 +44,9 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  await connection();
+  const requestHeaders = await headers();
+  const locale = resolveLocale(requestHeaders.get(ROUTE_LOCALE_HEADER));
+  const nonce = requestHeaders.get('x-arsvine-nonce') ?? undefined;
   const mediaBase = getPublicMediaBase();
   const catalog = await getStaticCatalogAssets().catch(() => ({}));
   const assets = Object.fromEntries(
@@ -53,20 +56,27 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     ]),
   );
   return (
-    <html lang={htmlLangMap[defaultLocale]} data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang={htmlLangMap[locale]} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
-        {process.env.NODE_ENV === 'production' ? (
-          <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
-        ) : null}
         <link
-          href={buildManagedAssetUrl(siteConfig.fonts.stylesheetKey, mediaBase)}
+          href={buildManagedAssetUrl(siteConfig.fonts.firstPaintFontKey, mediaBase)}
+          rel="preload"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          href={buildManagedAssetUrl(siteConfig.fonts.criticalStylesheetKey, mediaBase)}
           rel="stylesheet"
           crossOrigin="anonymous"
           referrerPolicy="strict-origin-when-cross-origin"
         />
-        <DocumentBootstrapScript script={buildDocumentBootstrapScript()} />
+        <DocumentBootstrapScript script={buildDocumentBootstrapScript()} nonce={nonce} />
       </head>
       <body>
+        <DeferredFontStyles
+          href={buildManagedAssetUrl(siteConfig.fonts.extendedStylesheetKey, mediaBase)}
+        />
         <LocaleClientProviders assets={assets} mediaBase={mediaBase}>
           {children}
         </LocaleClientProviders>

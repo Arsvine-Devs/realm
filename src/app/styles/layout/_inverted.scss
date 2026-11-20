@@ -70,7 +70,7 @@
     }
   }
 
-  .drawerBackdrop.backdropVisible {
+  .leftPanel::backdrop {
     background-color: rgba(var(--white-rgb), 0.4);
   }
 

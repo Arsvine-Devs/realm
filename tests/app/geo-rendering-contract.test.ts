@@ -18,10 +18,9 @@ describe('GEO and content rendering', () => {
       'utf8',
     );
 
-    expect(rootLayout).not.toContain("from 'next/headers'");
     expect(rootLayout).not.toContain('cookies()');
     expect(rootLayout).toContain(
-      '<DocumentBootstrapScript script={buildDocumentBootstrapScript()} />',
+      '<DocumentBootstrapScript script={buildDocumentBootstrapScript()} nonce={nonce} />',
     );
     expect(rootLayout).not.toMatch(/<script\s+dangerouslySetInnerHTML/);
     expect(localeLayout).not.toContain('<html');

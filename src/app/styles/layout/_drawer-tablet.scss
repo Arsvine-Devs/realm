@@ -3,34 +3,36 @@
 @include breakpoints.tablet-down {
   .leftPanel {
     width: var(--left-panel-width);
-    left: 0;
-    transform: translateX(-100%);
-    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    z-index: var(--z-navigation-drawer);
+    max-width: calc(100vw - 1.5rem);
+    height: 100dvh;
+    max-height: none;
+    inset: 0 auto 0 0;
+    margin: 0;
+    border: 0;
     background-color: rgba(26, 26, 26, 0.97);
+    color: inherit;
     pointer-events: auto;
-    // 抽屉模式: 改为垂直流式布局
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
-    padding: 60px 20px 30px 20px;
+    padding: max(0.75rem, env(safe-area-inset-top)) 20px 30px;
     overflow-y: auto;
     gap: 0;
 
-    &.drawerOpen {
-      transform: translateX(0);
+    &[open] {
+      display: flex;
+      animation: drawerEnter 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) both;
     }
 
-    // 独立页：不用 opacity 隐藏，让 transform 控制可见性
-    &.standaloneHide {
-      opacity: 1 !important;
-      pointer-events: none !important;
-      // 关闭状态下仍在 translateX(-100%) 视野外，无需额外隐藏
+    &:modal {
+      overscroll-behavior: contain;
+    }
 
-      &.drawerOpen {
-        pointer-events: auto !important;
-      }
+    &::backdrop {
+      background: rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+      overscroll-behavior: contain;
     }
 
     // 隐藏桌面端绝对定位的装饰/背景
@@ -240,27 +242,30 @@
   }
 }
 
-// ===== 抽屉背景遮罩 =====
-.drawerBackdrop {
-  display: none;
-  border: 0;
-  padding: 0;
-  font: inherit;
+.drawerCloseButton {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  order: 0;
+  align-self: flex-end;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 1px solid var(--ark-border);
+  background: var(--ark-dark-blue);
+  color: var(--ark-primary);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
 
-  @include breakpoints.tablet-down {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    z-index: var(--z-drawer-backdrop);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-
-    &.backdropVisible {
-      opacity: 1;
-      pointer-events: auto;
-    }
+@keyframes drawerEnter {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
   }
 }
 

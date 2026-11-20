@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('next-intl', () => ({
@@ -20,7 +20,7 @@ describe('BlogSection layout', () => {
       <BlogSection
         blogSectionRef={{ current: null }}
         locale="en"
-        handleBlogItemClick={vi.fn()}
+        navigateTo={vi.fn()}
         posts={[
           {
             slug: 'signal',
@@ -41,13 +41,12 @@ describe('BlogSection layout', () => {
     expect(postList?.contains(screen.getByText('Signal'))).toBe(true);
   });
 
-  it('opens a live post on activation', () => {
-    const handleBlogItemClick = vi.fn();
+  it('exposes a localized native link for the live article', () => {
     render(
       <BlogSection
         blogSectionRef={{ current: null }}
         locale="en"
-        handleBlogItemClick={handleBlogItemClick}
+        navigateTo={vi.fn()}
         posts={[
           {
             slug: 'signal',
@@ -61,17 +60,8 @@ describe('BlogSection layout', () => {
         ]}
       />,
     );
-    const card = screen.getByRole('link');
-
-    fireEvent.mouseEnter(card);
-    fireEvent.focus(card);
-    fireEvent.pointerDown(card, { button: 2 });
-    expect(handleBlogItemClick).not.toHaveBeenCalled();
-
-    fireEvent.pointerDown(card, { button: 0 });
-    fireEvent.keyDown(card, { key: 'Enter' });
-    fireEvent.keyDown(card, { key: ' ' });
-
-    expect(handleBlogItemClick).toHaveBeenCalledTimes(2);
+    const card = screen.getByRole('link', { name: 'Signal' });
+    expect(card.tagName).toBe('A');
+    expect(card.getAttribute('href')).toBe('/en/blog/signal?lang=en');
   });
 });

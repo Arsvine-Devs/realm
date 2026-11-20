@@ -23,7 +23,7 @@ interface TransitionContextValue {
   setBackOverride: (handler: (() => void) | null) => void;
   handleBack: () => void;
   isDetailOpen: () => boolean;
-  registerTransitionSurface: (element: HTMLDivElement | null) => void;
+  registerTransitionSurface: (element: HTMLElement | null) => void;
   pendingUrl: string | null;
 }
 
@@ -84,7 +84,7 @@ const DIAG_COLLAPSE_OPTS: KeyframeAnimationOptions = {
 };
 
 interface NavStrategyCtx {
-  wrapper: HTMLDivElement;
+  wrapper: HTMLElement;
   url: string;
   options?: { scroll?: boolean };
   contentHashRequest: ContentHashNavigationRequest | null;
@@ -219,7 +219,7 @@ export function TransitionProvider({ children }: TransitionProviderProps) {
   const reducedMotion = useReducedMotion();
   const { align: alignContentHash, cancel: cancelContentHashAlignment } = useLayoutAnchors();
   const runControllerRef = useRef(new AnimationRunController());
-  const transitionSurfaceRef = useRef<HTMLDivElement | null>(null);
+  const transitionSurfaceRef = useRef<HTMLElement | null>(null);
   const backOverrideRef = useRef<(() => void) | null>(null);
   const navigateToRef = useRef<((url: string, options?: { scroll?: boolean }) => void) | null>(
     null,
@@ -227,7 +227,7 @@ export function TransitionProvider({ children }: TransitionProviderProps) {
   const pendingCommitRef = useRef<(() => void) | null>(null);
   const [pendingUrl, setPendingUrl] = useState<string | null>(null);
 
-  const registerTransitionSurface = useCallback((element: HTMLDivElement | null) => {
+  const registerTransitionSurface = useCallback((element: HTMLElement | null) => {
     transitionSurfaceRef.current = element;
   }, []);
 

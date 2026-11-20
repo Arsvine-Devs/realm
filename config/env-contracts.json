@@ -107,6 +107,21 @@
       "failureBehavior": "Visitor-statistics persistence is skipped when the secret is absent."
     },
     {
+      "key": "REALM_CSP_SCRIPT_REPORT_ONLY",
+      "section": "Security",
+      "exampleFiles": [".env.example"],
+      "commented": true,
+      "requiredness": "optional",
+      "secret": false,
+      "format": "1 enables report-only diagnostics",
+      "example": "1",
+      "localDefault": "",
+      "scopes": ["local", "preview", "production"],
+      "usedBy": ["src/proxy.ts"],
+      "description": "Enables nonce-based script CSP diagnostics without blocking scripts.",
+      "failureBehavior": "The standard Realm response security headers still apply."
+    },
+    {
       "key": "DATABASE_URL",
       "section": "Infra",
       "exampleFiles": [".env.example"],

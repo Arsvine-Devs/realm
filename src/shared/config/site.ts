@@ -96,7 +96,9 @@ export const siteConfig: SiteConfig = {
   fonts: {
     googleStylesheet:
       'https://fonts.googleapis.com/css2?family=Dosis:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700&display=swap',
-    stylesheetKey: 'shared/fonts/google-fonts.css',
+    criticalStylesheetKey: 'shared/fonts/realm-fonts-critical.570a4ecb7a9d.css',
+    extendedStylesheetKey: 'shared/fonts/realm-fonts-extended.0461ba9d448a.css',
+    firstPaintFontKey: 'shared/fonts/dosis/dosis-300-normal-002.woff2',
   },
   locale: {
     htmlLang: 'zh',

@@ -2,8 +2,6 @@ import { renderHook } from '@testing-library/react';
 import { createElement, useInsertionEffect, type ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import useAnimationSequence from '@/features/hud/model/useAnimationSequence';
-
 const safeTimers = vi.hoisted(() => ({
   clearInterval: vi.fn(),
   clearTimeout: vi.fn(),
@@ -20,6 +18,7 @@ vi.mock('@/shared/hooks/useMediaQuery', () => ({
 }));
 
 const BOOT_COMPLETE_ATTRIBUTE = 'data-initial-boot-complete';
+let useAnimationSequence: typeof import('@/features/hud/model/useAnimationSequence').default;
 
 function HtmlAttributeReconciler({ children }: { children: ReactNode }) {
   useInsertionEffect(() => {
@@ -30,9 +29,11 @@ function HtmlAttributeReconciler({ children }: { children: ReactNode }) {
 }
 
 describe('useAnimationSequence initial state', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     document.documentElement.removeAttribute(BOOT_COMPLETE_ATTRIBUTE);
     vi.clearAllMocks();
+    vi.resetModules();
+    ({ default: useAnimationSequence } = await import('@/features/hud/model/useAnimationSequence'));
   });
 
   afterEach(() => {
@@ -40,7 +41,7 @@ describe('useAnimationSequence initial state', () => {
   });
 
   it('keeps a fresh document in the original hidden loading state', () => {
-    const { result } = renderHook(() => useAnimationSequence());
+    const { result } = renderHook(() => useAnimationSequence(true));
 
     expect(result.current).toMatchObject({
       animationsComplete: false,
@@ -57,7 +58,7 @@ describe('useAnimationSequence initial state', () => {
   it('initializes a remounted provider from the completed document state', () => {
     document.documentElement.setAttribute(BOOT_COMPLETE_ATTRIBUTE, 'true');
 
-    const { result } = renderHook(() => useAnimationSequence(), {
+    const { result } = renderHook(() => useAnimationSequence(true), {
       wrapper: HtmlAttributeReconciler,
     });
 
@@ -72,5 +73,24 @@ describe('useAnimationSequence initial state', () => {
       textVisible: true,
     });
     expect(document.documentElement.getAttribute(BOOT_COMPLETE_ATTRIBUTE)).toBe('true');
+  });
+
+  it('consumes an interrupted opening when the same provider navigates away from home', () => {
+    const { result, rerender } = renderHook(({ home }) => useAnimationSequence(home), {
+      initialProps: { home: true },
+    });
+    expect(result.current.isLoading).toBe(true);
+
+    rerender({ home: false });
+    expect(result.current).toMatchObject({
+      isLoading: false,
+      mainVisible: true,
+      hudVisible: true,
+      animationsComplete: true,
+    });
+    expect(document.documentElement.getAttribute(BOOT_COMPLETE_ATTRIBUTE)).toBe('true');
+
+    rerender({ home: true });
+    expect(result.current.isLoading).toBe(false);
   });
 });

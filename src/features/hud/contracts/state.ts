@@ -15,6 +15,7 @@ export interface AnimationSequenceState {
   pulsingNormalIndices: number[] | null;
   pulsingReverseIndices: number[] | null;
   handleLoadingComplete: () => void;
+  skipOpening: () => void;
   columnPhase: ColumnPhase;
   retractColumns: (onComplete: () => void) => void;
   expandColumns: (onComplete?: () => void) => void;

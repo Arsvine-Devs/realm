@@ -17,7 +17,6 @@ import WorkDetailView from '../../portfolio/ui/WorkDetailView';
 import ExperienceDetailView from '../../experience/ui/ExperienceDetailView';
 import LifeDetailView from '../../life/ui/LifeDetailView';
 
-import { buildBlogPostHref } from '../../blog/model/blogClient';
 import { resolveRawAssetUrl } from '@/shared/lib/media';
 import { setHudTypingOverlaySuppressed } from '@/shared/lib/hud-typing-visibility';
 import { markCursorTargetsDirty } from '@/shared/lib/cursor-targets';
@@ -221,6 +220,14 @@ export default function ContentPage({
     [setActiveWorkTab],
   );
 
+  const getWorkHref = useCallback(
+    (item: Project) =>
+      webProjects.some((project) => project.id === item.id)
+        ? `/${locale}/web/${item.id}`
+        : undefined,
+    [locale, webProjects],
+  );
+
   const handleWorkItemClick = useCallback(
     (item: Project) => {
       const coverImg = resolveRawAssetUrl(item.imageUrl);
@@ -228,23 +235,22 @@ export default function ContentPage({
         const img = new Image();
         img.src = coverImg;
       }
-      const isWeb = webProjects.some((p) => p.id === item.id);
-      if (isWeb) {
-        navigateTo(`/${locale}/web/${item.id}`);
+      const href = getWorkHref(item);
+      if (href) {
+        navigateTo(href);
       } else {
         openDetail({ type: 'work', id: item.id });
       }
     },
-    [openDetail, navigateTo, webProjects, locale],
+    [openDetail, navigateTo, getWorkHref],
   );
 
   const handleWorkItemIntent = useCallback(
     (item: Project) => {
-      if (webProjects.some((project) => project.id === item.id)) {
-        prefetchOnIntent(`/${locale}/web/${item.id}`);
-      }
+      const href = getWorkHref(item);
+      if (href) prefetchOnIntent(href);
     },
-    [locale, prefetchOnIntent, webProjects],
+    [prefetchOnIntent, getWorkHref],
   );
 
   const handleExperienceItemClick = useCallback(
@@ -293,13 +299,6 @@ export default function ContentPage({
   const handleShowFriendLinks = useCallback(() => {
     navigateTo(`/${locale}/friends`);
   }, [navigateTo, locale]);
-
-  const handleBlogItemClick = useCallback(
-    (post: BlogPostMeta) => {
-      navigateTo(buildBlogPostHref(locale, post.slug, locale));
-    },
-    [navigateTo, locale],
-  );
 
   const handleBackFromDetail = useCallback(() => {
     if (isClosingRef.current) return;
@@ -357,6 +356,7 @@ export default function ContentPage({
             webProjects={webProjects}
             gameProjects={gameProjects}
             earlyProjects={earlyProjects}
+            getWorkHref={getWorkHref}
             handleWorkItemClick={handleWorkItemClick}
             handleWorkItemIntent={handleWorkItemIntent}
             skillCategories={skillCategories}
@@ -376,12 +376,13 @@ export default function ContentPage({
             blogSectionRef={blogSectionRef}
             locale={locale}
             posts={blogPosts}
-            handleBlogItemClick={handleBlogItemClick}
+            navigateTo={navigateTo}
           />
         </div>
 
         <div id="section-life" className={contentStyles.sectionAnchor}>
           <LifeSection
+            locale={locale}
             lifeSectionRef={lifeSectionRef}
             activeSection="content"
             activeLifeTab={activeLifeTab}

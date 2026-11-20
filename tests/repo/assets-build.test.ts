@@ -9,10 +9,12 @@ import { describe, expect, it } from 'vitest';
 const execFileAsync = promisify(execFile);
 
 describe('assets build script', () => {
-  it('builds hashed public assets and versioned private catalogs', async () => {
+  it('builds and publishes immutable assets and both font layers', async () => {
     const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'arsvine-assets-'));
     const workspaceRoot = path.join(tempRoot, 'cos-workspace');
     const distRoot = path.join(tempRoot, 'dist');
+    const publishedRoot = path.join(tempRoot, 'published');
+    const fontWorkspace = path.join(workspaceRoot, 'public-root', 'shared', 'fonts');
 
     await mkdir(
       path.join(workspaceRoot, 'public-root', 'realm', 'images', 'post', '2026', '07', '08'),
@@ -22,6 +24,14 @@ describe('assets build script', () => {
       recursive: true,
     });
     await mkdir(path.join(workspaceRoot, '_meta', 'realm'), { recursive: true });
+    await mkdir(fontWorkspace, { recursive: true });
+    await writeFile(
+      path.join(fontWorkspace, 'google-fonts.css'),
+      [
+        "@font-face { font-family: 'Dosis'; src: url(./dosis.woff2); }",
+        "@font-face { font-family: 'Noto Sans SC'; src: url(./noto-sans.woff2); }",
+      ].join('\n'),
+    );
 
     const imagePath = path.join(
       workspaceRoot,
@@ -136,7 +146,23 @@ describe('assets build script', () => {
     );
     const manifest = JSON.parse(manifestRaw) as {
       assets: Array<{ objectKey: string; type: string }>;
+      fontStylesheets: Array<{ layer: string; filename: string }>;
     };
+    expect(manifest.fontStylesheets.map(({ layer }) => layer)).toEqual(['critical', 'extended']);
+    await execFileAsync(process.execPath, ['scripts/assets/publish.mjs', publishedRoot, distRoot], {
+      cwd: process.cwd(),
+    });
+    const deployedFonts = path.join(publishedRoot, 'public', 'shared', 'fonts');
+    const [critical, extended] = manifest.fontStylesheets;
+    expect(critical.filename).toMatch(/^realm-fonts-critical\.[a-f0-9]{12}\.css$/);
+    expect(extended.filename).toMatch(/^realm-fonts-extended\.[a-f0-9]{12}\.css$/);
+    expect(await readFile(path.join(deployedFonts, critical.filename), 'utf8')).toContain('Dosis');
+    expect(await readFile(path.join(deployedFonts, extended.filename), 'utf8')).toContain(
+      'Noto Sans SC',
+    );
+    await expect(readFile(path.join(deployedFonts, 'google-fonts.css'))).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
     const imageEntry = manifest.assets.find((entry) => entry.type === 'image');
     const audioEntry = manifest.assets.find((entry) => entry.type === 'audio');
 

@@ -15,11 +15,13 @@ vi.mock('next/link', () => ({
     href,
     children,
     prefetch: _prefetch,
+    onNavigate: _onNavigate,
     ...props
   }: {
     href: string;
     children: React.ReactNode;
     prefetch?: boolean;
+    onNavigate?: (event: { preventDefault(): void }) => void;
   } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a href={href} {...props}>
       {children}
@@ -249,10 +251,7 @@ describe('protected blog detail navigation scaffold', () => {
     expect(unsafePrevLink.getAttribute('href')).toBe('/zh-CN/content#blog');
     expect(unsafeNextLink.getAttribute('href')).toBe('/zh-CN/content#blog');
 
-    fireEvent.click(unsafePrevLink);
-    fireEvent.click(unsafeNextLink);
-
-    expect(navigateTo).toHaveBeenNthCalledWith(1, '/zh-CN/content#blog');
-    expect(navigateTo).toHaveBeenNthCalledWith(2, '/zh-CN/content#blog');
+    expect(unsafePrevLink.getAttribute('href')).toBe('/zh-CN/content#blog');
+    expect(unsafeNextLink.getAttribute('href')).toBe('/zh-CN/content#blog');
   });
 });

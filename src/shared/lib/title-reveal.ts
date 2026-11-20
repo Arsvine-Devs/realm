@@ -21,6 +21,14 @@ export function animateTitleCharacters({
   opacity = 1,
   onComplete,
 }: TitleRevealOptions) {
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+    const context = gsap.context(() => {
+      gsap.set(root.querySelectorAll(innerSelector), { y: '0%', opacity });
+    }, root);
+    onComplete?.();
+    return () => context.revert();
+  }
+
   let context: gsap.Context | null = null;
   let cancelled = false;
 
