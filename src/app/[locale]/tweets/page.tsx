@@ -6,7 +6,6 @@ import { localizedMetadata } from '@/app/metadata';
 import { connection } from 'next/server';
 
 const INITIAL_MONTH_BATCH_SIZE = 1;
-export const revalidate = 300;
 
 export async function generateMetadata({
   params,

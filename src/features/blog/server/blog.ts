@@ -1,6 +1,8 @@
+import { cache } from 'react';
 import { defaultLocale, locales, isLocale, type Locale } from '@/shared/contracts/locale';
 import type { BlogPostMeta, TranslationStatus } from '../../../shared/types';
 import {
+  ContentServiceError,
   fetchPublishedBlogIndex,
   fetchPublishedPostVariant,
 } from '@/shared/lib/content/content-api';
@@ -232,8 +234,10 @@ function estimateReadingMinutes(content: string, locale: BlogContentLocale): num
   return Math.max(1, Math.ceil(minutes));
 }
 
+const readBlogIndex = cache(fetchPublishedBlogIndex);
+
 async function getBlogIndexEntry(slug: string) {
-  const index = await fetchPublishedBlogIndex();
+  const index = await readBlogIndex();
   return index.posts.find((post) => post.slug === slug) ?? null;
 }
 
@@ -253,11 +257,14 @@ export async function getAvailablePostContentLocales(slug: string): Promise<Blog
 export async function getPostBySlugAndContentLocale(slug: string, locale: BlogContentLocale) {
   const entry = await getBlogIndexEntry(slug);
   if (!entry) {
-    throw new Error(`No post found for slug: ${slug}`);
+    throw new ContentServiceError(`No post found for slug: ${slug}`, 404);
   }
 
   if (!entry.availableLocales.includes(locale)) {
-    throw new Error(`No post variant found for slug: ${slug}, locale: ${locale}`);
+    throw new ContentServiceError(
+      `No post variant found for slug: ${slug}, locale: ${locale}`,
+      404,
+    );
   }
 
   const parsed = await readVariantDocument(slug, locale, entry.access.mode === 'totp');
@@ -305,11 +312,9 @@ export async function getPostBySlugAndLocale(slug: string, locale: Locale) {
     throw new Error(`No post found for slug: ${slug}`);
   }
 
-  const parsed = await readVariantDocument(
-    slug,
-    metaResult.actualContentLocale,
-    entry.access.mode === 'totp',
-  );
+  // The route and feed use only the anonymous Content endpoint, including
+  // when a previously public post is protected during this request.
+  const parsed = await readVariantDocument(slug, metaResult.actualContentLocale);
   const meta = getVariantMeta(entry, metaResult.actualContentLocale, parsed.content);
 
   return {
@@ -324,7 +329,7 @@ export async function getPostBySlugAndLocale(slug: string, locale: Locale) {
 }
 
 export async function getAllPostsForLocale(locale: Locale): Promise<BlogPostMeta[]> {
-  const index = await fetchPublishedBlogIndex();
+  const index = await readBlogIndex();
   const metas = index.posts.map((entry) => {
     const actualLocale = getPreferredVariantLocale(entry, locale);
     return sanitizeProtectedPostMeta(getVariantMetaFromIndex(entry, actualLocale));

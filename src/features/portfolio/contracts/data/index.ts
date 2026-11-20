@@ -1,5 +1,4 @@
 import type { CopyableToken, Project } from '@/shared/types';
-import type { Locale } from '@/shared/contracts/locale';
 import {
   findSourceItem,
   galleryReferences,
@@ -116,10 +115,3 @@ export const copyableTokens: CopyableToken[] = [
   { pattern: '2162371684', label: '个人 QQ 号' },
   { pattern: 'Details', label: '查看详情' },
 ];
-
-// 详情页 revalidation 路径注册表，供内部 assets.published 事件调用
-export function getAssetRevalidationPaths(locale: Locale): string[] {
-  return [...webProjects, ...gameProjects, ...earlyProjects].map(
-    (project) => `/${locale}/web/${project.id}`,
-  );
-}

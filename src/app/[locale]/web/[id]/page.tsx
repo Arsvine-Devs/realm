@@ -7,11 +7,6 @@ import { loadMessages, loadProjects, resolveWebProject } from '@/app/i18n/data';
 import { type Locale } from '@/app/i18n/config';
 import { localizedMetadata } from '@/app/metadata';
 
-export const revalidate = 300;
-export function generateStaticParams() {
-  return [];
-}
-
 export async function generateMetadata({
   params,
 }: {

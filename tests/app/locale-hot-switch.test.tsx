@@ -49,7 +49,7 @@ describe('locale hot switch providers', () => {
 
   it('updates locale messages without remounting stable children', () => {
     const view = render(
-      <LocaleClientProviders>
+      <LocaleClientProviders assets={{}} mediaBase="/media">
         <StatefulChild />
       </LocaleClientProviders>,
     );
@@ -60,7 +60,7 @@ describe('locale hot switch providers', () => {
 
     pathname = '/en/content';
     view.rerender(
-      <LocaleClientProviders>
+      <LocaleClientProviders assets={{}} mediaBase="/media">
         <StatefulChild />
       </LocaleClientProviders>,
     );

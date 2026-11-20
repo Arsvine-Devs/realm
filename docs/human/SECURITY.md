@@ -14,7 +14,6 @@
 - 通过转发头绕过限流；
 - `javascript:` / `data:` 外链 XSS；
 - 未验证 slug 或 locale 进入内部导航；
-- revalidation endpoint 被未授权调用；
 - 自动化请求通过访客统计接口污染累计人数。
 
 ## Protected post 流程
@@ -151,10 +150,6 @@ MDX 链接使用专用规则：允许安全绝对 URL、`mailto:`、relative pat
 - 不安全的相邻文章目标退回 `/${locale}/content#blog`。
 - `protected-verify` 的 `next` 必须通过 `normalizeNextPath()`，拒绝外部和 protocol-relative redirect。
 
-## Revalidation 认证
-
-内部 revalidation handler 使用 `REVALIDATE_WEBHOOK_SECRET` 验证带时间戳的 HMAC。时间戳超出允许窗口、签名不匹配或事件资源越界时必须拒绝。不要在 URL、客户端 bundle 或日志中暴露 secret。
-
 ## 安全验证清单
 
 1. 未授权访问 protected page 时 HTML/RSC 不含 body。
@@ -163,8 +158,7 @@ MDX 链接使用专用规则：允许安全绝对 URL、`mailto:`、relative pat
 4. 正确 TOTP 设置 HttpOnly Cookie，随后正文可加载。
 5. 过期、错误 group 或篡改 Cookie 无效。
 6. Content service protected read、external redirect 和 dangerous link 均按边界验证。
-7. revalidation 无 secret 时拒绝。
-8. 生产 Cookie 包含 `Secure`。
+7. 生产 Cookie 包含 `Secure`。
 
 相关测试集中在：
 

@@ -25,16 +25,13 @@ export interface ContentBlogIndexItem {
 }
 
 export interface ContentBlogIndex {
-  version: number;
-  updatedAt: string;
   posts: ContentBlogIndexItem[];
 }
 
 export interface ContentTweetIndexItem {
   month: string;
-  path: string;
-  count?: number;
-  updatedAt?: string;
+  count: number;
+  updatedAt: string;
 }
 
 interface TotpSecretSet {

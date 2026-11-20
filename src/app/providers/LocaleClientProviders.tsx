@@ -13,9 +13,15 @@ import AppShell from '../shell/AppShell';
 
 interface LocaleClientProvidersProps {
   children: ReactNode;
+  assets: Record<string, string>;
+  mediaBase: string;
 }
 
-export default function LocaleClientProviders({ children }: LocaleClientProvidersProps) {
+export default function LocaleClientProviders({
+  children,
+  assets,
+  mediaBase,
+}: LocaleClientProvidersProps) {
   const pathname = usePathname();
   const locale = getLocaleFromPath(pathname) ?? defaultLocale;
   const messages = getMessages(locale);
@@ -33,7 +39,7 @@ export default function LocaleClientProviders({ children }: LocaleClientProvider
       getMessageFallback={({ key }) => key}
     >
       <AppNavigationRuntime>
-        <AppProviders>
+        <AppProviders assets={assets} mediaBase={mediaBase}>
           <AppShell>{children}</AppShell>
         </AppProviders>
       </AppNavigationRuntime>

@@ -17,17 +17,16 @@
 
 This table is the canonical maintained list of current route methods. Human architecture and operations documents may explain responsibility or procedure, but should link here instead of maintaining a second method registry.
 
-| Route                                  | Method | Responsibility                                 |
-| -------------------------------------- | ------ | ---------------------------------------------- |
-| `/api/hitokoto`                        | GET    | Return cached/timeout-safe third-party text    |
-| `/api/grant-check`                     | GET    | Read signed protected-post grant               |
-| `/api/protected-verify`                | POST   | Verify TOTP, rate-limit, issue grant           |
-| `/api/post-variant`                    | GET    | Return authorized MDX variant                  |
-| `/api/tweet-months`                    | GET    | Return paginated tweet month groups            |
-| `/api/visitor-stats`                   | POST   | Record canonical visitor and return counts     |
-| `/api/assets/{audio,home,links,works}` | GET    | Read public Catalog sections                   |
-| `/api/assets/collections/[slug]`       | GET    | Read paginated collection assets               |
-| `/api/internal/revalidate`             | POST   | Accept signed Content/asset publication events |
+| Route                                  | Method | Responsibility                              |
+| -------------------------------------- | ------ | ------------------------------------------- |
+| `/api/hitokoto`                        | GET    | Return cached/timeout-safe third-party text |
+| `/api/grant-check`                     | GET    | Read signed protected-post grant            |
+| `/api/protected-verify`                | POST   | Verify TOTP, rate-limit, issue grant        |
+| `/api/post-variant`                    | GET    | Return authorized MDX variant               |
+| `/api/tweet-months`                    | GET    | Return paginated tweet month groups         |
+| `/api/visitor-stats`                   | POST   | Record canonical visitor and return counts  |
+| `/api/assets/{audio,home,links,works}` | GET    | Read public Catalog sections                |
+| `/api/assets/collections/[slug]`       | GET    | Read paginated collection assets            |
 
 Route files adapt `Request`/`Response`; feature server modules own validation and domain work.
 

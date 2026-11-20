@@ -1,10 +1,5 @@
 // Published Content source for the Realm timeline.
-import type {
-  TweetIndexItem,
-  TweetItem,
-  TweetMonthGroup,
-  TweetMonthGroupsPage,
-} from '../model/types';
+import type { TweetItem, TweetMonthGroup, TweetMonthGroupsPage } from '../model/types';
 import { readEnv } from '@/shared/config/env-provider';
 import {
   fetchPublishedTweetIndex,
@@ -172,66 +167,32 @@ function buildStressMonthGroups(): TweetMonthGroup[] {
   return groups;
 }
 
-async function getTweetIndex(): Promise<TweetIndexItem[]> {
-  const data = await fetchPublishedTweetIndex();
-  if (!Array.isArray(data.months)) throw new Error('Invalid published tweet index shape');
-  return data.months;
-}
-
-export async function getTweetMonthGroups(): Promise<TweetMonthGroup[]> {
-  if (STRESS_TEST_ENABLED) {
-    return buildStressMonthGroups();
-  }
-
-  let index: TweetIndexItem[];
-  try {
-    index = await getTweetIndex();
-  } catch (error) {
-    console.warn(
-      '[tweets/content] published release unavailable, returning empty month groups:',
-      error,
-    );
-    return [];
-  }
-
-  const monthlyTweets = await Promise.all(
-    index.map(async (item): Promise<TweetMonthGroup | null> => {
-      try {
-        const data = (await fetchPublishedTweetMonth(item.month)).tweets;
-        if (!isTweetList(data)) throw new Error(`Invalid tweet document: ${item.path}`);
-        const tweets = data;
-        const visibleTweets = sortTweets(
-          tweets.filter((tweet) => (tweet.visibility ?? 'public') === 'public'),
-        );
-
-        return {
-          month: item.month,
-          count: item.count,
-          updatedAt: item.updatedAt,
-          tweets: visibleTweets,
-        } satisfies TweetMonthGroup;
-      } catch (error) {
-        // The index is a directory of independent monthly documents. A single
-        // transient 5xx must not prevent ISR/static generation from rendering
-        // every other available month.
-        console.warn(`[tweets/content] skipping unavailable month ${item.month}:`, error);
-        return null;
-      }
-    }),
-  );
-
-  return monthlyTweets
-    .filter((group): group is TweetMonthGroup => group !== null)
-    .filter((group) => group.tweets.length > 0);
-}
-
 export async function getTweetMonthGroupsPage(
   offset: number,
   limit: number,
 ): Promise<TweetMonthGroupsPage> {
-  const allGroups = await getTweetMonthGroups();
-  return {
-    monthGroups: allGroups.slice(offset, offset + limit),
-    totalMonths: allGroups.length,
-  };
+  if (STRESS_TEST_ENABLED) {
+    const groups = buildStressMonthGroups();
+    return { monthGroups: groups.slice(offset, offset + limit), totalMonths: groups.length };
+  }
+
+  const { months } = await fetchPublishedTweetIndex();
+  if (!Array.isArray(months)) throw new Error('Invalid published tweet index shape');
+  const batch = await Promise.all(
+    months.slice(offset, offset + limit).map(async (entry) => {
+      const { tweets } = await fetchPublishedTweetMonth(entry.month);
+      if (!isTweetList(tweets)) throw new Error(`Invalid tweets for ${entry.month}`);
+      const visibleTweets = sortTweets(
+        tweets.filter((tweet) => (tweet.visibility ?? 'public') === 'public'),
+      );
+      return {
+        month: entry.month,
+        count: visibleTweets.length,
+        updatedAt: entry.updatedAt,
+        tweets: visibleTweets,
+      };
+    }),
+  );
+
+  return { monthGroups: batch, totalMonths: months.length };
 }

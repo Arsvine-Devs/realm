@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { buildManagedAssetUrl, PUBLIC_MEDIA_PATH } from '@/shared/lib/media';
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
+import { PUBLIC_MEDIA_PATH } from '@/shared/lib/media';
 
 const SITE_ASSET_KEYS = [
   'site/about-qr',
@@ -10,18 +10,14 @@ const SITE_ASSET_KEYS = [
   'decor/life-title',
   'decor/texture-noise',
 ] as const;
-export type SiteAssetKey = (typeof SITE_ASSET_KEYS)[number];
+type SiteAssetKey = (typeof SITE_ASSET_KEYS)[number];
 
-interface SiteAssetRecord {
-  objectKey: string;
-  alt?: string;
-  width?: number;
-  height?: number;
-}
 interface SiteAssetsContextValue {
+  mediaBase: string;
   getSiteAssetUrl: (key: SiteAssetKey, fallback?: string) => string;
 }
 const SiteAssetsContext = createContext<SiteAssetsContextValue>({
+  mediaBase: PUBLIC_MEDIA_PATH,
   getSiteAssetUrl: (_key, fallback = '') => fallback,
 });
 
@@ -33,72 +29,30 @@ const CSS_ASSETS: Partial<Record<SiteAssetKey, string>> = {
   'decor/texture-noise': '--site-texture-noise',
 };
 
-function isValidRecord(value: unknown): value is SiteAssetRecord {
-  if (!value || typeof value !== 'object') return false;
-  const objectKey = (value as SiteAssetRecord).objectKey;
-  return (
-    typeof objectKey === 'string' &&
-    (objectKey.startsWith('realm/') || objectKey.startsWith('shared/'))
-  );
-}
-
-export function getSiteAssetManifestUrl(version: string) {
-  return `${PUBLIC_MEDIA_PATH}/realm/site-catalog/versions/${version}/assets.json`;
-}
-
-export function SiteAssetsProvider({ children }: { children: ReactNode }) {
-  const [assets, setAssets] = useState<Partial<Record<SiteAssetKey, SiteAssetRecord>>>({});
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const load = async () => {
-      try {
-        const pointerResponse = await fetch(
-          `${PUBLIC_MEDIA_PATH}/realm/site-catalog/current.json`,
-          {
-            signal: controller.signal,
-            cache: 'no-cache',
-          },
-        );
-        if (!pointerResponse.ok) return;
-        const pointer = (await pointerResponse.json()) as { version?: string };
-        if (!pointer.version || !/^\d{8}T\d{6}Z$/.test(pointer.version)) return;
-        const manifestResponse = await fetch(getSiteAssetManifestUrl(pointer.version), {
-          signal: controller.signal,
-        });
-        if (!manifestResponse.ok) return;
-        const manifest = (await manifestResponse.json()) as { assets?: Record<string, unknown> };
-        const next: Partial<Record<SiteAssetKey, SiteAssetRecord>> = {};
-        for (const key of SITE_ASSET_KEYS) {
-          const record = manifest.assets?.[key];
-          if (isValidRecord(record)) next[key] = record;
-        }
-        setAssets(next);
-      } catch (error) {
-        if (!controller.signal.aborted && process.env.NODE_ENV !== 'production')
-          console.warn('[site-assets] manifest unavailable', error);
-      }
-    };
-    void load();
-    return () => controller.abort();
-  }, []);
-
+export function SiteAssetsProvider({
+  children,
+  assets,
+  mediaBase,
+}: {
+  children: ReactNode;
+  assets: Record<string, string>;
+  mediaBase: string;
+}) {
   useEffect(() => {
     const html = document.documentElement;
     for (const [key, property] of Object.entries(CSS_ASSETS) as Array<[SiteAssetKey, string]>) {
-      const record = assets[key];
-      if (record)
-        html.style.setProperty(property, `url("${buildManagedAssetUrl(record.objectKey)}")`);
+      const url = assets[key];
+      if (url) html.style.setProperty(property, `url("${url}")`);
       else html.style.removeProperty(property);
     }
   }, [assets]);
 
   const value = useMemo<SiteAssetsContextValue>(
     () => ({
-      getSiteAssetUrl: (key, fallback = '') =>
-        assets[key] ? buildManagedAssetUrl(assets[key]!.objectKey) : fallback,
+      mediaBase,
+      getSiteAssetUrl: (key, fallback = '') => assets[key] ?? fallback,
     }),
-    [assets],
+    [assets, mediaBase],
   );
   return <SiteAssetsContext.Provider value={value}>{children}</SiteAssetsContext.Provider>;
 }

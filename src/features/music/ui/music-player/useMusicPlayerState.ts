@@ -3,6 +3,7 @@ import type { MusicTrack } from '@/features/music/contracts/musicTrack';
 import { MUSIC_PLAYER_STORAGE_KEY } from './constants';
 import { readPersistedPlayerStateFromStorage } from './persistence';
 import { buildManagedAssetUrl } from '@/shared/lib/media';
+import { useSiteAssets } from '@/features/assets/model/SiteAssetsProvider';
 
 interface UseMusicPlayerStateOptions {
   playlist: MusicTrack[];
@@ -10,21 +11,16 @@ interface UseMusicPlayerStateOptions {
 
 const PERSIST_INTERVAL_MS = 1_000;
 
-function getTrackSrc(track: MusicTrack) {
+function getTrackSrc(track: MusicTrack, mediaBase: string) {
   if (track.src) return track.src;
   if (!track.objectKey) {
     throw new Error(`Music track "${track.id}" is missing both objectKey and src`);
   }
-  return buildManagedAssetUrl(track.objectKey);
-}
-
-function getAudioPath(src: string) {
-  return new URL(src, window.location.origin).pathname;
+  return buildManagedAssetUrl(track.objectKey, mediaBase);
 }
 
 function syncAudioSource(audio: HTMLAudioElement, src: string) {
-  const currentSrcPath = audio.src ? getAudioPath(audio.src) : null;
-  if (currentSrcPath === getAudioPath(src)) return false;
+  if (audio.src === new URL(src, window.location.origin).href) return false;
 
   audio.src = src;
   audio.load();
@@ -32,6 +28,7 @@ function syncAudioSource(audio: HTMLAudioElement, src: string) {
 }
 
 export function useMusicPlayerState({ playlist }: UseMusicPlayerStateOptions) {
+  const { mediaBase } = useSiteAssets();
   const initialPersistedState = useMemo(() => {
     if (typeof window === 'undefined') return null;
     return readPersistedPlayerStateFromStorage(
@@ -174,7 +171,7 @@ export function useMusicPlayerState({ playlist }: UseMusicPlayerStateOptions) {
     const track = playlist[resolvedTrackIndex];
     if (!audio || !track || !hasUserInteractedRef.current) return;
 
-    syncAudioSource(audio, getTrackSrc(track));
+    syncAudioSource(audio, getTrackSrc(track, mediaBase));
     if (!desiredPlayingRef.current) return;
 
     const attempt = ++playAttemptRef.current;
@@ -185,7 +182,7 @@ export function useMusicPlayerState({ playlist }: UseMusicPlayerStateOptions) {
       setIsPlaying(false);
       persistPlayerState(true);
     });
-  }, [persistPlayerState, playRequest, playlist, resolvedTrackIndex]);
+  }, [mediaBase, persistPlayerState, playRequest, playlist, resolvedTrackIndex]);
 
   useEffect(() => {
     const audio = audioRef.current;

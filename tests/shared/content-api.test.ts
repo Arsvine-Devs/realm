@@ -32,22 +32,19 @@ function jsonResponse(body: unknown, status = 200) {
 
 describe('published Content client', () => {
   it('reads public data from the source-controlled Content origin', async () => {
-    fetchMock.mockResolvedValue(
-      jsonResponse({ publishedAt: '2026-09-15T00:00:00.000Z', posts: [] }),
-    );
+    fetchMock.mockResolvedValue(jsonResponse({ posts: [] }));
 
     await expect(fetchPublishedBlogIndex()).resolves.toEqual({
-      version: 1,
-      updatedAt: '2026-09-15T00:00:00.000Z',
       posts: [],
     });
     expect(fetchMock).toHaveBeenCalledWith(
       'https://content.arsvine.com/v1/posts',
       expect.objectContaining({
-        next: { revalidate: 300, tags: ['published-content'] },
+        cache: 'no-store',
         headers: expect.any(Headers),
       }),
     );
+    expect(fetchMock.mock.calls[0]?.[1]?.next).toBeUndefined();
   });
 
   it('uses the public preview audience over private Auth and Content transports', async () => {

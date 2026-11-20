@@ -96,7 +96,7 @@ export const siteConfig: SiteConfig = {
   fonts: {
     googleStylesheet:
       'https://fonts.googleapis.com/css2?family=Dosis:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700&display=swap',
-    mediaStylesheet: '/media/shared/fonts/google-fonts.css',
+    stylesheetKey: 'shared/fonts/google-fonts.css',
   },
   locale: {
     htmlLang: 'zh',

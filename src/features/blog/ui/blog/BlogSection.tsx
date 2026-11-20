@@ -19,7 +19,6 @@ interface BlogSectionProps {
   locale: Locale;
   posts: BlogPostMeta[];
   handleBlogItemClick: (post: BlogPostMeta) => void;
-  handleBlogItemIntent?: (post: BlogPostMeta) => void;
 }
 
 interface BlogExcerptProps {
@@ -118,7 +117,6 @@ export default function BlogSection({
   locale,
   posts,
   handleBlogItemClick,
-  handleBlogItemIntent,
 }: BlogSectionProps) {
   const t = useTranslations('sections.blog');
   const reducedMotion = useReducedMotion();
@@ -137,12 +135,9 @@ export default function BlogSection({
             aria-label={post.title}
             data-cursor-no-magnetic
             onClick={() => handleBlogItemClick(post)}
-            onPointerDown={(event) => {
-              if (event.button === 0) handleBlogItemIntent?.(post);
-            }}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                handleBlogItemIntent?.(post);
+                e.preventDefault();
                 handleBlogItemClick(post);
               }
             }}

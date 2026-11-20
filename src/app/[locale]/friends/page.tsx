@@ -1,12 +1,9 @@
 import FriendsPage from '@/features/profile/ui/FriendsPage';
 import { getStaticCatalogAssets } from '@/features/assets/server/catalog/catalog-provider';
-import { connection } from 'next/server';
 import { hydrateCatalogAssets } from '@/features/assets/server/catalog/hydrate-catalog-assets';
 import { loadFriendLinks, loadMessages, loadServices } from '@/app/i18n/data';
 import type { Locale } from '@/app/i18n/config';
 import { localizedMetadata } from '@/app/metadata';
-
-export const revalidate = 300;
 
 export async function generateMetadata({
   params,
@@ -23,7 +20,6 @@ export async function generateMetadata({
 }
 
 export default async function Friends({ params }: { params: Promise<{ locale: Locale }> }) {
-  await connection();
   const { locale } = await params;
   const [messages, catalogAssets] = await Promise.all([
     loadMessages(locale),

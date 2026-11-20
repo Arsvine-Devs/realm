@@ -1,4 +1,4 @@
-import { createHmac, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import { lstat, mkdir, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 
@@ -17,12 +17,6 @@ if (typeof version !== 'string' || !/^\d{8}T\d{6}Z$/.test(version))
 const publicSource = join(buildRoot, 'public-root');
 const privateSource = join(buildRoot, 'private-root');
 const catalogRelative = join('realm', 'catalog', 'versions', version);
-const siteRelative = join('realm', 'site-catalog', 'versions', version);
-const publicManifest = JSON.parse(
-  await readFile(join(publicSource, siteRelative, 'assets.json'), 'utf8'),
-);
-if (publicManifest.version !== version || !publicManifest.assets)
-  throw Error('Invalid public asset manifest');
 
 function collectMediaKeys(record, keys) {
   if (!record || typeof record !== 'object') return;
@@ -31,7 +25,6 @@ function collectMediaKeys(record, keys) {
 }
 
 const keys = new Set();
-collectMediaKeys(publicManifest, keys);
 for (const section of ['home', 'works', 'collections', 'links', 'audio', 'static-assets']) {
   const catalog = JSON.parse(
     await readFile(join(privateSource, catalogRelative, `${section}.json`), 'utf8'),
@@ -85,16 +78,8 @@ async function copyRelease(source, target) {
   }
 }
 
-const revalidateOrigin = process.env.REALM_REVALIDATE_ORIGIN;
-const revalidateSecret = process.env.REVALIDATE_WEBHOOK_SECRET;
-if (Boolean(revalidateOrigin) !== Boolean(revalidateSecret)) {
-  throw Error('Set both REALM_REVALIDATE_ORIGIN and REVALIDATE_WEBHOOK_SECRET to notify Realm');
-}
-const revalidateUrl = revalidateOrigin && new URL('/api/internal/revalidate', revalidateOrigin);
-
 await copyRelease(join(publicSource, 'realm', 'images'), join(publicRoot, 'realm', 'images'));
 await copyRelease(join(publicSource, 'realm', 'audio'), join(publicRoot, 'realm', 'audio'));
-await copyRelease(join(publicSource, siteRelative), join(publicRoot, siteRelative));
 await copyRelease(join(privateSource, catalogRelative), join(privateRoot, catalogRelative));
 
 const fonts = join('shared', 'fonts');
@@ -111,33 +96,8 @@ await atomicWrite(
 );
 
 await atomicWrite(
-  join(publicRoot, 'realm', 'site-catalog', 'current.json'),
+  join(privateRoot, 'realm', 'catalog', 'current.json'),
   `${JSON.stringify({ version })}\n`,
 );
-
-if (revalidateUrl) {
-  const timestamp = String(Date.now());
-  const body = JSON.stringify({
-    event: 'assets.published',
-    releaseId: version,
-    timestamp: new Date(Number(timestamp)).toISOString(),
-  });
-  const signature = createHmac('sha256', revalidateSecret)
-    .update(`${timestamp}.${body}`)
-    .digest('hex');
-  const response = await fetch(revalidateUrl, {
-    method: 'POST',
-    body,
-    signal: AbortSignal.timeout(8000),
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Arsvine-Timestamp': timestamp,
-      'X-Arsvine-Signature': signature,
-    },
-  });
-  const result = await response.json();
-  if (!response.ok || !result.revalidated)
-    throw Error(`Published ${version}, but Realm refresh failed`);
-}
 
 console.log(`Published Realm media ${version}`);

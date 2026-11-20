@@ -8,7 +8,7 @@ Only active constraints belong here. Historical reasons are omitted unless they 
 
 - Protected post bodies stay out of static props/RSC and load only after a valid grant.
 - Grant checks and variant loads remain XState invoked actors with cancellation on article/locale changes.
-- Protected and revalidation redirects accept only validated internal paths.
+- Protected redirects accept only validated internal paths.
 - Realm runtime content uses the static Content origin from `config/site-config.mjs`; protected reads use the static Auth origin and `CONTENT_SERVICE_CLIENT_*` credentials server-side.
 - External link variants use parsed URLs and hostnames, never substring matching.
 - TOTP, grant, rate-limit, and protected payload tests are security evidence and should not be replaced by styling tests.

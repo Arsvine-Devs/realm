@@ -37,20 +37,7 @@ vi.mock('@/features/portfolio/ui/WorksSection', () => ({
   ),
 }));
 vi.mock('@/features/experience/ui/ExperienceSection', () => ({ default: () => null }));
-vi.mock('@/features/blog/ui/blog/BlogSection', () => ({
-  default: ({
-    posts,
-    handleBlogItemIntent,
-  }: {
-    posts: Array<{ slug: string }>;
-    handleBlogItemIntent: (post: unknown) => void;
-  }) => (
-    <>
-      <button onPointerDown={() => handleBlogItemIntent(posts[0])}>prefetch public blog</button>
-      <button onPointerDown={() => handleBlogItemIntent(posts[1])}>prefetch protected blog</button>
-    </>
-  ),
-}));
+vi.mock('@/features/blog/ui/blog/BlogSection', () => ({ default: () => null }));
 vi.mock('@/features/life/ui/LifeSection', () => ({
   default: ({
     gameData,
@@ -216,17 +203,7 @@ describe('ContentPage detail closing', () => {
       button: 0,
     });
     fireEvent.pointerDown(screen.getByRole('button', { name: 'prefetch life' }), { button: 0 });
-    fireEvent.pointerDown(screen.getByRole('button', { name: 'prefetch public blog' }), {
-      button: 0,
-    });
-    fireEvent.pointerDown(screen.getByRole('button', { name: 'prefetch protected blog' }), {
-      button: 0,
-    });
 
-    expect(prefetchMock.mock.calls.map(([url]) => url)).toEqual([
-      '/en/web/2',
-      '/en/life/life-one',
-      '/en/blog/public-post?lang=en',
-    ]);
+    expect(prefetchMock.mock.calls.map(([url]) => url)).toEqual(['/en/web/2', '/en/life/life-one']);
   });
 });
