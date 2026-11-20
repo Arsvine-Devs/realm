@@ -35,13 +35,13 @@ describe('server HTTP helpers', () => {
     expect(getClientAddress(request)).toBe('203.0.113.10');
   });
 
-  it('trusts Vercel-managed forwarding headers by default', () => {
+  it('requires explicit trust even when a legacy platform variable is supplied', () => {
     delete process.env.TRUST_PROXY;
     process.env.VERCEL = '1';
     const request = new Request('https://arsvine.com/api/test', {
       headers: { 'X-Real-IP': '203.0.113.11' },
     });
-    expect(getClientAddress(request)).toBe('203.0.113.11');
+    expect(getClientAddress(request)).toBe('unknown');
   });
 
   it('parses valid cookies and drops malformed encoded values', () => {

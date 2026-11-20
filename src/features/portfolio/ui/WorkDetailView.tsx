@@ -10,7 +10,7 @@ import {
   getSafeExternalLinkVariant,
   getSafeExternalUrl,
 } from '@/shared/lib/safe-external-href';
-import { resolveImageUrl } from '@/shared/lib/cdn';
+import { resolveRawAssetUrl } from '@/shared/lib/media';
 
 // Reusing ProjectCard might be complex due to layout differences in detail view.
 // Let's build a dedicated detail view component.
@@ -21,7 +21,7 @@ interface WorkDetailViewProps {
 
 const WorkDetailView = ({ item }: WorkDetailViewProps) => {
   const { title, description, tech, imageUrl, link, galleryImages, articleContent } = item || {};
-  const backgroundImageUrl = resolveImageUrl(imageUrl, 'large');
+  const backgroundImageUrl = resolveRawAssetUrl(imageUrl);
   const imageStyle = backgroundImageUrl ? { backgroundImage: `url(${backgroundImageUrl})` } : {};
   const safeProjectLink = getSafeExternalHref(link);
 
@@ -225,7 +225,7 @@ const WorkDetailView = ({ item }: WorkDetailViewProps) => {
                 ref={bindThumbnailRef(`thumb_${index}`)}
               >
                 <img
-                  src={resolveImageUrl(img.src, 'card')}
+                  src={resolveRawAssetUrl(img.src)}
                   alt={img.caption || `${title} thumbnail ${index + 1}`}
                   className={styles.thumbnailImage}
                 />

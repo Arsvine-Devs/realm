@@ -3,6 +3,7 @@
 node_modules
 .next
 dist
+media-workspace
 coverage
 output
 cos-workspace

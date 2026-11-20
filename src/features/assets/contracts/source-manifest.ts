@@ -1,5 +1,5 @@
 import type { AssetReference } from '@/shared/types';
-import { avatar, cover, gallery, post } from '@/shared/lib/cdn';
+import { avatar, cover, gallery, post } from '@/shared/lib/media';
 
 import portfolioSource from '@/features/portfolio/contracts/source-manifest.json';
 import lifeSource from '@/features/life/contracts/source-manifest.json';

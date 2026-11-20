@@ -25,7 +25,7 @@ import { useDetailSectionNav, type DetailSectionNavItem } from '@/shared/hooks/u
 import { useDetailTitleReveal } from '@/shared/hooks/useDetailTitleReveal';
 import { useTypingSubtitle } from '@/shared/hooks/useTypingSubtitle';
 import useGalleryLightbox from '@/shared/hooks/useGalleryLightbox';
-import { resolveImageUrl } from '@/shared/lib/cdn';
+import { resolveRawAssetUrl } from '@/shared/lib/media';
 import type { Locale } from '@/shared/contracts/locale';
 import type { CopyableToken, Project, TranslationStatus } from '../../../shared/types';
 
@@ -216,9 +216,9 @@ function WebDetailContent({
   );
 
   const showHero = !project.noHero && !project.isConfidential && !!project.imageUrl;
-  const baseCover = resolveImageUrl(project.imageUrl, 'large');
+  const baseCover = resolveRawAssetUrl(project.imageUrl);
   const invertedCover = project.invertedImageUrl
-    ? resolveImageUrl(project.invertedImageUrl, 'large')
+    ? resolveRawAssetUrl(project.invertedImageUrl)
     : '';
   const coverImage = isInverted && invertedCover ? invertedCover : baseCover;
 
@@ -319,8 +319,6 @@ function WebDetailContent({
             <LazyImage
               src={leftImageSrc}
               alt={group.left.caption || `${project.title} mobile ${group.leftIndex + 1}`}
-              quality="high"
-              preset="card"
             />
           </div>
           <div
@@ -344,8 +342,6 @@ function WebDetailContent({
             <LazyImage
               src={rightImageSrc}
               alt={group.right.caption || `${project.title} mobile ${group.rightIndex + 1}`}
-              quality="high"
-              preset="card"
             />
           </div>
         </div>
@@ -382,8 +378,6 @@ function WebDetailContent({
         <LazyImage
           src={imageSrc}
           alt={group.image.caption || `${project.title} gallery ${group.index + 1}`}
-          quality="high"
-          preset="card"
         />
       </div>
     );

@@ -26,6 +26,7 @@ interface UseBlogPostStateOptions {
   locale: Locale;
   meta: BlogPostMeta;
   mdxSource: BlogVariantPayload['mdxSource'] | null;
+  hasServerBody?: boolean;
   translationStatus: TranslationStatus;
   actualLocale: Locale;
   actualContentLocale: BlogContentLocale;
@@ -63,6 +64,7 @@ export default function useBlogPostState({
   locale,
   meta,
   mdxSource,
+  hasServerBody = false,
   translationStatus,
   actualLocale,
   actualContentLocale,
@@ -79,7 +81,10 @@ export default function useBlogPostState({
   const requestedContentLocale =
     getRequestedContentLocaleFromPath(currentUrl) ?? defaultContentLocale;
   const requiresAuth = isProtected && access.mode !== 'public';
-  const baseVariant = useMemo(() => (mdxSource ? { meta, mdxSource } : null), [mdxSource, meta]);
+  const baseVariant = useMemo(
+    () => (mdxSource || hasServerBody ? { meta, mdxSource } : null),
+    [hasServerBody, mdxSource, meta],
+  );
   const variants = useMemo(
     () => ({
       ...contentVariants,

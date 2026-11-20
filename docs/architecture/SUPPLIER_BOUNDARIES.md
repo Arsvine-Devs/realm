@@ -8,21 +8,21 @@
 
 状态含义：`CURRENT` 表示代码或配置确认，`LIVE` 表示公开端点确认，`CLAIMED` 表示控制面确认但未由独立运行探针完全覆盖，`UNKNOWN` 表示现有证据不足。
 
-| 供应商/平台     | 当前职责                                                                                               | 代码耦合                   | 当前证据                                                             |
-| --------------- | ------------------------------------------------------------------------------------------------------ | -------------------------- | -------------------------------------------------------------------- |
-| Vercel          | Realm、Console、Auth、API、Content 的生产托管；Next.js Functions、Proxy、Geo、Analytics/Speed Insights | 高                         | `CURRENT` + `LIVE`；五个 production deployment 均 `READY`            |
-| Neon            | Realm 访客统计；Console/Auth/API 的数据库资源                                                          | 中高                       | `CURRENT` + `CLAIMED`；资源项目映射已确认，database/branch 未读取    |
-| Upstash Redis   | Realm 限流；Console session 和限流                                                                     | 中                         | `CURRENT` + `CLAIMED`；当前资源项目映射已确认                        |
-| Better Stack    | `status.arsvine.com` 状态页和外部健康检测                                                              | 无业务代码耦合             | `LIVE` + `CLAIMED`；CNAME 和页面 HTTP 200 已确认，monitor 配置未读取 |
-| Auth / OIDC     | `auth.arsvine.com` 的身份、OAuth/OIDC、JWKS、Passkey、TOTP 和 role                                     | 中高                       | `CURRENT` + `LIVE`；Discovery/JWKS/health 可读                       |
-| Content service | `content.arsvine.com` 的 published release、Blog/Tweet read API 和 protected internal variant          | 中                         | `CURRENT` + `LIVE`；readiness 和公开保护边界可读                     |
-| Tencent COS     | private Catalog、public media object 和 publication storage                                            | 中高                       | `CURRENT` + `CLAIMED`；存储边界由代码和部署配置定义                  |
-| Tencent EdgeOne | `cdn.arsvine.com` 的边缘缓存、HTTPS、安全策略和 COS 回源                                               | 低到中                     | `LIVE` + `CLAIMED`；CNAME 和 CDN 响应信号可读                        |
-| Tencent DNSPod  | `arsvine.com` 的权威 DNS 和子域记录                                                                    | 低                         | `CLAIMED`；NS/控制面信息已记录，完整 zone 未读取                     |
-| Tencent SSL     | CDN/域名的 TLS 证书和绑定                                                                              | 无运行时代码耦合           | `CLAIMED`；完整证书绑定清单未读取                                    |
-| GitHub          | Realm/Platform 源代码托管、Realm CI 和代码审查入口                                                     | 低；不承载 Content runtime | `CURRENT`；两个仓库的 remote 和 Realm CI workflow 可读               |
-| Hitokoto        | Realm `/api/hitokoto` 的第三方句子来源                                                                 | 低                         | `CURRENT`；服务端代理、缓存、限流和 fallback 已实现                  |
-| Google Fonts    | Realm 构建阶段的 CSS/字体来源                                                                          | 低                         | `CURRENT`；构建脚本读取并生成自有 CDN stylesheet                     |
+| 供应商/平台     | 当前职责                                                                                             | 代码耦合                   | 当前证据                                                                     |
+| --------------- | ---------------------------------------------------------------------------------------------------- | -------------------------- | ---------------------------------------------------------------------------- |
+| Vercel          | Realm、Ripple、Console、Auth、API、Content 的生产托管；Next.js/Vite Functions、Proxy、Geo、Analytics | 高                         | `CURRENT` + `LIVE`；Platform 四服务 ready 200；Ripple live；Realm health 429 |
+| Neon            | Realm 访客统计；Console/Auth/API 的数据库资源                                                        | 中高                       | `CURRENT` + `CLAIMED`；资源项目映射已确认，database/branch 未读取            |
+| Upstash Redis   | Realm 限流；Console session 和限流                                                                   | 中                         | `CURRENT` + `CLAIMED`；当前资源项目映射已确认                                |
+| Better Stack    | `status.arsvine.com` 状态页和外部健康检测                                                            | 无业务代码耦合             | `LIVE` + `CLAIMED`；CNAME 和页面 HTTP 200 已确认，monitor 配置未读取         |
+| Auth / OIDC     | `auth.arsvine.com` 的身份、OAuth/OIDC、JWKS、Passkey、TOTP 和 role                                   | 中高                       | `CURRENT` + `LIVE`；Discovery/JWKS/health 可读                               |
+| Content service | `content.arsvine.com` 的 published release、Blog/Tweet read API 和 protected internal variant        | 中                         | `CURRENT` + `LIVE`；readiness 和公开保护边界可读                             |
+| Tencent COS     | private Catalog、public media object 和 publication storage                                          | 中高                       | `CURRENT` + `CLAIMED`；存储边界由代码和部署配置定义                          |
+| Tencent EdgeOne | `cdn.arsvine.com` 的边缘缓存、HTTPS、安全策略和 COS 回源                                             | 低到中                     | `LIVE` + `CLAIMED`；CNAME 和 CDN 响应信号可读                                |
+| Tencent DNSPod  | `arsvine.com` 的权威 DNS 和子域记录                                                                  | 低                         | `CLAIMED`；NS/控制面信息已记录，完整 zone 未读取                             |
+| Tencent SSL     | CDN/域名的 TLS 证书和绑定                                                                            | 无运行时代码耦合           | `CLAIMED`；完整证书绑定清单未读取                                            |
+| GitHub          | Realm/Platform 源代码托管、Realm CI 和代码审查入口                                                   | 低；不承载 Content runtime | `CURRENT`；两个仓库的 remote 和 Realm CI workflow 可读                       |
+| Hitokoto        | Realm `/api/hitokoto` 的第三方句子来源                                                               | 低                         | `CURRENT`；服务端代理、缓存、限流和 fallback 已实现                          |
+| Google Fonts    | Realm 构建阶段的 CSS/字体来源                                                                        | 低                         | `CURRENT`；构建脚本读取并生成自有 CDN stylesheet                             |
 
 ## Vercel
 

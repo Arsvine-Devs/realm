@@ -1,5 +1,5 @@
 import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
-import { neon, type NeonQueryFunction } from '@neondatabase/serverless';
+import { Pool } from 'pg';
 
 import { readEnv } from '@/shared/config/env-provider';
 import { getSiteUrl } from '@/shared/config/site';
@@ -17,9 +17,9 @@ const VISITOR_ID_PATTERN =
 const BOT_USER_AGENT_PATTERN =
   /(?:bot|crawler|spider|slurp|headless|phantom|selenium|playwright|puppeteer|curl|wget|python[-_ ]?(?:requests?|urllib)|scrapy|go-http-client|libwww|httpclient|bytespider|ahrefsbot|semrushbot|mj12bot|dotbot|petalbot|baiduspider|yandexbot|bingpreview)/i;
 
-type VisitorStatsSql = NeonQueryFunction<false, false>;
+type VisitorStatsSql = Pick<Pool, 'query'>;
 
-let sqlClient: VisitorStatsSql | null = null;
+let sqlClient: Pool | null = null;
 let sqlConnectionString = '';
 
 function getVisitorStatsSecret(): string | null {
@@ -37,7 +37,15 @@ function getSqlClient(): VisitorStatsSql | null {
   if (!databaseUrl) return null;
 
   if (!sqlClient || sqlConnectionString !== databaseUrl) {
-    sqlClient = neon(databaseUrl);
+    void sqlClient?.end();
+    sqlClient = new Pool({
+      connectionString: databaseUrl,
+      max: 3,
+      connectionTimeoutMillis: 1500,
+      query_timeout: 3000,
+      allowExitOnIdle: true,
+    });
+    sqlClient.on('error', () => console.error('[visitor-stats] PostgreSQL connection failed'));
     sqlConnectionString = databaseUrl;
   }
 
@@ -146,13 +154,10 @@ function isSameOriginRequest(request: Request): boolean {
 }
 
 export function getVisitorRateLimitKey(request: Request, secret: string): string | null {
-  const ja4 = request.headers.get('x-vercel-ja4-digest')?.trim() ?? '';
   const clientAddress = getClientAddress(request);
-  if (!ja4 && clientAddress === 'unknown') return null;
-
-  const userAgent = request.headers.get('user-agent')?.trim().slice(0, 256) ?? '';
-  const signal = [ja4 || 'missing-ja4', clientAddress, userAgent].join('|');
-  return `visitor-stats:${hmacHex(secret, `rate:${signal}`)}`;
+  return clientAddress === 'unknown'
+    ? null
+    : `visitor-stats:${hmacHex(secret, `rate:${clientAddress}`)}`;
 }
 
 function parseCounter(value: unknown, field: string): number {
@@ -167,19 +172,20 @@ export async function recordVisitor(
   sql: VisitorStatsSql,
   visitorKey: string,
 ): Promise<VisitorStatsCounts> {
-  const rows = await sql`
+  const { rows } = await sql.query(
+    `
     WITH current_day AS (
       SELECT (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Shanghai')::date AS visit_date
     ),
     new_identity AS (
       INSERT INTO arsvine_visitor_identities (visitor_key, first_seen_at)
-      VALUES (${visitorKey}, CURRENT_TIMESTAMP)
+      VALUES ($1, CURRENT_TIMESTAMP)
       ON CONFLICT (visitor_key) DO NOTHING
       RETURNING visitor_key
     ),
     new_daily_visit AS (
       INSERT INTO arsvine_visitor_daily_visits (visit_date, visitor_key)
-      SELECT current_day.visit_date, ${visitorKey}
+      SELECT current_day.visit_date, $1
       FROM current_day
       ON CONFLICT (visit_date, visitor_key) DO NOTHING
       RETURNING visit_date
@@ -216,7 +222,9 @@ export async function recordVisitor(
     FROM total_update
     CROSS JOIN current_day
     LEFT JOIN daily_update ON daily_update.visit_date = current_day.visit_date
-  `;
+  `,
+    [visitorKey],
+  );
 
   const row = rows[0] as { total_visitors?: unknown; today_visitors?: unknown } | undefined;
   if (!row) throw new Error('visitor stats query returned no counters');

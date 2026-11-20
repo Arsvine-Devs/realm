@@ -1,36 +1,4 @@
-// One-shot: fetch the current Google Fonts stylesheet (URL lives in src/shared/config/site.ts),
-// download every woff2 referenced by the per-unicode-range @font-face blocks,
-// and rewrite the CSS so its url() entries point at the self-hosted COS copy.
-//
-// Run with: `node scripts/fetch-google-fonts.mjs`
-//
-// Output layout (mirrors what gets uploaded to cos://arsvine-cdn/shared/fonts/):
-//   public/_fonts-staging/google-fonts.css        ← entry stylesheet, url() rewritten
-//   public/_fonts-staging/manifest.json           ← run record (timestamp, file count, sha8)
-//   public/_fonts-staging/<family-slug>/<file>.woff2
-//
-// public/_fonts-staging/ is gitignored. Re-run is idempotent: same source CSS →
-// same filenames → byte-identical output.
-//
-// Upload through the documented COSCLI asset workflow. Credentials must be
-// supplied by the current process and must not be persisted in a CLI config.
-//      （woff2 子目录用「文件夹上传」，保持目录结构）
-//   3. 为 google-fonts.css 在「文件详情 → 自定义 Header」设置：
-//        Content-Type:   text/css; charset=utf-8
-//        Cache-Control:  public, max-age=86400, must-revalidate
-//   4. 为所有 woff2（可批量选中后「编辑元数据」）设置：
-//        Content-Type:   font/woff2
-//        Cache-Control:  public, max-age=31536000, immutable
-//
-//   ⚠ 重要：自定义 Header 的「Key」字段只写 header 名（如 Cache-Control），
-//   「Value」字段只写值（如 public, max-age=86400, must-revalidate）。
-//   不要把 "Cache-Control: " 这种前缀写进 Value，否则 COS 会拼出
-//   "Cache-Control: Cache-Control: ..." 这种非法响应头，导致 Firefox
-//   拒绝渲染 woff2 字体（fallback 到系统字体，繁体/低频字会显示为方块）。
-//
-// Why a modern Chrome User-Agent: Google Fonts CSS API serves different src formats
-// based on UA. Without a modern UA you get .ttf instead of .woff2, ballooning the
-// per-segment file size by 3-4x.
+// Prepare local webfonts and a stylesheet with paths relative to the font directory.
 
 import { mkdir, writeFile, readFile, rm } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -39,7 +7,6 @@ import { spawn } from 'node:child_process';
 
 const STAGING_DIR = 'public/_fonts-staging';
 const SITE_CONFIG_PATH = 'src/shared/config/site.ts';
-const CDN_BASE = 'https://cdn.arsvine.com/shared/fonts';
 const MODERN_CHROME_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36';
 const DOWNLOAD_CONCURRENCY = 4;
@@ -162,7 +129,7 @@ async function main() {
   await mkdir(STAGING_DIR, { recursive: true });
   await writeFile(
     join(STAGING_DIR, '.gitignore'),
-    '# scripts/fetch-google-fonts.mjs output. Uploaded to cdn.arsvine.com, not committed.\n*\n!.gitignore\n',
+    '# scripts/fetch-google-fonts.mjs output. Published with Realm media.\n*\n!.gitignore\n',
   );
 
   console.log('[fonts] Fetching CSS via curl (honors HTTPS_PROXY if set)...');
@@ -196,9 +163,9 @@ async function main() {
       continue;
     }
     const destPath = join(STAGING_DIR, parsed.slug, parsed.filename);
-    const cdnUrl = `${CDN_BASE}/${parsed.slug}/${parsed.filename}`;
-    rewrites.set(parsed.url, cdnUrl);
-    tasks.push({ ...parsed, destPath, cdnUrl });
+    const fontPath = `./${parsed.slug}/${parsed.filename}`;
+    rewrites.set(parsed.url, fontPath);
+    tasks.push({ ...parsed, destPath });
   }
   console.log(
     `[fonts] After dedup: ${tasks.length} unique woff2 files (from ${blocks.length} @font-face blocks)`,
@@ -235,40 +202,14 @@ async function main() {
     cssBytes: rewrittenCss.length,
     fontFiles: tasks.length,
     totalFontBytes: totalBytes,
-    cdnBase: CDN_BASE,
     families: [...new Set(tasks.map((t) => t.family))],
   };
   await writeFile(join(STAGING_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2));
 
-  console.log('');
-  console.log('================================================================');
-  console.log(`[fonts] Done. ${tasks.length} files, ${(totalBytes / 1024).toFixed(0)} KB total.`);
-  console.log(`[fonts] Families: ${manifest.families.join(', ')}`);
-  console.log('================================================================');
-  console.log('');
-  console.log('按 docs/human/ASSETS.md 使用临时环境凭据和 COSCLI 上传到 COS：');
-  console.log('');
-  console.log('  1. 控制台 → 桶 arsvine-cdn → shared/fonts/ 目录');
-  console.log('  2. 上传 public/_fonts-staging/google-fonts.css 和所有 woff2 子目录');
-  console.log('     （woff2 用「文件夹上传」，保持目录结构）');
-  console.log('');
-  console.log('  3. 为 google-fonts.css 设置自定义 Header（文件详情 → 编辑元数据）：');
-  console.log('       Key: Content-Type     Value: text/css; charset=utf-8');
-  console.log('       Key: Cache-Control    Value: public, max-age=86400, must-revalidate');
-  console.log('');
-  console.log('  4. 批量选中所有 woff2 → 编辑元数据：');
-  console.log('       Key: Content-Type     Value: font/woff2');
-  console.log('       Key: Cache-Control    Value: public, max-age=31536000, immutable');
-  console.log('');
-  console.log('  ⚠ Value 只写值，不要带 "Cache-Control: " 这种前缀，');
-  console.log('    否则响应头会变成 "Cache-Control: Cache-Control: ..."');
-  console.log('    Firefox 会拒绝渲染字体，繁体/低频字 fallback 到系统字体。');
-  console.log('');
-  console.log('Verify with:');
+  console.log(`[fonts] Prepared ${tasks.length} files in ${STAGING_DIR}`);
   console.log(
-    '  curl -I -H "Referer: https://arsvine.com/" https://cdn.arsvine.com/shared/fonts/google-fonts.css',
+    '[fonts] Copy the stylesheet and font directories into the media workspace shared/fonts tree.',
   );
-  console.log('  → Content-Type / Cache-Control 各只出现一次');
 }
 
 main().catch((err) => {

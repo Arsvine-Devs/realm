@@ -3,12 +3,12 @@ import styles from '../styles/LifeDetailView.module.scss';
 import Lightbox from '../../../shared/ui/Lightbox';
 import LazyImage from '../../../shared/ui/LazyImage';
 import useGalleryLightbox from '@/shared/hooks/useGalleryLightbox';
-import { resolveImageUrl } from '@/shared/lib/cdn';
+import { resolveRawAssetUrl } from '@/shared/lib/media';
 import type { GalleryImage, LifeItem } from '../../../shared/types';
 
 const LifeDetailView = ({ item }: { item: LifeItem | null }) => {
   const { title, description, tech, imageUrl, articleContent, galleryImages } = item || {};
-  const backgroundImageUrl = resolveImageUrl(imageUrl, 'large');
+  const backgroundImageUrl = resolveRawAssetUrl(imageUrl);
   const imageStyle = backgroundImageUrl ? { backgroundImage: `url(${backgroundImageUrl})` } : {};
 
   const paragraphs = articleContent ? articleContent.split('\n\n') : [];
@@ -74,7 +74,6 @@ const LifeDetailView = ({ item }: { item: LifeItem | null }) => {
                       src={img.src}
                       alt={img.caption || `${title} thumbnail ${idx + 1}`}
                       className={styles.thumbnailImage}
-                      quality="low"
                     />
                   </button>
                 ))}

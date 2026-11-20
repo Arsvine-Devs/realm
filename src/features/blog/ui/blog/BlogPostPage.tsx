@@ -1,6 +1,6 @@
 'use client';
 
-import { startTransition, useState, useEffect, useRef, useCallback } from 'react';
+import { startTransition, useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote';
 import MDXComponents from '../mdx/MDXComponents';
@@ -31,6 +31,7 @@ export interface BlogPostPageProps {
   messages: Record<string, unknown>;
   meta: BlogPostMeta;
   mdxSource: MDXRemoteSerializeResult | null;
+  initialBody?: ReactNode;
   allPosts: BlogPostMeta[];
   translationStatus: TranslationStatus;
   actualLocale: Locale;
@@ -45,6 +46,7 @@ export default function BlogPostPage({
   locale,
   meta,
   mdxSource,
+  initialBody,
   allPosts,
   translationStatus,
   actualLocale,
@@ -85,6 +87,7 @@ export default function BlogPostPage({
     locale,
     meta,
     mdxSource,
+    hasServerBody: initialBody != null,
     translationStatus,
     actualLocale,
     actualContentLocale,
@@ -155,6 +158,7 @@ export default function BlogPostPage({
       locale={locale}
       meta={selectedVariant.meta}
       mdxSource={selectedVariant.mdxSource}
+      initialBody={selectedContentLocale === actualContentLocale ? initialBody : undefined}
       allPosts={allPosts}
       translationStatus={effectiveStatus}
       actualLocale={actualLocale}
@@ -175,6 +179,7 @@ function BlogDetailContent({
   locale,
   meta,
   mdxSource,
+  initialBody,
   allPosts,
   translationStatus,
   actualLocale,
@@ -191,7 +196,7 @@ function BlogDetailContent({
   BlogPostPageProps,
   'messages' | 'contentVariants' | 'access' | 'isProtected' | 'actualContentLocale' | 'mdxSource'
 > & {
-  mdxSource: MDXRemoteSerializeResult;
+  mdxSource: MDXRemoteSerializeResult | null;
   viewState: BlogPostViewState;
   selectedContentLocale: BlogContentLocale;
   originLocale: Locale;
@@ -348,7 +353,8 @@ function BlogDetailContent({
                 locale={selectedContentLocale}
               >
                 <SpoilerProvider>
-                  <MDXRemote {...mdxSource} components={MDXComponents} />
+                  {initialBody ??
+                    (mdxSource && <MDXRemote {...mdxSource} components={MDXComponents} />)}
                 </SpoilerProvider>
               </BlogContentRevealProvider>
             </div>

@@ -61,7 +61,7 @@ describe('visitor stats identity and filtering', () => {
   });
 
   it('uses a keyed rate-limit signal without putting raw fingerprint data in the key', () => {
-    vi.stubEnv('VERCEL', '1');
+    vi.stubEnv('TRUST_PROXY', '1');
     const request = new Request('https://arsvine.com/api/visitor-stats', {
       headers: {
         'user-agent': 'Mozilla/5.0',
@@ -79,19 +79,19 @@ describe('visitor stats identity and filtering', () => {
 
 describe('visitor stats persistence query', () => {
   it('uses atomic daily and all-time conflict-safe SQL and parses counters', async () => {
-    const sqlMock = vi.fn(async (strings: TemplateStringsArray, ...values: unknown[]) => {
-      expect(values).toContain('opaque-visitor-key');
-      return [{ total_visitors: '12', today_visitors: '4' }];
+    const queryMock = vi.fn(async (_query: string, values: string[]) => {
+      expect(values).toEqual(['opaque-visitor-key']);
+      return { rows: [{ total_visitors: '12', today_visitors: '4' }] };
     });
-    const sql = sqlMock as unknown as Parameters<typeof recordVisitor>[0];
+    const sql = { query: queryMock } as unknown as Parameters<typeof recordVisitor>[0];
 
     await expect(recordVisitor(sql, 'opaque-visitor-key')).resolves.toEqual({
       totalVisitors: 12,
       todayVisitors: 4,
     });
 
-    const [strings] = sqlMock.mock.calls[0] as [TemplateStringsArray, ...unknown[]];
-    const query = strings.raw.join('?');
+    const [query] = queryMock.mock.calls[0];
+    expect(query).toContain('VALUES ($1, CURRENT_TIMESTAMP)');
     expect(query).toContain('ON CONFLICT (visitor_key) DO NOTHING');
     expect(query).toContain('ON CONFLICT (visit_date, visitor_key) DO NOTHING');
     expect(query).toContain("AT TIME ZONE 'Asia/Shanghai'");

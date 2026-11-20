@@ -23,7 +23,7 @@ import { useDetailSectionNav, type DetailSectionNavItem } from '@/shared/hooks/u
 import { useDetailTitleReveal } from '@/shared/hooks/useDetailTitleReveal';
 import { useTypingSubtitle } from '@/shared/hooks/useTypingSubtitle';
 import useGalleryLightbox from '@/shared/hooks/useGalleryLightbox';
-import { resolveImageUrl } from '@/shared/lib/cdn';
+import { resolveRawAssetUrl } from '@/shared/lib/media';
 import type { Locale } from '@/shared/contracts/locale';
 import type { LifeItem, TranslationStatus } from '../../../shared/types';
 
@@ -157,7 +157,7 @@ function LifeDetailContent({
     [locale, navigateTo],
   );
 
-  const coverImage = resolveImageUrl(item.imageUrl, 'large');
+  const coverImage = resolveRawAssetUrl(item.imageUrl);
   let revealCursor = 0;
   const storyRevealIndices = paragraphs.map(() => revealCursor++);
   const galleryRevealIndices = galleryImages.map(() => revealCursor++);
@@ -217,7 +217,7 @@ function LifeDetailContent({
               const revealIndex = galleryRevealIndices[index];
               return (
                 <div
-                  key={`${resolveImageUrl(image.src, 'card')}-${index}`}
+                  key={`${resolveRawAssetUrl(image.src)}-${index}`}
                   className={styles.galleryItem}
                   onClick={(event) => openLightbox(index, event, 'gallery')}
                   onKeyDown={(event) => handleGalleryKeyDown(event, index, openLightbox)}
@@ -234,8 +234,6 @@ function LifeDetailContent({
                   <LazyImage
                     src={image.src}
                     alt={image.caption || `${item.title} gallery ${index + 1}`}
-                    quality="medium"
-                    preset="card"
                   />
                   <div className={styles.galleryOverlay} />
                   <div className={styles.galleryCornerTL} />

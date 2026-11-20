@@ -10,19 +10,12 @@ const remotePatterns = require('./config/image-hosts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  distDir: process.env.NEXT_BUILD_DIR || '.next',
-  // Allow accessing the dev server via the local hosts alias (scripts/dev-host-setup).
-  // COS bucket cdn.arsvine.com only accepts Referer matching *.arsvine.com, so we
-  // browse dev via dev.arsvine.com:3000 instead of localhost during development.
-  allowedDevOrigins: ['dev.arsvine.com', '127.0.0.1', 'localhost'],
+  agentRules: true,
+  output: 'standalone',
+  experimental: { isrFlushToDisk: false },
+  cacheMaxMemorySize: 16 * 1024 * 1024,
   images: {
     remotePatterns,
-  },
-  webpack: (config, { dev }) => {
-    if (!dev && process.platform === 'win32') {
-      config.cache = false;
-    }
-    return config;
   },
 };
 

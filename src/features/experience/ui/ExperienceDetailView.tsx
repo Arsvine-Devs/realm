@@ -3,7 +3,7 @@ import React from 'react';
 import styles from '../styles/ExperienceDetailView.module.scss';
 import Lightbox from '../../../shared/ui/Lightbox';
 import useGalleryLightbox from '@/shared/hooks/useGalleryLightbox';
-import { resolveImageUrl } from '@/shared/lib/cdn';
+import { resolveRawAssetUrl } from '@/shared/lib/media';
 import type { ExperienceItem, GalleryImage } from '../../../shared/types';
 
 const ExperienceDetailView = ({ item }: { item: ExperienceItem | null }) => {
@@ -78,7 +78,7 @@ const ExperienceDetailView = ({ item }: { item: ExperienceItem | null }) => {
                 ref={bindThumbnailRef(`thumb_${imgIndex}`)}
               >
                 <img
-                  src={resolveImageUrl(img.src, 'card')}
+                  src={resolveRawAssetUrl(img.src)}
                   alt={img.caption || `${title} thumbnail ${imgIndex + 1}`}
                   className={styles.thumbnailImage}
                 />

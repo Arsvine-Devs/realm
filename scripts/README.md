@@ -10,4 +10,4 @@
 - 部署和数据库流程：[`docs/human/OPERATIONS.md`](../docs/human/OPERATIONS.md)
 - AI 安全规则：[`AGENTS.md`](./AGENTS.md)
 
-一次性媒体和字体工具保持独立。没有明确授权时，不要运行发布 COS 资产或修改数据库的命令。
+媒体发布和数据库变更通过获得授权的运维流程执行。

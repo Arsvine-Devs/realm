@@ -2,27 +2,26 @@
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { serialize } from 'next-mdx-remote/serialize';
-import BlogPostClient from '@/features/blog/ui/blog/BlogPostClient';
+import { compileMDX } from 'next-mdx-remote/rsc';
+import BlogPostPage from '@/features/blog/ui/blog/BlogPostPage';
+import MDXComponents from '@/features/blog/ui/mdx/MDXComponents';
 import {
   getAllPostsForLocale,
   getAvailablePostContentLocales,
   getBlogPostEntry,
   getPostBySlugAndLocale,
   getPostMetaBySlugAndLocale,
-  getPostSlugs,
   getProtectedPostPublicMeta,
   normalizeAccess,
 } from '@/features/blog/server/blog';
 import { loadMessages } from '@/app/i18n/data';
-import { locales, type Locale } from '@/app/i18n/config';
+import type { Locale } from '@/app/i18n/config';
 import { localizedMetadata } from '@/app/metadata';
 
 export const revalidate = 300;
 export const dynamicParams = true;
-export async function generateStaticParams() {
-  const slugs = await getPostSlugs();
-  return slugs.flatMap((slug) => locales.map((locale) => ({ locale, slug })));
+export function generateStaticParams() {
+  return [];
 }
 
 export async function generateMetadata({
@@ -71,7 +70,7 @@ export default async function BlogPost({
     const access = normalizeAccess(entry.access);
     if (access.mode !== 'public') {
       return (
-        <BlogPostClient
+        <BlogPostPage
           locale={locale}
           messages={messages}
           meta={getProtectedPostPublicMeta(metaResult.meta)}
@@ -88,12 +87,18 @@ export default async function BlogPost({
       );
     }
     const post = await getPostBySlugAndLocale(slug, locale);
+    const { content: initialBody } = await compileMDX({
+      source: post.content,
+      components: MDXComponents,
+      options: { blockJS: true },
+    });
     return (
-      <BlogPostClient
+      <BlogPostPage
         locale={locale}
         messages={messages}
         meta={post.meta}
-        mdxSource={await serialize(post.content)}
+        mdxSource={null}
+        initialBody={initialBody}
         allPosts={allPosts}
         translationStatus={post.translationStatus}
         actualLocale={post.actualLocale}

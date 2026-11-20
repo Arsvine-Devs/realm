@@ -1,5 +1,5 @@
 import type { PublicCatalogStaticAsset } from './catalog-provider';
-import { isCatalogAssetReference, managedAsset } from '@/shared/lib/cdn';
+import { isCatalogAssetReference, managedAsset } from '@/shared/lib/media';
 
 export function hydrateCatalogAssets<T>(
   value: T,

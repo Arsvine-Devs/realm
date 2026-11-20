@@ -1,0 +1,21 @@
+name: Web builds
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [preview, production]
+        default: preview
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: Arsvine-Devs/platform/.github/workflows/build-web.yml@main
+    with:
+      environment: ${{ inputs.environment || 'production' }}

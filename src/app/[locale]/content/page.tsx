@@ -5,6 +5,7 @@ import { hydrateCatalogAssets } from '@/features/assets/server/catalog/hydrate-c
 import { loadExperience, loadLife, loadMessages, loadProjects, loadSkills } from '@/app/i18n/data';
 import type { Locale } from '@/app/i18n/config';
 import { localizedMetadata } from '@/app/metadata';
+import { connection } from 'next/server';
 
 export const revalidate = 300;
 
@@ -23,6 +24,7 @@ export async function generateMetadata({
 }
 
 export default async function Content({ params }: { params: Promise<{ locale: Locale }> }) {
+  await connection();
   const { locale } = await params;
   const [messages, blogPosts, catalogAssets] = await Promise.all([
     loadMessages(locale),

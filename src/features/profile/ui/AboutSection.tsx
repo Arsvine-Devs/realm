@@ -13,6 +13,8 @@ import { getVisitorLanguageLabel } from '../model/visitorLanguageLabel';
 import type { RefObject } from 'react';
 import { useNavigationRuntime } from '@/features/navigation/model/NavigationRuntime';
 
+const COPYRIGHT_YEAR = new Date().getFullYear();
+
 interface AboutSectionProps {
   aboutSectionRef: RefObject<HTMLDivElement | null>;
   aboutContentRef: RefObject<HTMLDivElement | null>;
@@ -31,10 +33,9 @@ export default function AboutSection({ aboutSectionRef, aboutContentRef }: About
   const locale = isLocale(queryLocale) ? queryLocale : defaultLocale;
   const formatVisitorCount = (value: number | null) =>
     value === null ? '--' : new Intl.NumberFormat(locale).format(value);
-  const currentYear = new Date().getFullYear();
   const yearRange =
-    currentYear > siteConfig.copyrightYearStart
-      ? `${siteConfig.copyrightYearStart}-${currentYear}`
+    COPYRIGHT_YEAR > siteConfig.copyrightYearStart
+      ? `${siteConfig.copyrightYearStart}-${COPYRIGHT_YEAR}`
       : `${siteConfig.copyrightYearStart}`;
   return (
     <div

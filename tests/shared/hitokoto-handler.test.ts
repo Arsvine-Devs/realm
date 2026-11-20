@@ -43,9 +43,7 @@ describe('/api/hitokoto', () => {
     expect(enforceRateLimitMock).toHaveBeenCalledWith('hitokoto:203.0.113.25', 30, 600_000);
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ text: '一言demo' });
-    expect(response.headers.get('Cache-Control')).toBe(
-      'public, s-maxage=300, stale-while-revalidate=3600',
-    );
+    expect(response.headers.get('Cache-Control')).toBe('public, max-age=60');
   });
 
   it('returns 429 with Retry-After and skips the upstream call when limited', async () => {

@@ -1,6 +1,5 @@
-export const serviceOrigins = Object.freeze({
-  realm: 'https://arsvine.com',
-  auth: 'https://auth.arsvine.com',
-  content: 'https://content.arsvine.com',
-  cdn: 'https://cdn.arsvine.com',
-});
+/**
+ * Realm adapter over the canonical @arsvine/site-config package.
+ * Fixed topology must not be overridden by dotenv.
+ */
+export { catalogNamespaces, serviceOrigins, siteConfig } from '@arsvine/site-config';

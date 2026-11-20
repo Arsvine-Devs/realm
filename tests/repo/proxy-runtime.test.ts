@@ -11,7 +11,8 @@ describe('proxy bare-path redirect', () => {
       }),
     );
 
-    expect(response.status).toBe(308);
+    expect(response.status).toBe(307);
+    expect(response.headers.get('cache-control')).toBe('private, no-store');
     expect(response.headers.get('Location')).toBe('https://arsvine.com/en/about');
     expect(response.headers.get('Vary')).toBe('Cookie, Accept-Language');
   });

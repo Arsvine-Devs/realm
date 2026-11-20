@@ -9,6 +9,7 @@ import type { Locale } from '@/shared/contracts/locale';
 
 const MIT_URL = 'https://opensource.org/license/mit/';
 const CC_URL = 'https://creativecommons.org/licenses/by-nc-nd/4.0/';
+const COPYRIGHT_YEAR = new Date().getFullYear();
 
 export interface CopyrightPageProps {
   locale: Locale;
@@ -19,10 +20,9 @@ export default function CopyrightPage({ locale }: CopyrightPageProps) {
   const t = useTranslations('pages.copyright');
   const [entered, setEntered] = useState(false);
   const shareItems = t.raw('shareItems') as string[];
-  const currentYear = new Date().getFullYear();
   const yearRange =
-    currentYear > siteConfig.copyrightYearStart
-      ? `${siteConfig.copyrightYearStart}–${currentYear}`
+    COPYRIGHT_YEAR > siteConfig.copyrightYearStart
+      ? `${siteConfig.copyrightYearStart}–${COPYRIGHT_YEAR}`
       : `${siteConfig.copyrightYearStart}`;
 
   // intro / contentLicense 的文案里有 {mitLink} / {ccLink} 占位符。

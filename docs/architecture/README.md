@@ -22,12 +22,13 @@ Realm 单仓库实现细节由 [`human/ARCHITECTURE.md`](../human/ARCHITECTURE.m
 
 ## 当前仓库
 
-| 工作区   | Git 仓库/分支                    | 当前基线                       | 系统角色                                   |
-| -------- | -------------------------------- | ------------------------------ | ------------------------------------------ |
-| Realm    | `Arsvine-Devs/realm` / `master`  | `07c761f` · `CURRENT` + `LIVE` | 主站、Realm 数据和资产工具                 |
-| Platform | `Arsvine-Devs/platform` / `main` | `4479147` · `CURRENT` + `LIVE` | Console、Auth、API、Content 和共享运行时包 |
+| 工作区   | Git 仓库/分支                          | 当前基线                                                  | 系统角色                             |
+| -------- | -------------------------------------- | --------------------------------------------------------- | ------------------------------------ |
+| Realm    | `Arsvine-Devs/realm` / `master`        | 源码 `17a809f` · `CURRENT`；生产 deployment SHA `UNKNOWN` | 主站、Realm 数据和资产工具           |
+| Platform | `Arsvine-Devs/platform` / `main`       | `4479147` · `CURRENT` + `LIVE`                            | Console、Auth、API、Content 和共享包 |
+| Ripple   | `Arsvine-Devs/ripple-website` / `main` | `LIVE`（`ripple.arsvine.com`）                            | 产品体验站与公开 music API           |
 
-当前 Vercel 团队 `arsvine-realm` 的核心项目为 `arsvine-realm`、`arsvine-admin`、`arsvine-auth`、`arsvine-api` 和 `arsvine-content`；`status.arsvine.com` 由 Better Stack 独立托管，不属于 Vercel 项目。
+当前 Vercel 团队 `arsvine-realm` 的核心项目为 `arsvine-realm`、`arsvine-admin`、`arsvine-auth`、`arsvine-api`、`arsvine-content` 和 `arsvine-ripple`；`status.arsvine.com` 由 Better Stack 独立托管。
 
 ## 保护范围
 

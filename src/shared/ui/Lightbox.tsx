@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import styles from './Lightbox.module.scss';
 import { useSafeTimeouts } from '@/shared/hooks/useSafeTimeouts';
-import { resolveAssetAlt, resolveImageUrl } from '@/shared/lib/cdn';
+import { resolveAssetAlt, resolveRawAssetUrl } from '@/shared/lib/media';
 import type { GalleryImage } from '@/shared/types';
 
 const SWIPE_THRESHOLD = 50;
@@ -80,7 +80,7 @@ const Lightbox = ({
       }
     }
 
-    const imageUrl = resolveImageUrl(image.src, 'large');
+    const imageUrl = resolveRawAssetUrl(image.src);
     const isNavigation = prevSrcRef.current && prevSrcRef.current !== imageUrl;
     prevSrcRef.current = imageUrl;
 
@@ -336,7 +336,7 @@ const Lightbox = ({
 
         <img
           ref={imageRef}
-          src={resolveImageUrl(image.src, 'large')}
+          src={resolveRawAssetUrl(image.src)}
           alt={resolveAssetAlt(image.src, image.caption || 'Lightbox image')}
           className={styles.lightboxImage}
           style={{ willChange: 'transform, opacity' }}

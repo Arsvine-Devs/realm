@@ -95,16 +95,16 @@ grant check 和 variant load 必须保留在 `blogPostState.ts` 的 invoked acto
 
 ## 限流
 
-`/api/protected-verify` 使用 client + group key，当前限制为每分钟 5 次。revalidation endpoint 也有独立限流。
+`/api/protected-verify` 按客户端地址和文章分组计数，每组每分钟最多验证 5 次。
 
-优先使用 Upstash Redis：
+使用本机 Valkey 时，在 `.env.local` 填写连接地址和开发环境专用的键前缀。
 
 ```env
-UPSTASH_REDIS_REST_URL=...
-UPSTASH_REDIS_REST_TOKEN=...
+REDIS_URL=redis://127.0.0.1:6379/2
+REDIS_KEY_PREFIX=realm:local:
 ```
 
-没有 Redis 或 Redis 失败时，系统 fail-open 到进程内 fixed-window `Map`，同时记录错误。该 fallback 不具备 serverless 多实例一致性。
+未设置 `REDIS_URL` 时，Realm 使用进程内的固定窗口计数。Valkey 请求失败时，Realm 记录错误，并使用同一进程内的计数方式。
 
 ## 访客统计
 

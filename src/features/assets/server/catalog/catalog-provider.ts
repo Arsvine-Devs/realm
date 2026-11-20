@@ -1,26 +1,13 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import COS from 'cos-nodejs-sdk-v5';
 import { readEnv } from '@/shared/config/env-provider';
 import { parseCatalogSection } from './catalog-validator';
 
-const PROJECT_NAMESPACE = 'realm';
-const DEFAULT_PRIVATE_ROOT = path.join(
-  /* turbopackIgnore: true */ process.cwd(),
-  'dist',
-  'cos-upload',
-  'private-root',
-);
+const CATALOG_DIRECTORY = 'realm/catalog';
 const DEFAULT_WORKS_PAGE_SIZE = 12;
 
 type CatalogSectionName = 'home' | 'works' | 'collections' | 'links' | 'audio' | 'static-assets';
 type CatalogStatus = 'published' | 'draft' | 'hidden';
-
-interface CatalogCurrentPointer {
-  version?: string;
-  current?: string;
-  path?: string;
-}
 
 interface CatalogImageRecord {
   id: string;
@@ -89,118 +76,44 @@ interface CatalogCollectionsFile {
   items?: CatalogImageRecord[];
 }
 
-function readJson<T>(raw: string): T {
-  return JSON.parse(raw) as T;
-}
-
-function normalizePrefix(prefix = readEnv('COS_PRIVATE_CATALOG_PREFIX') || '') {
-  return prefix.replace(/^\/+|\/+$/g, '');
-}
-
-function buildCatalogKey(relativeKey: string) {
-  const prefix = normalizePrefix();
-  return prefix ? `${prefix}/${relativeKey}` : relativeKey;
-}
-
-function getCosClient() {
-  const secretId = readEnv('COS_SECRET_ID');
-  const secretKey = readEnv('COS_SECRET_KEY');
-  if (!secretId || !secretKey) {
-    return null;
+function readCatalogFile(key: string) {
+  const root = readEnv('REALM_CATALOG_ROOT');
+  if (!root || !path.isAbsolute(root)) {
+    throw new Error('REALM_CATALOG_ROOT must name the absolute private media directory');
   }
-
-  return new COS({
-    SecretId: secretId,
-    SecretKey: secretKey,
-  });
+  return readFile(path.join(/* turbopackIgnore: true */ root, CATALOG_DIRECTORY, key), 'utf-8');
 }
 
-async function readCosObjectText(key: string) {
-  const bucket = readEnv('COS_PRIVATE_BUCKET');
-  const region = readEnv('COS_PRIVATE_REGION');
-  const client = getCosClient();
-  if (!bucket || !region || !client) {
-    return null;
+async function loadCurrentVersion() {
+  const location = readEnv('REALM_CATALOG_POINTER');
+  if (!location || !path.isAbsolute(location)) {
+    throw new Error('REALM_CATALOG_POINTER must name the absolute current Catalog pointer');
   }
-
-  const result = await client.getObject({
-    Bucket: bucket,
-    Region: region,
-    Key: key,
-  });
-
-  const body = result.Body;
-  if (typeof body === 'string') {
-    return body;
-  }
-  if (Buffer.isBuffer(body)) {
-    return body.toString('utf-8');
-  }
-  if (ArrayBuffer.isView(body)) {
-    const view = body as Uint8Array;
-    return Buffer.from(view.buffer, view.byteOffset, view.byteLength).toString('utf-8');
-  }
-
-  return null;
-}
-
-async function readLocalObjectText(key: string) {
-  const localRoot =
-    process.env.NODE_ENV === 'test' && readEnv('COS_PRIVATE_LOCAL_ROOT')
-      ? readEnv('COS_PRIVATE_LOCAL_ROOT')!
-      : DEFAULT_PRIVATE_ROOT;
-  const fullPath = path.join(/* turbopackIgnore: true */ localRoot, ...key.split('/'));
-  return readFile(fullPath, 'utf-8');
-}
-
-function extractCurrentVersion(pointer: CatalogCurrentPointer | string) {
-  if (typeof pointer === 'string') {
-    return pointer.replace(/\/+$/, '').split('/').pop() || pointer;
-  }
-  return (
-    pointer.version || pointer.current || pointer.path?.replace(/\/+$/, '').split('/').pop() || null
-  );
-}
-
-function isCatalogVersion(value: string): boolean {
-  return /^\d{8}T\d{6}Z$/.test(value);
-}
-
-async function loadCurrentVersion(read: (relativeKey: string) => Promise<string | null>) {
-  const currentRaw = await read(`${PROJECT_NAMESPACE}/catalog/current.json`);
-  if (currentRaw == null) return null;
-  const current = readJson<CatalogCurrentPointer | string>(currentRaw);
-  const version = extractCurrentVersion(current);
-  if (!version || !isCatalogVersion(version)) {
-    throw new Error('Catalog current.json does not contain a version pointer');
-  }
-  return version;
-}
-
-async function loadSection(section: CatalogSectionName) {
-  const readRemote = (relativeKey: string) => readCosObjectText(buildCatalogKey(relativeKey));
-  const readLocal = (relativeKey: string) => readLocalObjectText(buildCatalogKey(relativeKey));
-  const loadFrom = async (read: (relativeKey: string) => Promise<string | null>) => {
-    const version = await loadCurrentVersion(read);
-    if (!version) return null;
-    const raw = await read(`${PROJECT_NAMESPACE}/catalog/versions/${version}/${section}.json`);
-    if (raw == null) return null;
-    return parseCatalogSection(section, raw);
+  const pointer = JSON.parse(await readFile(/* turbopackIgnore: true */ location, 'utf-8')) as {
+    version?: unknown;
   };
-
-  try {
-    const remote = await loadFrom(readRemote);
-    if (remote != null) return remote;
-  } catch (error) {
-    console.warn(
-      `[catalog] remote ${section} is invalid; using local fallback:`,
-      (error as Error).message,
-    );
+  if (typeof pointer?.version !== 'string' || !/^\d{8}T\d{6}Z$/.test(pointer.version)) {
+    throw new Error('Catalog current.json does not contain a valid version pointer');
   }
+  return pointer.version;
+}
 
-  const local = await loadFrom(readLocal);
-  if (local == null) throw new Error(`[catalog] ${section} is unavailable remotely and locally`);
-  return local;
+async function loadSection(section: CatalogSectionName, version?: string) {
+  const current = version ?? (await loadCurrentVersion());
+  return parseCatalogSection(section, await readCatalogFile(`versions/${current}/${section}.json`));
+}
+
+export async function checkCatalogReady() {
+  const version = await loadCurrentVersion();
+  const sections: CatalogSectionName[] = [
+    'home',
+    'works',
+    'collections',
+    'links',
+    'audio',
+    'static-assets',
+  ];
+  await Promise.all(sections.map((section) => loadSection(section, version)));
 }
 
 function isPublished(status?: CatalogStatus) {
@@ -341,7 +254,7 @@ export async function getAudioAssets() {
 }
 
 export async function getStaticCatalogAssets(): Promise<Record<string, PublicCatalogStaticAsset>> {
-  if (!readEnv('COS_PRIVATE_BUCKET') || !readEnv('COS_PRIVATE_REGION') || !getCosClient()) {
+  if (!readEnv('REALM_CATALOG_ROOT')) {
     return {};
   }
 

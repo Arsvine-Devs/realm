@@ -1,7 +1,8 @@
 import { createHmac } from 'node:crypto';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { readEnv } from '@/shared/config/env-provider';
 import { locales } from '@/shared/contracts/locale';
+import { PUBLIC_CONTENT_CACHE_TAG } from '@/shared/lib/content/content-api';
 import { getAssetRevalidationPaths as getPortfolioPaths } from '@/features/portfolio/contracts/data';
 import { getAssetRevalidationPaths as getLifePaths } from '@/features/life/contracts/data';
 import { jsonResponse, secureStringEqual } from '@/shared/server/http';
@@ -9,12 +10,10 @@ import { jsonResponse, secureStringEqual } from '@/shared/server/http';
 const MAX_TIMESTAMP_SKEW_MS = 5 * 60 * 1000;
 const TIMESTAMP_HEADER = 'x-arsvine-timestamp';
 const SIGNATURE_HEADER = 'x-arsvine-signature';
-const POST_RESOURCE_PATTERN = /^posts:([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 
 type RevalidationEvent = {
   event: 'content.published' | 'assets.published';
   releaseId: string;
-  resources: string[];
   timestamp: string;
 };
 
@@ -34,6 +33,7 @@ function readTimestamp(value: string | null) {
 
 function readEvent(value: unknown): RevalidationEvent | null {
   if (!isRecord(value)) return null;
+  if (Object.keys(value).length !== 3) return null;
   const event = value.event;
   if (event !== 'content.published' && event !== 'assets.published') return null;
   if (
@@ -42,30 +42,12 @@ function readEvent(value: unknown): RevalidationEvent | null {
   ) {
     return null;
   }
-  if (
-    !Array.isArray(value.resources) ||
-    value.resources.length > 256 ||
-    value.resources.some((resource) => typeof resource !== 'string')
-  ) {
-    return null;
-  }
-  const resources = value.resources as string[];
-  if (
-    event === 'content.published' &&
-    resources.some((resource) => resource !== 'tweets' && !POST_RESOURCE_PATTERN.test(resource))
-  ) {
-    return null;
-  }
-  if (event === 'assets.published' && resources.some((resource) => resource !== 'assets')) {
-    return null;
-  }
   if (typeof value.timestamp !== 'string' || !Number.isFinite(Date.parse(value.timestamp))) {
     return null;
   }
   return {
     event,
     releaseId: value.releaseId,
-    resources,
     timestamp: value.timestamp,
   };
 }
@@ -83,27 +65,14 @@ function verifyRequest(request: Request, rawBody: string) {
   return secureStringEqual(signature, expected);
 }
 
-function pathsForEvent(event: RevalidationEvent) {
+function assetPaths() {
   const paths = new Set<string>();
-  if (event.event === 'assets.published') {
-    for (const locale of locales) {
-      paths.add(`/${locale}`);
-      paths.add(`/${locale}/content`);
-      paths.add(`/${locale}/friends`);
-      for (const path of getPortfolioPaths(locale)) paths.add(path);
-      for (const path of getLifePaths(locale)) paths.add(path);
-    }
-    return [...paths];
-  }
-
   for (const locale of locales) {
+    paths.add(`/${locale}`);
     paths.add(`/${locale}/content`);
-    paths.add(`/${locale}/tweets`);
-  }
-  for (const resource of event.resources) {
-    const match = POST_RESOURCE_PATTERN.exec(resource);
-    if (!match) continue;
-    for (const locale of locales) paths.add(`/${locale}/blog/${match[1]}`);
+    paths.add(`/${locale}/friends`);
+    for (const path of getPortfolioPaths(locale)) paths.add(path);
+    for (const path of getLifePaths(locale)) paths.add(path);
   }
   return [...paths];
 }
@@ -129,20 +98,24 @@ export default async function handler(request: Request) {
     return jsonResponse({ error: { code: 'STALE_EVENT' } }, { status: 401 });
   }
 
-  const paths = pathsForEvent(event);
-  const results = await Promise.allSettled(paths.map(async (path) => revalidatePath(path)));
+  const isContent = event.event === 'content.published';
+  const targets = isContent ? [PUBLIC_CONTENT_CACHE_TAG] : assetPaths();
+  const invalidate = isContent
+    ? (tag: string) => revalidateTag(tag, { expire: 0 })
+    : revalidatePath;
+  const results = await Promise.allSettled(targets.map(async (target) => invalidate(target)));
   const failed = results.flatMap((result, index) =>
-    result.status === 'rejected' ? [paths[index]!] : [],
+    result.status === 'rejected' ? [targets[index]!] : [],
   );
   const response = {
     revalidated: failed.length === 0,
-    partial: failed.length > 0 && failed.length < paths.length,
+    partial: failed.length > 0 && failed.length < targets.length,
     releaseId: event.releaseId,
-    paths,
+    ...(isContent ? { tags: targets } : { paths: targets }),
     ...(failed.length > 0 ? { failed } : {}),
   };
   return jsonResponse(response, {
-    status: failed.length === paths.length ? 500 : 200,
+    status: failed.length === targets.length ? 500 : 200,
     headers: { 'Cache-Control': 'private, no-store' },
   });
 }

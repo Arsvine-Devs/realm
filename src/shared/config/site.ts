@@ -1,5 +1,5 @@
 import type { SiteAssets, SiteFonts, SiteLocale, SitePages } from '@/shared/types';
-import { authOrigin, cdnOrigin, contentOrigin, realmOrigin } from './site-endpoints';
+import { authOrigin, contentOrigin, realmOrigin } from './site-endpoints';
 
 /**
  * 站点集中配置 — 所有"我的"信息的单一信息源。
@@ -33,7 +33,6 @@ export interface SiteConfig {
   serviceOrigins: {
     auth: string;
     content: string;
-    cdn: string;
   };
   /** 版权起始年份 */
   copyrightYearStart: number;
@@ -73,7 +72,6 @@ export const siteConfig: SiteConfig = {
   serviceOrigins: {
     auth: authOrigin,
     content: contentOrigin,
-    cdn: cdnOrigin,
   },
   copyrightYearStart: 2026,
   metaTitle: 'ARSVINE REALM',
@@ -96,27 +94,9 @@ export const siteConfig: SiteConfig = {
     twitterImage: '/avatar_transparent.webp',
   },
   fonts: {
-    // 自有 CDN preconnect。所有访客都走 cdn.arsvine.com（腾讯云 COS 香港桶）：
-    //   - 国内：Google Fonts 基本不可达，CDN 是唯一可行选项
-    //   - 国外：HK COS 多 80-150ms 延迟，但保持单一字体源更简单可靠
-    cdnPreconnect: [{ href: cdnOrigin, crossOrigin: 'anonymous' }],
-    // 真理之源：所有字体 family + 权重都在这一行配置。
-    // - Dosis: 300/400/500 (HUD UI 文字主力)
-    // - Noto Sans SC: 300/400/500/700 (中文正文 + 部分粗体)
-    // - Noto Serif SC: 400/700 (MDX 博客阅读体；500 实际未用，已裁掉)
-    //
-    // 改完这一行后必须运行：
-    //   node scripts/fetch-google-fonts.mjs       # 抓取并改写 CSS
-    //   然后按 docs/human/ASSETS.md 通过 COSCLI 发布到 COS
-    //
-    // 注意：本字段不再直接被 <link rel="stylesheet"> 使用，仅作为脚本的输入。
-    // 浏览器实际加载的是 cdnStylesheet。
     googleStylesheet:
       'https://fonts.googleapis.com/css2?family=Dosis:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700&display=swap',
-    // 对应 COS 上的改写版 CSS。fetch-google-fonts.mjs 会解析 Google 返回的 CSS、
-    // 下载每段 unicode-range 的 woff2、把 url 改写为
-    // cdn.arsvine.com/shared/fonts/<family>/<file>。
-    cdnStylesheet: `${cdnOrigin}/shared/fonts/google-fonts.css`,
+    mediaStylesheet: '/media/shared/fonts/google-fonts.css',
   },
   locale: {
     htmlLang: 'zh',
