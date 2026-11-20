@@ -1,4 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { resolve } from 'node:path';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   getAudioAssets,
   getCollectionAssets,
@@ -6,32 +7,18 @@ import {
   getWorksAssets,
 } from '@/features/assets/server/catalog/catalog-provider';
 
-const previousEnv = {
-  COS_PRIVATE_BUCKET: process.env.COS_PRIVATE_BUCKET,
-  COS_PRIVATE_REGION: process.env.COS_PRIVATE_REGION,
-  COS_SECRET_ID: process.env.COS_SECRET_ID,
-  COS_SECRET_KEY: process.env.COS_SECRET_KEY,
-  COS_PRIVATE_CATALOG_PREFIX: process.env.COS_PRIVATE_CATALOG_PREFIX,
-  COS_PRIVATE_LOCAL_ROOT: process.env.COS_PRIVATE_LOCAL_ROOT,
-};
-
 describe('catalog provider', () => {
   beforeEach(() => {
-    process.env.COS_PRIVATE_BUCKET = '';
-    process.env.COS_PRIVATE_REGION = '';
-    process.env.COS_SECRET_ID = '';
-    process.env.COS_SECRET_KEY = '';
-    process.env.COS_PRIVATE_CATALOG_PREFIX = '';
-    process.env.COS_PRIVATE_LOCAL_ROOT = 'tests/fixtures/private-root';
+    const root = resolve('tests/fixtures/private-root');
+    vi.stubEnv('REALM_CATALOG_ROOT', root);
+    vi.stubEnv('REALM_CATALOG_POINTER', resolve(root, 'realm/catalog/current.json'));
   });
 
-  afterEach(() => {
-    process.env.COS_PRIVATE_BUCKET = previousEnv.COS_PRIVATE_BUCKET;
-    process.env.COS_PRIVATE_REGION = previousEnv.COS_PRIVATE_REGION;
-    process.env.COS_SECRET_ID = previousEnv.COS_SECRET_ID;
-    process.env.COS_SECRET_KEY = previousEnv.COS_SECRET_KEY;
-    process.env.COS_PRIVATE_CATALOG_PREFIX = previousEnv.COS_PRIVATE_CATALOG_PREFIX;
-    process.env.COS_PRIVATE_LOCAL_ROOT = previousEnv.COS_PRIVATE_LOCAL_ROOT;
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('reports a missing current pointer without falling back to a different release', async () => {
+    vi.stubEnv('REALM_CATALOG_POINTER', resolve('tests/fixtures/missing-pointer.json'));
+    await expect(getAudioAssets()).rejects.toMatchObject({ code: 'ENOENT' });
   });
 
   it('returns only published audio records in stable order', async () => {

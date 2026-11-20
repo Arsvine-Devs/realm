@@ -1,5 +1,5 @@
 {
-  "path": ["../src", "../scripts", "../server.js", "../next.config.js"],
+  "path": ["../src", "../scripts", "../next.config.js"],
   "pattern": "**/*.{ts,tsx,js,mjs}",
   "ignore": ["**/contracts/data/**", "**/contracts/friendLinks/**", "**/contracts/skills/**"],
   "minTokens": 80,

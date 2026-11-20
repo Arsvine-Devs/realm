@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { buildManagedAssetUrl, normalizeCdnBase } from '@/shared/lib/cdn';
+import { buildManagedAssetUrl, PUBLIC_MEDIA_PATH } from '@/shared/lib/media';
 
 const SITE_ASSET_KEYS = [
   'site/about-qr',
@@ -42,17 +42,8 @@ function isValidRecord(value: unknown): value is SiteAssetRecord {
   );
 }
 
-export function getSiteAssetManifestUrl(base: string, version: string) {
-  const url = new URL(`${base}/realm/site-catalog/versions/${version}/assets.json`);
-
-  // EdgeOne can retain a pre-CORS response for an immutable manifest path.
-  // Keep every site origin in a separate cache namespace so a stale header
-  // variant cannot block production, beta, or local development clients.
-  if (typeof window !== 'undefined') {
-    url.searchParams.set('cors-origin', window.location.origin);
-  }
-
-  return url.toString();
+export function getSiteAssetManifestUrl(version: string) {
+  return `${PUBLIC_MEDIA_PATH}/realm/site-catalog/versions/${version}/assets.json`;
 }
 
 export function SiteAssetsProvider({ children }: { children: ReactNode }) {
@@ -62,15 +53,17 @@ export function SiteAssetsProvider({ children }: { children: ReactNode }) {
     const controller = new AbortController();
     const load = async () => {
       try {
-        const base = normalizeCdnBase();
-        const pointerResponse = await fetch(`${base}/realm/site-catalog/current.json`, {
-          signal: controller.signal,
-          cache: 'no-cache',
-        });
+        const pointerResponse = await fetch(
+          `${PUBLIC_MEDIA_PATH}/realm/site-catalog/current.json`,
+          {
+            signal: controller.signal,
+            cache: 'no-cache',
+          },
+        );
         if (!pointerResponse.ok) return;
         const pointer = (await pointerResponse.json()) as { version?: string };
         if (!pointer.version || !/^\d{8}T\d{6}Z$/.test(pointer.version)) return;
-        const manifestResponse = await fetch(getSiteAssetManifestUrl(base, pointer.version), {
+        const manifestResponse = await fetch(getSiteAssetManifestUrl(pointer.version), {
           signal: controller.signal,
         });
         if (!manifestResponse.ok) return;

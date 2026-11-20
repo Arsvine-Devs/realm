@@ -1,9 +1,9 @@
-FROM node:24-bookworm-slim AS build
+FROM node:26.13.1-bookworm-slim AS build
 
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 
-RUN corepack enable && corepack prepare pnpm@11.17.0 --activate
+RUN npm install --global pnpm@12.21.0
 
 WORKDIR /app
 
@@ -15,16 +15,19 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 RUN pnpm build
-RUN pnpm prune --prod
 
-FROM node:24-bookworm-slim AS runner
+FROM node:26.13.1-bookworm-slim AS runner
 
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
 WORKDIR /app
 
-COPY --from=build /app ./
+COPY --from=build --chown=node:node /app/.next/standalone ./
+COPY --from=build --chown=node:node /app/.next/static ./.next/static
+COPY --from=build --chown=node:node /app/public ./public
+USER node
 
 EXPOSE 3000
 

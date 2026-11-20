@@ -241,11 +241,6 @@ export async function getBlogPostEntry(slug: string) {
   return getBlogIndexEntry(slug);
 }
 
-export async function getPostSlugs(): Promise<string[]> {
-  const index = await fetchPublishedBlogIndex();
-  return index.posts.map((post) => post.slug);
-}
-
 export async function getAvailablePostContentLocales(slug: string): Promise<BlogContentLocale[]> {
   const entry = await getBlogIndexEntry(slug);
   if (!entry) return [];

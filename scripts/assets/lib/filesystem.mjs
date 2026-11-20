@@ -1,4 +1,4 @@
-import { mkdir, readdir, rm } from 'node:fs/promises';
+import { readdir } from 'node:fs/promises';
 import path from 'node:path';
 
 export function toPosix(value) {
@@ -17,9 +17,4 @@ export async function walkFiles(root) {
     }
   }
   return files;
-}
-
-export async function ensureEmptyDir(targetPath) {
-  await rm(targetPath, { recursive: true, force: true });
-  await mkdir(targetPath, { recursive: true });
 }

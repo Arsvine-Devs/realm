@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import styles from '../../styles/Explain.module.scss';
 import { useResponsive } from '@/shared/hooks/useMediaQuery';

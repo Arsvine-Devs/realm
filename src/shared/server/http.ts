@@ -44,12 +44,12 @@ export function secureStringEqual(left: string, right: string) {
   return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer);
 }
 
-function isProxyTrusted() {
+export function isProxyTrusted() {
   const configured = readEnv('TRUST_PROXY')?.toLowerCase();
   if (configured) {
     return configured === '1' || configured === 'true' || configured === 'yes';
   }
-  return process.env.VERCEL === '1';
+  return false;
 }
 
 export function getClientAddress(request: Request) {

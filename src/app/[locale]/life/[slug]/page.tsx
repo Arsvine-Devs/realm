@@ -4,15 +4,13 @@ import LifeDetailPage from '@/features/life/ui/LifeDetailPage';
 import { getStaticCatalogAssets } from '@/features/assets/server/catalog/catalog-provider';
 import { hydrateCatalogAssets } from '@/features/assets/server/catalog/hydrate-catalog-assets';
 import { loadLife, loadMessages, resolveLifeItem } from '@/app/i18n/data';
-import { defaultLocale, locales, type Locale } from '@/app/i18n/config';
+import { type Locale } from '@/app/i18n/config';
 import { localizedMetadata } from '@/app/metadata';
 
 export const revalidate = 300;
 export const dynamicParams = false;
 export function generateStaticParams() {
-  const base = loadLife(defaultLocale);
-  const slugs = [...base.gameData, ...base.travelData, ...base.otherData].map((item) => item.id);
-  return locales.flatMap((locale) => slugs.map((slug) => ({ locale, slug })));
+  return [];
 }
 
 export async function generateMetadata({

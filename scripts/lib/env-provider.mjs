@@ -10,12 +10,6 @@ export function readEnv(name, source = process.env) {
   return normalized || undefined;
 }
 
-export function requiredEnv(name, source = process.env) {
-  const value = readEnv(name, source);
-  if (!value) throw new Error(`Missing ${name}`);
-  return value;
-}
-
 export function readEnvList(name, source = process.env) {
   const value = readEnv(name, source);
   if (!value) return undefined;

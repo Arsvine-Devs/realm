@@ -2,9 +2,8 @@
   <h1>ARSVINE REALM</h1>
   <p>
     <a href="https://github.com/Arsvine-Devs/realm/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Arsvine-Devs/realm/actions/workflows/ci.yml/badge.svg" /></a>
-    <a href="https://nodejs.org/"><img alt="Node.js 24.x" src="https://img.shields.io/badge/Node.js-24.x-339933?logo=node.js&logoColor=white" /></a>
+    <a href="https://nodejs.org/"><img alt="Node.js 26.x" src="https://img.shields.io/badge/Node.js-26.x-339933?logo=node.js&logoColor=white" /></a>
     <a href="https://nextjs.org/"><img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white" /></a>
-    <a href="https://arsvine.com"><img alt="Deployed on Vercel" src="https://img.shields.io/badge/deployed%20on-Vercel-000000?logo=vercel&logoColor=white" /></a>
     <a href="./LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-2f855a.svg" /></a>
   </p>
   <p><em>记录项目、文字、实验以及仍在成形中的事物的个人档案终端。</em></p>
@@ -31,7 +30,7 @@ English: personal HUD-style portfolio and blog for Arsvine Zhu. Part of the Arsv
 - 带自适应性能能力的桌面 Three.js 氛围层。
 - 音乐播放器、自定义光标、剧透控件和可访问的响应式交互。
 - 运行时受 TOTP 保护的文章；未授权静态输出不包含 protected body。
-- 使用不可变 hash 对象和 pointer-last 发布的腾讯 COS 媒体 Catalog。
+- 媒体位于站点 `/media/`，版本目录与当前发布指针由 VPS 文件系统管理。
 
 Blog 与 Tweet 的运行时内容统一来自 `content.arsvine.com` 的已发布 release。
 
@@ -65,4 +64,4 @@ Copy-Item .env.example .env.local
 
 ## 项目状态
 
-站点作为个人档案持续演进。生产应用运行在 Vercel，源码变更通过仓库质量门禁验证；本地检查不替代已认证的线上业务流程验收。
+站点作为个人档案持续演进。部署流程见 [Realm 运行与部署](docs/human/OPERATIONS.md)。

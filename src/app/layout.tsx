@@ -46,15 +46,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {process.env.NODE_ENV === 'production' ? (
           <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
         ) : null}
-        {siteConfig.fonts.cdnPreconnect.map((preconnect) => (
-          <link
-            key={preconnect.href}
-            rel="preconnect"
-            href={preconnect.href}
-            {...(preconnect.crossOrigin ? { crossOrigin: preconnect.crossOrigin } : {})}
-          />
-        ))}
-        <link href={siteConfig.fonts.cdnStylesheet} rel="stylesheet" />
+        <link href={siteConfig.fonts.mediaStylesheet} rel="stylesheet" />
         <DocumentBootstrapScript script={buildDocumentBootstrapScript()} />
       </head>
       <body>

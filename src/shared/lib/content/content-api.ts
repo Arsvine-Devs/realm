@@ -4,6 +4,7 @@ import { authOrigin, contentOrigin } from '@/shared/config/site-endpoints';
 
 const FETCH_TIMEOUT_MS = 8000;
 const PUBLIC_CONTENT_REVALIDATE_SECONDS = 300;
+export const PUBLIC_CONTENT_CACHE_TAG = 'published-content';
 const PROTECTED_SCOPE = 'content:protected:read';
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 
@@ -27,17 +28,43 @@ class ContentServiceError extends Error {
 
 const AUTH_TOKEN_PATH = '/api/auth/oauth2/token';
 
-function getBaseUrl() {
+function readOrigin(value: string, allowInternalHttp = false) {
   let url: URL;
   try {
-    url = new URL(contentOrigin);
+    url = new URL(value);
   } catch {
-    throw new ContentServiceError('Configured Content origin must be an absolute URL.');
+    throw new ContentServiceError('Configured service origin must be an absolute URL.');
   }
-  if (url.protocol !== 'https:' && !LOOPBACK_HOSTS.has(url.hostname)) {
-    throw new ContentServiceError('Configured Content origin must use HTTPS outside localhost.');
+  if (
+    (url.protocol !== 'https:' &&
+      (url.protocol !== 'http:' || (!allowInternalHttp && !LOOPBACK_HOSTS.has(url.hostname)))) ||
+    url.pathname !== '/' ||
+    url.username ||
+    url.password ||
+    url.search ||
+    url.hash
+  ) {
+    throw new ContentServiceError('Configured service origin must be an HTTP(S) origin.');
   }
-  return url.toString().replace(/\/$/, '');
+  return url.origin;
+}
+
+function getContentAudience() {
+  return readOrigin(readEnv('CONTENT_ORIGIN') ?? contentOrigin);
+}
+
+function getBaseUrl() {
+  const internalOrigin = readEnv('CONTENT_INTERNAL_ORIGIN');
+  return internalOrigin ? readOrigin(internalOrigin, true) : getContentAudience();
+}
+
+export async function checkContentReady() {
+  const response = await fetch(`${getBaseUrl()}/health/ready`, {
+    cache: 'no-store',
+    signal: AbortSignal.timeout(2000),
+  });
+  await response.body?.cancel();
+  if (!response.ok) throw new Error('Content service is not ready');
 }
 
 function getProtectedContentAuthConfig() {
@@ -46,16 +73,11 @@ function getProtectedContentAuthConfig() {
   if (!clientId || !clientSecret) {
     throw new ContentServiceError('Protected content service credentials are not configured.');
   }
-  let issuerUrl: URL;
-  try {
-    issuerUrl = new URL(authOrigin);
-  } catch {
-    throw new ContentServiceError('Configured Auth issuer must be an absolute URL.');
-  }
-  if (issuerUrl.protocol !== 'https:' && !LOOPBACK_HOSTS.has(issuerUrl.hostname)) {
-    throw new ContentServiceError('Configured Auth issuer must use HTTPS outside localhost.');
-  }
-  const tokenUrl = new URL(AUTH_TOKEN_PATH, issuerUrl).toString();
+  const internalOrigin = readEnv('AUTH_INTERNAL_ORIGIN');
+  const tokenOrigin = internalOrigin
+    ? readOrigin(internalOrigin, true)
+    : readOrigin(readEnv('AUTH_ORIGIN') ?? authOrigin);
+  const tokenUrl = new URL(AUTH_TOKEN_PATH, tokenOrigin).toString();
   return { tokenUrl, clientId, clientSecret };
 }
 
@@ -65,7 +87,7 @@ async function getProtectedContentToken() {
   }
 
   const { tokenUrl, clientId, clientSecret } = getProtectedContentAuthConfig();
-  const resource = new URL(getBaseUrl()).origin;
+  const resource = getContentAudience();
   const clientCredentials = Buffer.from(`${clientId}:${clientSecret}`, 'utf8').toString('base64');
   const response = await fetch(tokenUrl, {
     method: 'POST',
@@ -115,7 +137,9 @@ async function fetchContentJson<T>(
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     ...(options.protected
       ? { cache: 'no-store' as const }
-      : { next: { revalidate: PUBLIC_CONTENT_REVALIDATE_SECONDS } }),
+      : {
+          next: { revalidate: PUBLIC_CONTENT_REVALIDATE_SECONDS, tags: [PUBLIC_CONTENT_CACHE_TAG] },
+        }),
   });
   const body = (await response.json().catch(() => null)) as {
     error?: { code?: string; message?: string };

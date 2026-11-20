@@ -3,7 +3,7 @@ import { defaultLocale, isLocale, type Locale } from '@/shared/contracts/locale'
 const BYPASS_PREFIXES = [
   '/api',
   '/_next',
-  '/_vercel',
+  '/media',
   '/favicon.ico',
   '/apple-touch-icon.png',
   '/icons',

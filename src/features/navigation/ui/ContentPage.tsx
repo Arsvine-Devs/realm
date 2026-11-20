@@ -18,7 +18,7 @@ import ExperienceDetailView from '../../experience/ui/ExperienceDetailView';
 import LifeDetailView from '../../life/ui/LifeDetailView';
 
 import { buildBlogPostHref } from '../../blog/model/blogClient';
-import { resolveImageUrl } from '@/shared/lib/cdn';
+import { resolveRawAssetUrl } from '@/shared/lib/media';
 import { setHudTypingOverlaySuppressed } from '@/shared/lib/hud-typing-visibility';
 import { markCursorTargetsDirty } from '@/shared/lib/cursor-targets';
 import { siteConfig } from '@/shared/config/site';
@@ -223,7 +223,7 @@ export default function ContentPage({
 
   const handleWorkItemClick = useCallback(
     (item: Project) => {
-      const coverImg = resolveImageUrl(item.imageUrl, 'large');
+      const coverImg = resolveRawAssetUrl(item.imageUrl);
       if (coverImg) {
         const img = new Image();
         img.src = coverImg;
@@ -263,7 +263,7 @@ export default function ContentPage({
 
   const handleLifeItemClick = useCallback(
     (item: LifeItem) => {
-      const coverImg = resolveImageUrl(item.imageUrl, 'large');
+      const coverImg = resolveRawAssetUrl(item.imageUrl);
       if (coverImg) {
         const img = new Image();
         img.src = coverImg;

@@ -2,12 +2,8 @@
 
 [返回文档组](./README.md)
 
-跨仓拓扑、健康契约、Catalog 命名空间、身份范围和新站点清单的权威长文在文档站：
+公开请求经 Cloudflare 到 VPS 的 Caddy。Realm 使用 Next.js standalone 运行，Ripple 由 Caddy 提供静态文件。Realm 同源 `/media/` 只提供公开媒体，Ripple 从同源静态曲库读取媒体地址。
 
-- 契约：<https://docs.arsvine.com/reference>
-- 维护者内部说明：<https://docs.arsvine.com/internal>（Auth `owner`）
-- 源码：[`Arsvine-Devs/docs`](https://github.com/Arsvine-Devs/docs) 的 `content/reference` 与 `content/internal`
+Platform 的 Console 通过 Auth 登录，经同源 BFF 调用 API。API 持有 PostgreSQL 中的编辑数据，Content 提供已发布快照。Realm 从 Content 读取博客和动态，内容发布后 API 发送签名事件刷新页面。私有 Catalog、保护文章和数据库各自使用 VPS 私有路径。
 
-本仓库只保留 Realm 自己的实现说明，见 [`human/ARCHITECTURE.md`](../human/ARCHITECTURE.md)。固定 origin 以 `@arsvine/site-config` 为准。
-
-文档站尚未绑定生产域名。在此之前，以上路径是约定入口，不以本文件复制一份系统说明。
+服务地址和身份契约由 `@arsvine/site-config` 管理。部署、域名路由和探针由 VPS Web Ops 管理。Realm 的运行方式与媒体边界见 [运行与部署](../human/OPERATIONS.md) 和 [媒体与 Catalog](../human/ASSETS.md)。

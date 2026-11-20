@@ -3,6 +3,7 @@ import { getTweetMonthGroupsPage } from '@/features/tweets/server/content';
 import { loadMessages } from '@/app/i18n/data';
 import type { Locale } from '@/app/i18n/config';
 import { localizedMetadata } from '@/app/metadata';
+import { connection } from 'next/server';
 
 const INITIAL_MONTH_BATCH_SIZE = 1;
 export const revalidate = 300;
@@ -22,6 +23,7 @@ export async function generateMetadata({
 }
 
 export default async function Tweets({ params }: { params: Promise<{ locale: Locale }> }) {
+  await connection();
   const { locale } = await params;
   const messages = await loadMessages(locale);
   let monthGroups: TweetsPageProps['monthGroups'] = [];

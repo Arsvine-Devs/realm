@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import SectionPageLayout from '../../../app/shell/SectionPageLayout';
 import styles from '../styles/ProfileSections.module.scss';
 import type { Locale } from '@/shared/contracts/locale';
-import { resolveRawAssetUrl } from '@/shared/lib/cdn';
+import { resolveRawAssetUrl } from '@/shared/lib/media';
 import type { FriendLink, ServiceCredit } from '../../../shared/types';
 
 export interface FriendsPageProps {

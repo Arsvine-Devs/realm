@@ -30,7 +30,7 @@ ARSVINE REALM 是一个 Next.js App Router 应用，按 feature 组织源码，�
 
 ## 运行时边界
 
-- Vercel 使用标准 Next.js App Router 输出；`server.js` 只用于本地开发和可选自托管。
-- 公共媒体通过版本化 COS Catalog 解析；生成的 `dist/` 和 `cos-workspace/` 只是本地产物。
-- Blog/Tweet 运行时通过 `config/site-config.mjs` 中的 Content origin 读取已发布 release。
+- VPS 运行 Next.js 构建生成的 standalone 服务。
+- 公开媒体通过 `/media/` 提供，Realm 从私有文件目录读取版本化 Catalog。
+- Blog 与 Tweet 运行时从 Content 读取已发布版本。
 - Protected blog 正文只在 grant 验证后运行时获取。

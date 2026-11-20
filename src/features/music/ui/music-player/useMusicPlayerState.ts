@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { MusicTrack } from '@/features/music/contracts/musicTrack';
 import { MUSIC_PLAYER_STORAGE_KEY } from './constants';
 import { readPersistedPlayerStateFromStorage } from './persistence';
-import { buildManagedAssetUrl } from '@/shared/lib/cdn';
+import { buildManagedAssetUrl } from '@/shared/lib/media';
 
 interface UseMusicPlayerStateOptions {
   playlist: MusicTrack[];

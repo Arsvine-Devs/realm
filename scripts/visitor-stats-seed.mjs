@@ -1,4 +1,4 @@
-import { neon } from '@neondatabase/serverless';
+import { Client } from 'pg';
 import { loadProjectEnv, readEnv } from './lib/env-provider.mjs';
 
 loadProjectEnv();
@@ -29,11 +29,14 @@ if (!databaseUrl) {
   process.exit(1);
 }
 
-const sql = neon(databaseUrl);
-const rows = await sql`
+const client = new Client({ connectionString: databaseUrl });
+await client.connect();
+try {
+  const { rows } = await client.query(
+    `
   WITH baseline AS (
     INSERT INTO arsvine_visitor_baselines (baseline_name, added_visitors)
-    VALUES (${BASELINE_NAME}, ${total})
+    VALUES ($1, $2)
     ON CONFLICT (baseline_name) DO NOTHING
     RETURNING added_visitors
   )
@@ -44,18 +47,23 @@ const rows = await sql`
   RETURNING
     total_visitors,
     (SELECT COUNT(*) FROM baseline)::integer AS applied
-`;
+`,
+    [BASELINE_NAME, total],
+  );
 
-const row = rows[0];
-if (!row) {
-  console.error('[visitor-stats] totals row is missing; run pnpm db:migrate first');
-  process.exit(1);
+  const row = rows[0];
+  if (!row) {
+    console.error('[visitor-stats] totals row is missing; run pnpm db:migrate first');
+    throw new Error('Visitor totals row is missing');
+  }
+
+  if (Number(row.applied) === 1) {
+    console.log(`[visitor-stats] applied historical baseline: ${total}`);
+  } else {
+    console.log('[visitor-stats] historical baseline was already applied; no change made');
+  }
+
+  console.log(`[visitor-stats] total visitors: ${row.total_visitors}`);
+} finally {
+  await client.end();
 }
-
-if (Number(row.applied) === 1) {
-  console.log(`[visitor-stats] applied historical baseline: ${total}`);
-} else {
-  console.log('[visitor-stats] historical baseline was already applied; no change made');
-}
-
-console.log(`[visitor-stats] total visitors: ${row.total_visitors}`);

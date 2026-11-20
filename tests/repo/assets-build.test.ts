@@ -147,17 +147,13 @@ describe('assets build script', () => {
       /^realm\/audio\/2026\/07\/08\/demo-track\.[a-f0-9]{8}\.m4a$/,
     );
 
-    const currentRaw = await readFile(
-      path.join(distRoot, 'cos-upload', 'private-root', 'realm', 'catalog', 'current.next.json'),
-      'utf-8',
-    );
-    const current = JSON.parse(currentRaw) as { version: string };
+    const current = { version: (JSON.parse(manifestRaw) as { version: string }).version };
     expect(current.version).toMatch(/^\d{8}T\d{6}Z$/);
 
     const worksRaw = await readFile(
       path.join(
         distRoot,
-        'cos-upload',
+        'media',
         'private-root',
         'realm',
         'catalog',
@@ -175,7 +171,7 @@ describe('assets build script', () => {
     const staticAssetsRaw = await readFile(
       path.join(
         distRoot,
-        'cos-upload',
+        'media',
         'private-root',
         'realm',
         'catalog',
@@ -195,23 +191,10 @@ describe('assets build script', () => {
     expect(staticAssets.assets).not.toHaveProperty('posts/arsvine-realm-sceenshot-1.png');
     expect(staticAssets.assets).not.toHaveProperty('posts/arsvine-realm-sceenshot-2.png');
 
-    const publicPointerRaw = await readFile(
-      path.join(
-        distRoot,
-        'cos-upload',
-        'public-root',
-        'realm',
-        'site-catalog',
-        'current.next.json',
-      ),
-      'utf-8',
-    );
-    expect(JSON.parse(publicPointerRaw)).toEqual({ version: current.version });
-
     const publicAssetsRaw = await readFile(
       path.join(
         distRoot,
-        'cos-upload',
+        'media',
         'public-root',
         'realm',
         'site-catalog',

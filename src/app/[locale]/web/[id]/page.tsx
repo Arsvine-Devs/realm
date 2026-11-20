@@ -4,15 +4,13 @@ import WebDetailPage from '@/features/portfolio/ui/WebDetailPage';
 import { getStaticCatalogAssets } from '@/features/assets/server/catalog/catalog-provider';
 import { hydrateCatalogAssets } from '@/features/assets/server/catalog/hydrate-catalog-assets';
 import { loadMessages, loadProjects, resolveWebProject } from '@/app/i18n/data';
-import { defaultLocale, locales, type Locale } from '@/app/i18n/config';
+import { type Locale } from '@/app/i18n/config';
 import { localizedMetadata } from '@/app/metadata';
 
 export const revalidate = 300;
 export const dynamicParams = false;
 export function generateStaticParams() {
-  return locales.flatMap((locale) =>
-    loadProjects(defaultLocale).webProjects.map((project) => ({ locale, id: String(project.id) })),
-  );
+  return [];
 }
 
 export async function generateMetadata({

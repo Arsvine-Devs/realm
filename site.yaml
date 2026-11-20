@@ -1,0 +1,8 @@
+version: 1
+services:
+  - id: realm
+    runtime: node
+    production: { branch: master, hostname: arsvine.com }
+    health: /api/health/ready
+    capabilities: [postgres, valkey, oidc, private-catalog, public-media]
+    build: { type: next, directory: . }

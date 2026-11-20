@@ -152,34 +152,26 @@ pnpm vitest run tests/features/blog/blog-protected-rsc-contract.test.ts
 
 `502` 表示 Catalog 读取/验证失败，不等于空 Catalog。检查：
 
-- `COS_PRIVATE_BUCKET` / `REGION`；
-- 当前 Function credential；
-- private `realm/catalog/current.json`；
+- `REALM_CATALOG_ROOT` 的挂载路径及服务读权限；
+- `REALM_CATALOG_POINTER` 当前版本；
 - 对应 version section JSON；
-- `COS_PRIVATE_CATALOG_PREFIX`；
 - Catalog schema 与 objectKey。
 
 不要把失败转换成假 `200 []`，否则 UI 会把基础设施故障当成无内容。
 
-## 图片、音频或 manifest 在本地 `403`
+## 图片、音频或 manifest 请求失败
 
-COS Referer 通常拒绝 localhost。使用：
-
-```powershell
-scripts\dev-host-setup.cmd
-```
-
-如果 `dev.arsvine.com` 仍失败，检查 hosts、系统 proxy bypass、bucket Referer allowlist、CORS origin 和 CDN cache key 是否包含 `Origin`。
+检查请求路径和应用或媒体服务响应。媒体从公开 `/media/` 目录提供，Ripple 音频请求需要正确的 Range 和 CORS 响应。
 
 ## 新资产发布后页面仍旧
 
 检查顺序：
 
 1. public/private version object 是否存在；
-2. 两个 pointer 是否指向新 version；
+2. 公开和私有读取方是否在使用同一个当前版本指针；
 3. `/api/internal/revalidate` response 的 `failed`；
 4. ISR route 是否包含目标 detail；
-5. CDN 是否缓存了旧 public manifest；
+5. 公开 manifest 是否为当前版本；
 6. 数据中的 `catalogKey` 是否正确。
 
 不要删除旧 object，直到新版本全部验证。
@@ -189,14 +181,13 @@ scripts\dev-host-setup.cmd
 检查 response header：
 
 ```bash
-curl -I -H "Referer: https://arsvine.com/" https://cdn.arsvine.com/shared/fonts/google-fonts.css
+curl -I https://arsvine.com/media/shared/fonts/google-fonts.css
 ```
 
 常见原因：
 
-- COS Value 字段误填 `Cache-Control: ...`，形成重复 header name；
 - Content-Type 错误；
-- Referer/CORS 拒绝；
+- 样式表相对路径与公开字体文件不匹配；
 - 把 Latin-only `--font-display` 用于 CJK 或 accented text；
 - 误认为 variable font 相同 URL 是重复文件并手工拆分。
 
@@ -225,15 +216,9 @@ document.documentElement.dataset.performanceReason;
 
 移动端首次进入不应自动打开播放器；desktop delay 与 mobile guard 要同时保留。
 
-## Windows production build 异常
+## 生产构建异常
 
-`next.config.js` 在 Windows production 关闭 webpack cache，这是有意兼容。先清理由当前失败生成且确认可重建的 build output，再重跑；不要删除用户文件或 lockfile。
-
-可用 `NEXT_BUILD_DIR` 指向临时 build dir 诊断：
-
-```powershell
-$env:NEXT_BUILD_DIR='.next-diagnostic'; pnpm build
-```
+检查 `pnpm build` 输出。需要完整重建时，清理此前失败生成的 `.next` 目录后再构建。
 
 ## Revalidation 返回 `401`、`422` 或 partial
 

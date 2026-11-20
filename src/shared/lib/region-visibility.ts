@@ -5,7 +5,7 @@
  * 不参与权限/安全决策；未知 country 一律按"显示"处理。
  *
  * 数据流：
- *   1. proxy.ts 读 Vercel geolocation → 写 GEO_COUNTRY cookie
+ *   1. proxy.ts 根据可信入口转发的国家码写 GEO_COUNTRY cookie
  *   2. 根布局的 bootstrap 脚本在 hydration 前读 cookie → `<html data-country data-x-blocked data-bilibili-blocked>`
  *   3. globals.scss 用 `html[data-x-blocked] [data-hide-when-x-blocked]` 等规则直接隐藏
  *   4. 语言展示与地区可见性分离：UI 若要显示语言代码，改走 useVisitorLanguageCode hook

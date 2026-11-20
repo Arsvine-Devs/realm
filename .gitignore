@@ -18,6 +18,7 @@ package-lock.json
 
 # Deployment
 dist/
+media-workspace/
 
 # Misc
 .DS_Store

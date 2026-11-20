@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './ProjectCard.module.scss';
-import { resolveImageUrl } from '@/shared/lib/cdn';
+import { resolveRawAssetUrl } from '@/shared/lib/media';
 import type { KeyboardEvent, MouseEvent } from 'react';
 import type { AssetReference } from '@/shared/types';
 
@@ -45,7 +45,7 @@ function ProjectCard<T extends ProjectCardItem>({
   } = project;
 
   const resolvedImageUrl = isInverted && invertedImageUrl ? invertedImageUrl : imageUrl;
-  const backgroundImageUrl = resolveImageUrl(resolvedImageUrl, 'card');
+  const backgroundImageUrl = resolveRawAssetUrl(resolvedImageUrl);
   const imageStyle = backgroundImageUrl ? { backgroundImage: `url(${backgroundImageUrl})` } : {};
 
   const handleCardClick = (e: MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>) => {

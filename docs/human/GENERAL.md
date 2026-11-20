@@ -25,7 +25,7 @@ Copy-Item .env.example .env.local
 
 打开 `http://localhost:3000`。根路径按 `NEXT_LOCALE` Cookie、`Accept-Language`、`zh-CN` 的顺序选择 locale。
 
-如果需要本地 COS Referer 调试，阅读 [`OPERATIONS.md`](./OPERATIONS.md) 和 `scripts/dev-host-setup.cmd`；不要把本地凭据提交到仓库。
+本地媒体与私有 Catalog 的路径配置见 [`OPERATIONS.md`](./OPERATIONS.md)。
 
 ## 常用命令
 

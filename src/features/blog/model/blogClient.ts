@@ -26,7 +26,7 @@ const PROTOCOL_PREFIX_RE = /^[A-Za-z][A-Za-z\d+.-]*:/;
 
 export interface BlogVariantPayload {
   meta: BlogPostMeta;
-  mdxSource: MDXRemoteSerializeResult;
+  mdxSource: MDXRemoteSerializeResult | null;
 }
 
 export function getRequestedContentLocaleFromPath(currentUrl: string): BlogContentLocale | null {

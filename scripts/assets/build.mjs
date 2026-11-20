@@ -4,7 +4,7 @@ import { toPosix, walkFiles } from './lib/filesystem.mjs';
 import { copySharedAsset, processAudioFile, processImageFile } from './lib/media-transform.mjs';
 import { loadMetaSection, replaceSourceFields } from './lib/catalog-transform.mjs';
 
-const DEFAULT_WORKSPACE = path.join(process.cwd(), 'cos-workspace');
+const DEFAULT_WORKSPACE = path.join(process.cwd(), 'media-workspace');
 const DEFAULT_DIST = path.join(process.cwd(), 'dist');
 const SITE_ASSET_KEYS = new Set([
   'site/about-qr',
@@ -20,7 +20,6 @@ function parseArgs(argv) {
   const options = {
     workspace: DEFAULT_WORKSPACE,
     dist: DEFAULT_DIST,
-    publishCurrent: false,
   };
 
   for (let index = 2; index < argv.length; index += 1) {
@@ -31,8 +30,6 @@ function parseArgs(argv) {
     } else if (arg === '--dist') {
       options.dist = path.resolve(argv[index + 1]);
       index += 1;
-    } else if (arg === '--publish-current') {
-      options.publishCurrent = true;
     }
   }
 
@@ -51,12 +48,12 @@ async function main() {
   const workspaceRoot = options.workspace;
   const publicRoot = path.join(workspaceRoot, 'public-root');
   const metaRoot = path.join(workspaceRoot, '_meta', 'realm');
-  const distPublicRoot = path.join(options.dist, 'cos-upload', 'public-root');
-  const distPrivateRoot = path.join(options.dist, 'cos-upload', 'private-root');
+  const distPublicRoot = path.join(options.dist, 'media', 'public-root');
+  const distPrivateRoot = path.join(options.dist, 'media', 'private-root');
   const distManifestRoot = path.join(options.dist, 'local-manifest');
   const version = timestampVersion();
 
-  await rm(path.join(options.dist, 'cos-upload'), { recursive: true, force: true });
+  await rm(path.join(options.dist, 'media'), { recursive: true, force: true });
   await rm(distManifestRoot, { recursive: true, force: true });
 
   const publicFiles = await walkFiles(publicRoot);
@@ -116,6 +113,8 @@ async function main() {
     );
   }
 
+  transformedSections['static-assets'] ??= { assets: {} };
+
   const privateCatalogRoot = path.join(distPrivateRoot, 'realm', 'catalog');
   const versionRoot = path.join(privateCatalogRoot, 'versions', version);
   await mkdir(versionRoot, { recursive: true });
@@ -126,12 +125,6 @@ async function main() {
       JSON.stringify(sectionValue, null, 2),
     );
   }
-
-  const currentFileName = options.publishCurrent ? 'current.json' : 'current.next.json';
-  await writeFile(
-    path.join(privateCatalogRoot, currentFileName),
-    JSON.stringify({ version }, null, 2),
-  );
 
   const staticAssets = transformedSections['static-assets']?.assets || {};
   const publicSiteAssets = Object.fromEntries(
@@ -154,11 +147,6 @@ async function main() {
     path.join(publicSiteVersionRoot, 'assets.json'),
     JSON.stringify({ version, assets: publicSiteAssets }, null, 2),
   );
-  await writeFile(
-    path.join(publicSiteCatalogRoot, currentFileName),
-    JSON.stringify({ version }, null, 2),
-  );
-
   await mkdir(distManifestRoot, { recursive: true });
   await writeFile(
     path.join(distManifestRoot, 'manifest.generated.json'),
