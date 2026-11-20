@@ -140,6 +140,7 @@ function buildAppState(overrides: Record<string, unknown> = {}) {
     animationsComplete: true,
     chargeBattery: vi.fn(),
     handleLoadingComplete: vi.fn(),
+    skipOpening: vi.fn(),
     currentTime: '00:00:00',
     hudVisible: true,
     leftPanelAnimated: true,
@@ -163,6 +164,34 @@ function buildAppState(overrides: Record<string, unknown> = {}) {
 }
 
 describe('MainLayout adaptive performance gates', () => {
+  it('offers a native skip link to the focusable route landmark', () => {
+    render(
+      <MainLayout>
+        <p>Route content</p>
+      </MainLayout>,
+    );
+
+    const skip = screen.getByRole('link', { name: 'skipToContent' });
+    const main = screen.getByRole('main');
+    expect(skip.getAttribute('href')).toBe(`#${main.id}`);
+    expect(main.tabIndex).toBe(-1);
+    expect(main.contains(screen.getByText('Route content'))).toBe(true);
+  });
+
+  it('keeps the route landmark readable and reachable during the opening sequence', () => {
+    useAppMock.mockReturnValue(buildAppState({ mainVisible: false }));
+    const { container } = render(
+      <MainLayout>
+        <p>Route content</p>
+      </MainLayout>,
+    );
+
+    const main = container.querySelector('main');
+    expect(main?.hasAttribute('inert')).toBe(false);
+    expect(main?.style.opacity).not.toBe('0');
+    expect(screen.getByRole('link', { name: 'skipToContent' })).toBeTruthy();
+  });
+
   beforeEach(() => {
     vi.useFakeTimers();
     useResponsiveMock.mockReturnValue({ isMobile: false, isTablet: false, isDesktop: true });

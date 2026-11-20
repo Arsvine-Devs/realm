@@ -1,12 +1,14 @@
-import { useId, type MouseEvent, type RefObject } from 'react';
+import { useId, type RefObject } from 'react';
 import { useTranslations } from 'next-intl';
 import styles from '../styles/LifeSection.module.scss';
 import ProjectCard from '../../../shared/ui/ProjectCard';
 import type { LifeItem } from '../../../shared/types';
+import type { Locale } from '@/shared/contracts/locale';
 import { useHudPower } from '../../hud/model/HudProvider';
 import { useLocaleStableState } from '@/features/navigation/model/LocalePageState';
 
 interface LifeSectionProps {
+  locale: Locale;
   lifeSectionRef: RefObject<HTMLDivElement | null>;
   activeSection: string;
   activeLifeTab: string;
@@ -21,11 +23,12 @@ interface LifeSectionProps {
   otherData: LifeItem[];
   alsoPlayGames: string[];
   artPlaceholderText: string;
-  handleLifeItemClick: (item: LifeItem, event: MouseEvent<HTMLElement>) => void;
+  handleLifeItemClick: (item: LifeItem) => void;
   handleLifeItemIntent?: (item: LifeItem) => void;
 }
 
 export default function LifeSection({
+  locale,
   lifeSectionRef,
   activeSection,
   activeLifeTab,
@@ -96,6 +99,7 @@ export default function LifeSection({
               <ProjectCard
                 key={game.id}
                 project={game}
+                href={`/${locale}/life/${game.id}`}
                 onClick={handleLifeItemClick}
                 onNavigateIntent={handleLifeItemIntent}
                 isInverted={isInverted}
@@ -140,6 +144,7 @@ export default function LifeSection({
               <ProjectCard
                 key={place.id}
                 project={place}
+                href={`/${locale}/life/${place.id}`}
                 onClick={handleLifeItemClick}
                 onNavigateIntent={handleLifeItemIntent}
                 isInverted={isInverted}
@@ -168,6 +173,7 @@ export default function LifeSection({
               <ProjectCard
                 key={item.id}
                 project={item}
+                href={`/${locale}/life/${item.id}`}
                 onClick={handleLifeItemClick}
                 onNavigateIntent={handleLifeItemIntent}
                 isInverted={isInverted}

@@ -4,8 +4,8 @@ import { useSafeTimeouts } from '../../../shared/hooks/useSafeTimeouts';
 import { useResponsive } from '@/shared/hooks/useMediaQuery';
 import { completeInitialBootSequence, isInitialBootSequencePending } from './homeLoadingSession';
 
-export default function useAnimationSequence(): AnimationSequenceState {
-  const [initialBootPending] = useState(isInitialBootSequencePending);
+export default function useAnimationSequence(allowOpening: boolean): AnimationSequenceState {
+  const [initialBootPending] = useState(() => allowOpening && isInitialBootSequencePending());
   const initialSequenceComplete = !initialBootPending;
   const [isLoading, setIsLoading] = useState(initialBootPending);
   const [mainVisible, setMainVisible] = useState(initialSequenceComplete);
@@ -24,11 +24,29 @@ export default function useAnimationSequence(): AnimationSequenceState {
   const safeTimers = useSafeTimeouts();
   const { isMobile: hookIsMobile } = useResponsive();
 
+  const showReadyHud = useCallback(() => {
+    setIsLoading(false);
+    setMainVisible(true);
+    setLinesAnimated(true);
+    setHudVisible(true);
+    setLeftPanelAnimated(true);
+    setTextVisible(true);
+    setAnimationsComplete(true);
+    setLeversVisible(true);
+  }, []);
+
+  if (!allowOpening && isLoading) showReadyHud();
+
   useLayoutEffect(() => {
-    if (initialSequenceComplete) {
+    if (initialSequenceComplete || !allowOpening) {
       completeInitialBootSequence();
     }
-  }, [initialSequenceComplete]);
+  }, [allowOpening, initialSequenceComplete]);
+
+  const skipOpening = useCallback(() => {
+    completeInitialBootSequence();
+    showReadyHud();
+  }, [showReadyHud]);
 
   const handleLoadingComplete = () => {
     setIsLoading(false);
@@ -170,6 +188,7 @@ export default function useAnimationSequence(): AnimationSequenceState {
     pulsingNormalIndices,
     pulsingReverseIndices,
     handleLoadingComplete,
+    skipOpening,
     columnPhase,
     retractColumns,
     expandColumns,

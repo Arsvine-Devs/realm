@@ -14,11 +14,11 @@ export default function LocaleError({
   }, [error]);
 
   return (
-    <main role="alert">
+    <section role="alert">
       <h1>Unable to load this page</h1>
       <button type="button" onClick={reset}>
         Retry
       </button>
-    </main>
+    </section>
   );
 }

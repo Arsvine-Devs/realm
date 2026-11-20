@@ -20,7 +20,8 @@ interface WorksSectionProps {
   webProjects: Project[];
   gameProjects: Project[];
   earlyProjects: Project[];
-  handleWorkItemClick: (project: Project, e: React.MouseEvent) => void;
+  getWorkHref: (project: Project) => string | undefined;
+  handleWorkItemClick: (project: Project) => void;
   handleWorkItemIntent?: (project: Project) => void;
   skillCategories: SkillCategory[];
 }
@@ -35,6 +36,7 @@ function WorksSection({
   webProjects,
   gameProjects,
   earlyProjects,
+  getWorkHref,
   handleWorkItemClick,
   handleWorkItemIntent,
   skillCategories,
@@ -117,6 +119,7 @@ function WorksSection({
               <ProjectCard
                 key={project.id}
                 project={project}
+                href={getWorkHref(project)}
                 onClick={handleWorkItemClick}
                 onNavigateIntent={handleWorkItemIntent}
                 isInverted={isInverted}
@@ -150,6 +153,7 @@ function WorksSection({
                 <ProjectCard
                   key={project.id}
                   project={project}
+                  href={getWorkHref(project)}
                   onClick={handleWorkItemClick}
                   onNavigateIntent={handleWorkItemIntent}
                   isInverted={isInverted}

@@ -38,7 +38,6 @@ import {
 } from './useMainLayoutEffects';
 import { useLeftPanelNavigation, useTesseractDragFeedback } from './useMainLayoutNavigation';
 
-import HomeLoadingScreen from '../../features/hud/ui/loading/HomeLoadingScreen';
 import MusicPlayer from '../../features/music/ui/MusicPlayer';
 import GlobalHud from '../../features/hud/ui/layout/GlobalHud';
 import LeftPanel from '../../features/hud/ui/layout/LeftPanel';
@@ -68,6 +67,10 @@ const CustomCursor = dynamic(
   { ssr: false, loading: () => null },
 );
 
+const HomeLoadingScreen = dynamic(() => import('../../features/hud/ui/loading/HomeLoadingScreen'), {
+  ssr: false,
+});
+
 interface MainLayoutProps {
   children: ReactNode;
 }
@@ -85,6 +88,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
     mainVisible,
     animationsComplete,
     handleLoadingComplete,
+    skipOpening,
     hudVisible,
     leftPanelAnimated,
     leversVisible,
@@ -220,13 +224,20 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className={`${styles.container} ${isInverted ? styles.inverted : ''}`}>
+      <a
+        href="#main-content"
+        className={styles.skipToContent}
+        onClick={isHome && !mainVisible ? skipOpening : undefined}
+      >
+        {tCommon('skipToContent')}
+      </a>
       <div className={styles.leftDotMatrix}></div>
       {mainVisible && <MusicPlayer powerLevel={powerLevel} />}
       {clientEffectsReady && isDesktop && allowCustomCursor && <CustomCursor />}
       {clientEffectsReady && webglReady && isDesktop && allowAmbientWebGL && !webglUnavailable && (
         <RainMorimeEffect onContextLost={handleWebglContextLost} />
       )}
-      <HomeLoadingScreen onComplete={handleLoadingComplete} />
+      {isHome && !mainVisible && <HomeLoadingScreen onComplete={handleLoadingComplete} />}
       {clientEffectsReady && isTesseractActivated && allow3DTesseract && (
         <TesseractExperience
           chargeBattery={chargeBattery}
@@ -299,18 +310,18 @@ export default function MainLayout({ children }: MainLayoutProps) {
           />
         </>
       )}
-      <div
+      <main
+        id="main-content"
         ref={registerTransitionSurface}
         className="pageTransitionLayer"
+        tabIndex={-1}
         style={{
-          opacity: mainVisible ? 1 : 0,
-          pointerEvents: mainVisible ? 'auto' : 'none',
           transition: 'opacity 0.4s ease-out',
           zIndex: effectiveStandalone ? 15 : 2,
         }}
       >
         {children}
-      </div>
+      </main>
 
       {mainVisible && routeLoadingState.kind ? (
         <RouteLoadingOverlay

@@ -38,8 +38,14 @@ function useRequiredContext<T>(context: React.Context<T | null>, name: string): 
   return value;
 }
 
-export function HudProvider({ children }: { children: ReactNode }) {
-  const animation = useAnimationSequence();
+export function HudProvider({
+  children,
+  allowOpening = false,
+}: {
+  children: ReactNode;
+  allowOpening?: boolean;
+}) {
+  const animation = useAnimationSequence(allowOpening);
   const performance = useAdaptivePerformance(animation.animationsComplete);
   const power = usePowerSystem(animation.mainVisible);
   const stats = useRealtimeStats();
@@ -65,6 +71,7 @@ export function HudProvider({ children }: { children: ReactNode }) {
       pulsingNormalIndices: animation.pulsingNormalIndices,
       pulsingReverseIndices: animation.pulsingReverseIndices,
       handleLoadingComplete: animation.handleLoadingComplete,
+      skipOpening: animation.skipOpening,
       columnPhase: animation.columnPhase,
       retractColumns: animation.retractColumns,
       expandColumns: animation.expandColumns,
@@ -83,6 +90,7 @@ export function HudProvider({ children }: { children: ReactNode }) {
       animation.pulsingNormalIndices,
       animation.pulsingReverseIndices,
       animation.retractColumns,
+      animation.skipOpening,
       animation.textVisible,
     ],
   );

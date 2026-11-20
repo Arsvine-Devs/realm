@@ -202,7 +202,7 @@ export default function BlogDetailScaffold({
                 href={prevPostHref}
                 prefetch={false}
                 className={`${styles.footerNavButton} ${styles.footerNavPrev}`}
-                onClick={(event) => {
+                onNavigate={(event) => {
                   event.preventDefault();
                   navigateTo(prevPostHref);
                 }}
@@ -216,7 +216,10 @@ export default function BlogDetailScaffold({
                 href={contentIndexHref}
                 prefetch={false}
                 className={`${styles.footerNavButton} ${styles.footerNavPrev}`}
-                onClick={handleBack}
+                onNavigate={(event) => {
+                  event.preventDefault();
+                  handleBack();
+                }}
                 data-cursor-label="BACK"
               >
                 <span className={styles.footerNavArrow}>←</span>
@@ -229,7 +232,7 @@ export default function BlogDetailScaffold({
                 href={nextPostHref}
                 prefetch={false}
                 className={`${styles.footerNavButton} ${styles.footerNavNext}`}
-                onClick={(event) => {
+                onNavigate={(event) => {
                   event.preventDefault();
                   navigateTo(nextPostHref);
                 }}
@@ -243,7 +246,10 @@ export default function BlogDetailScaffold({
                 href={contentIndexHref}
                 prefetch={false}
                 className={`${styles.footerNavButton} ${styles.footerNavNext}`}
-                onClick={handleBack}
+                onNavigate={(event) => {
+                  event.preventDefault();
+                  handleBack();
+                }}
                 data-cursor-label="BACK"
               >
                 <span className={styles.footerNavTitle}>{tCommon('returnToIndex')}</span>

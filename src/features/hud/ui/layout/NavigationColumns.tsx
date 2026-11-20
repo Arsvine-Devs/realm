@@ -106,7 +106,7 @@ export default function NavigationColumns({
   }, [mainVisible, isMobile, reducedMotion]);
 
   return (
-    <main className={styles.mainLayout} style={{ opacity: 1, pointerEvents: 'auto' }}>
+    <div className={styles.mainLayout} style={{ opacity: 1, pointerEvents: 'auto' }}>
       {/* 导航列（桌面端垂直列 / 平板移动端横向条） */}
       <div
         className={`${styles.rightPanel}${columnPhase === 'retracting' ? ` ${styles.columnsRetracting}` : ''}`}
@@ -326,6 +326,6 @@ export default function NavigationColumns({
           );
         })}
       </div>
-    </main>
+    </div>
   );
 }
