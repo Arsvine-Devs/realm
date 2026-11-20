@@ -1,4 +1,4 @@
-// Dosis 由同源 /media/shared/fonts/google-fonts.css 提供（含 300/400/500）。
+// The root layout supplies the critical Dosis font faces.
 // 这里不再重复声明，否则浏览器会额外下载 /fonts/Dosis/Dosis-Light.ttf 浪费 60KB。
 // ZeldaFont 是自定义字体，CDN 没有，必须本地声明。
 @font-face {

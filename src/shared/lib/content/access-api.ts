@@ -20,15 +20,25 @@ export type GrantCheckResponse =
 export type ProtectedVerifyResponse =
   { ok: true; redirectTo: string } | { ok: false; error: AccessApiError };
 
+const INTERNAL_ORIGIN = 'https://realm.invalid';
+
 export function normalizeNextPath(value: unknown) {
-  if (typeof value !== 'string') {
+  if (
+    typeof value !== 'string' ||
+    !value.startsWith('/') ||
+    value.startsWith('//') ||
+    value.includes('\\') ||
+    Array.from(value).some(
+      (character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127,
+    )
+  ) {
     return '/';
   }
-  if (!value.startsWith('/')) {
+  try {
+    const url = new URL(value, INTERNAL_ORIGIN);
+    if (url.origin !== INTERNAL_ORIGIN || url.pathname.startsWith('//')) return '/';
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
     return '/';
   }
-  if (value.startsWith('//')) {
-    return '/';
-  }
-  return value;
 }

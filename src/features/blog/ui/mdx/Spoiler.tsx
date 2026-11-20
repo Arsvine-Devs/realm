@@ -14,6 +14,8 @@ import {
   type ReactNode,
 } from 'react';
 import { useTranslations } from 'next-intl';
+import { useReducedMotion } from '@/shared/hooks/useMediaQuery';
+import { useSafeTimeouts } from '@/shared/hooks/useSafeTimeouts';
 
 import styles from '../../styles/Spoiler.module.scss';
 
@@ -35,7 +37,7 @@ interface SpoilerGeometry {
 interface SpoilerContextValue {
   isRevealed: (id: string) => boolean;
   register: (id: string) => () => void;
-  reveal: (id: string, trigger: HTMLElement | null) => void;
+  reveal: (id: string) => void;
 }
 
 const fallbackSpoilerContext: SpoilerContextValue = {
@@ -47,103 +49,62 @@ const fallbackSpoilerContext: SpoilerContextValue = {
 const SpoilerContext = createContext<SpoilerContextValue>(fallbackSpoilerContext);
 
 interface SpoilerConfirmDialogProps {
-  open: boolean;
-  closing: boolean;
   onKeepVisible: () => void;
   onRevealAll: () => void;
 }
 
-function SpoilerConfirmDialog({
-  open,
-  closing,
-  onKeepVisible,
-  onRevealAll,
-}: SpoilerConfirmDialogProps) {
+function SpoilerConfirmDialog({ onKeepVisible, onRevealAll }: SpoilerConfirmDialogProps) {
   const t = useTranslations('spoiler');
-  const keepVisibleRef = useRef<HTMLButtonElement>(null);
-  const clearAllRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const backdropPress = useRef(false);
   const titleId = useId();
   const descriptionId = useId();
-  useEffect(() => {
-    if (!open || closing) return;
+  const reducedMotion = useReducedMotion();
+  const timers = useSafeTimeouts();
+  const [closing, setClosing] = useState(false);
 
-    const focusInitialAction = () => {
-      keepVisibleRef.current?.focus();
+  useLayoutEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    dialog.showModal();
+    return () => {
+      if (dialog.open) dialog.close();
     };
+  }, []);
 
-    if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
-      const frame = window.requestAnimationFrame(focusInitialAction);
-      return () => window.cancelAnimationFrame(frame);
+  const close = (action: () => void) => {
+    if (closing) return;
+    const finish = () => {
+      dialogRef.current?.close();
+      action();
+    };
+    if (reducedMotion) {
+      finish();
+    } else {
+      setClosing(true);
+      timers.setTimeout(finish, DIALOG_EXIT_MS);
     }
-
-    focusInitialAction();
-    return undefined;
-  }, [closing, open]);
-
-  useEffect(() => {
-    if (!open || closing) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        onKeepVisible();
-        return;
-      }
-
-      if (event.key !== 'Tab') return;
-
-      const focusableElements = [keepVisibleRef.current, clearAllRef.current].filter(
-        (element): element is HTMLButtonElement => element !== null && !element.disabled,
-      );
-      if (focusableElements.length === 0) return;
-
-      const first = focusableElements[0];
-      const last = focusableElements[focusableElements.length - 1];
-      const activeElement = document.activeElement;
-
-      if (event.shiftKey) {
-        if (activeElement === first) {
-          event.preventDefault();
-          last.focus();
-        } else if (activeElement === last) {
-          event.preventDefault();
-          first.focus();
-        }
-      } else if (activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [closing, onKeepVisible, open]);
-
-  if (!open || typeof document === 'undefined') return null;
+  };
 
   return createPortal(
-    <div
+    <dialog
+      ref={dialogRef}
       className={`${styles.dialogBackdrop} ${closing ? styles.dialogClosing : ''}`}
-      role="presentation"
-      tabIndex={-1}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onKeepVisible();
+      aria-labelledby={titleId}
+      aria-describedby={descriptionId}
+      onCancel={(event) => {
+        event.preventDefault();
+        close(onKeepVisible);
       }}
-      onKeyDown={(event) => {
-        if (event.key === 'Escape') onKeepVisible();
+      onPointerDown={(event) => {
+        backdropPress.current = event.target === event.currentTarget;
+      }}
+      onPointerUp={(event) => {
+        if (backdropPress.current && event.target === event.currentTarget) close(onKeepVisible);
+        backdropPress.current = false;
       }}
     >
-      <dialog
-        open
-        className={styles.dialogSurface}
-        aria-modal="true"
-        aria-labelledby={titleId}
-        aria-describedby={descriptionId}
-        tabIndex={-1}
-      >
+      <div className={styles.dialogSurface}>
         <span className={styles.dialogMarker} aria-hidden="true">
           {'///'}
         </span>
@@ -155,24 +116,22 @@ function SpoilerConfirmDialog({
         </p>
         <div className={styles.dialogActions}>
           <button
-            ref={keepVisibleRef}
             type="button"
             className={`${styles.dialogButton} ${styles.keepButton}`}
-            onClick={onKeepVisible}
+            onClick={() => close(onKeepVisible)}
           >
             {t('keepVisible')}
           </button>
           <button
-            ref={clearAllRef}
             type="button"
             className={`${styles.dialogButton} ${styles.clearButton}`}
-            onClick={onRevealAll}
+            onClick={() => close(onRevealAll)}
           >
             {t('revealAll')}
           </button>
         </div>
-      </dialog>
-    </div>,
+      </div>
+    </dialog>,
     document.body,
   );
 }
@@ -181,74 +140,10 @@ export function SpoilerProvider({ children }: { children: ReactNode }) {
   const [revealedIds, setRevealedIds] = useState<ReadonlySet<string>>(() => new Set());
   const revealedIdsRef = useRef<Set<string>>(new Set());
   const promptShownRef = useRef(false);
-  const returnFocusRef = useRef<HTMLElement | null>(null);
-  const dialogCloseTimerRef = useRef<number | null>(null);
   const registeredIdsRef = useRef(new Set<string>());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isDialogClosing, setIsDialogClosing] = useState(false);
 
   const isRevealed = useCallback((id: string) => revealedIds.has(id), [revealedIds]);
-
-  const restoreTriggerFocus = useCallback(() => {
-    const target = returnFocusRef.current;
-    returnFocusRef.current = null;
-    if (!target?.isConnected) return;
-
-    if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
-      window.requestAnimationFrame(() => {
-        if (target.isConnected) target.focus();
-      });
-      return;
-    }
-
-    target.focus();
-  }, []);
-
-  const finishDialogClose = useCallback(() => {
-    dialogCloseTimerRef.current = null;
-    setIsDialogOpen(false);
-    setIsDialogClosing(false);
-  }, []);
-
-  const openDialog = useCallback(() => {
-    if (dialogCloseTimerRef.current !== null) {
-      window.clearTimeout(dialogCloseTimerRef.current);
-      dialogCloseTimerRef.current = null;
-    }
-    setIsDialogClosing(false);
-    setIsDialogOpen(true);
-  }, []);
-
-  const closeDialog = useCallback(
-    (shouldRestoreFocus = true) => {
-      setIsDialogClosing(true);
-      if (shouldRestoreFocus) {
-        restoreTriggerFocus();
-      } else {
-        returnFocusRef.current = null;
-      }
-
-      if (typeof window === 'undefined') {
-        finishDialogClose();
-        return;
-      }
-
-      if (dialogCloseTimerRef.current !== null) {
-        window.clearTimeout(dialogCloseTimerRef.current);
-      }
-      dialogCloseTimerRef.current = window.setTimeout(finishDialogClose, DIALOG_EXIT_MS);
-    },
-    [finishDialogClose, restoreTriggerFocus],
-  );
-
-  useEffect(
-    () => () => {
-      if (dialogCloseTimerRef.current !== null) {
-        window.clearTimeout(dialogCloseTimerRef.current);
-      }
-    },
-    [],
-  );
 
   const register = useCallback((id: string) => {
     registeredIdsRef.current.add(id);
@@ -261,27 +156,23 @@ export function SpoilerProvider({ children }: { children: ReactNode }) {
     const allIds = new Set(registeredIdsRef.current);
     revealedIdsRef.current = allIds;
     setRevealedIds(allIds);
-    closeDialog();
-  }, [closeDialog]);
+    setIsDialogOpen(false);
+  }, []);
 
-  const reveal = useCallback(
-    (id: string, trigger: HTMLElement | null) => {
-      const currentIds = revealedIdsRef.current;
-      if (currentIds.has(id)) return;
+  const reveal = useCallback((id: string) => {
+    const currentIds = revealedIdsRef.current;
+    if (currentIds.has(id)) return;
 
-      const nextIds = new Set(currentIds);
-      nextIds.add(id);
-      revealedIdsRef.current = nextIds;
-      setRevealedIds(nextIds);
+    const nextIds = new Set(currentIds);
+    nextIds.add(id);
+    revealedIdsRef.current = nextIds;
+    setRevealedIds(nextIds);
 
-      if (nextIds.size >= SPOILER_PROMPT_THRESHOLD && !promptShownRef.current) {
-        promptShownRef.current = true;
-        returnFocusRef.current = trigger;
-        openDialog();
-      }
-    },
-    [openDialog],
-  );
+    if (nextIds.size >= SPOILER_PROMPT_THRESHOLD && !promptShownRef.current) {
+      promptShownRef.current = true;
+      setIsDialogOpen(true);
+    }
+  }, []);
 
   const contextValue = useMemo<SpoilerContextValue>(
     () => ({ isRevealed, register, reveal }),
@@ -291,12 +182,12 @@ export function SpoilerProvider({ children }: { children: ReactNode }) {
   return (
     <SpoilerContext.Provider value={contextValue}>
       {children}
-      <SpoilerConfirmDialog
-        open={isDialogOpen}
-        closing={isDialogClosing}
-        onKeepVisible={closeDialog}
-        onRevealAll={revealAll}
-      />
+      {isDialogOpen && (
+        <SpoilerConfirmDialog
+          onKeepVisible={() => setIsDialogOpen(false)}
+          onRevealAll={revealAll}
+        />
+      )}
     </SpoilerContext.Provider>
   );
 }
@@ -409,7 +300,7 @@ export default function Spoiler({ children }: SpoilerProps) {
   }, [measureLineRects]);
 
   const activate = useCallback(() => {
-    if (!revealed) reveal(id, triggerRef.current);
+    if (!revealed) reveal(id);
   }, [id, reveal, revealed]);
 
   const stateClass = revealed

@@ -162,7 +162,9 @@ export interface SiteAssets {
 
 export interface SiteFonts {
   googleStylesheet: string;
-  stylesheetKey: string;
+  criticalStylesheetKey: string;
+  extendedStylesheetKey: string;
+  firstPaintFontKey: string;
 }
 
 export interface SiteLocale {

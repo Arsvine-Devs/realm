@@ -1,7 +1,9 @@
 // Next.js discovers this App Router convention file from src/.
 import { NextResponse, type NextRequest } from 'next/server';
 import { isProxyTrusted } from './shared/server/http';
+import { readEnv } from './shared/config/env-provider';
 import { isLocale, type Locale } from './app/i18n/config';
+import { ROUTE_LOCALE_HEADER } from './shared/contracts/locale';
 import {
   coerceCookieLocale,
   LOCALE_PATH_PATTERN,
@@ -73,7 +75,22 @@ export function proxy(request: NextRequest) {
     // 已是合法 locale 路径：直接放行，response 上写 GEO_COUNTRY cookie，
     // 客户端 bootstrap 脚本读 cookie 写 <html dataset>。SSR 不再注入 country，
     // 避免 SSG/ISR 共享缓存被首访客 country 污染。
-    return attachGeo(NextResponse.next(), request, country, overrideAction);
+    const headers = new Headers(request.headers);
+    headers.set(ROUTE_LOCALE_HEADER, firstSegment);
+    headers.delete('x-arsvine-nonce');
+    let scriptPolicy: string | undefined;
+    if (readEnv('REALM_CSP_SCRIPT_REPORT_ONLY') === '1') {
+      const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+      scriptPolicy = `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'report-sample'; worker-src 'self' blob:`;
+      headers.set('x-arsvine-nonce', nonce);
+      // Next uses the request policy to attach the nonce to its rendered scripts.
+      headers.set('Content-Security-Policy', scriptPolicy);
+    } else {
+      headers.delete('Content-Security-Policy');
+    }
+    const response = NextResponse.next({ request: { headers } });
+    if (scriptPolicy) response.headers.set('Content-Security-Policy-Report-Only', scriptPolicy);
+    return attachGeo(response, request, country, overrideAction);
   }
 
   // The visitor's cookie or language preferences determine the temporary redirect.

@@ -4,18 +4,18 @@
 
 平台在 `cdn.arsvine.com/media/` 提供正式站的公开字体、图片和音频。预览保有各自的同源公开媒体入口。Realm 通过独立的只读路径读取私有 Catalog。
 
-| 路径                                                      | 内容                             |
-| --------------------------------------------------------- | -------------------------------- |
-| `media/public/realm/images/`、`media/public/realm/audio/` | 文件名包含内容 hash 的图片和音频 |
-| `media/public/shared/fonts/`                              | 字体和 `google-fonts.css`        |
-| `media/private/realm/catalog/current.json`                | 当前版本指针                     |
-| `media/private/realm/catalog/versions/`                   | 含源文件元数据的私有版本目录     |
+| 路径                                                      | 内容                              |
+| --------------------------------------------------------- | --------------------------------- |
+| `media/public/realm/images/`、`media/public/realm/audio/` | 文件名包含内容 hash 的图片和音频  |
+| `media/public/shared/fonts/`                              | WOFF2、首屏与延迟加载的哈希样式表 |
+| `media/private/realm/catalog/current.json`                | 当前版本指针                      |
+| `media/private/realm/catalog/versions/`                   | 含源文件元数据的私有版本目录      |
 
 Realm 在处理请求时读取当前版本指针。Catalog 的 `objectKey` 是相对媒体键，页面用平台的公开媒体源生成 URL。
 
 ## 生成和发布
 
-媒体源工作区包含 `public-root/realm/`、`public-root/shared/fonts/` 及 `_meta/realm/`。元数据引用源文件，构建将引用转换成文件键和尺寸。运行字体生成脚本后，把生成的样式表和字体家族目录放进 `public-root/shared/fonts/`。
+媒体源工作区包含 `public-root/realm/`、`public-root/shared/fonts/` 及 `_meta/realm/`。元数据引用源文件，构建将引用转换成文件键和尺寸。把字体生成脚本输出的 `google-fonts.css` 与字体家族目录放进 `public-root/shared/fonts/`。构建输出带哈希的 Dosis 首屏样式表和延迟加载的扩展样式表。发布前用生成清单中的文件名核对 Realm 的字体配置。
 
 ```sh
 node scripts/fetch-google-fonts.mjs

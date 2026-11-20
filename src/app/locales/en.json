@@ -2,6 +2,8 @@
   "common": {
     "backToTop": "Back to top",
     "back": "Back",
+    "home": "Home",
+    "siteNavigation": "Site navigation",
     "next": "Next",
     "previous": "Previous",
     "visit": "Visit",
@@ -20,6 +22,13 @@
     "collapsePlaylist": "Close Playlist",
     "openMenu": "Open Menu",
     "closeMenu": "Close Menu"
+  },
+  "lightbox": {
+    "gallery": "Image gallery",
+    "image": "Gallery image",
+    "close": "Close gallery",
+    "previous": "Previous image",
+    "next": "Next image"
   },
   "musicPlayer": {
     "playTitle": "Play",

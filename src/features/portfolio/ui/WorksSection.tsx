@@ -1,4 +1,4 @@
-import { useEffect, useState, type RefObject } from 'react';
+import { useEffect, useId, useState, type RefObject } from 'react';
 import { useTranslations } from 'next-intl';
 import styles from '../styles/WorksSection.module.scss';
 import { useSafeTimeouts } from '../../../shared/hooks/useSafeTimeouts';
@@ -40,6 +40,8 @@ function WorksSection({
   skillCategories,
 }: WorksSectionProps) {
   const { isInverted } = useHudPower();
+  const earlyWorksId = useId();
+  const skillsId = useId();
   const [earlyExpanded, setEarlyExpanded] = useLocaleStableState(
     'content.works.early-expanded',
     false,
@@ -128,6 +130,9 @@ function WorksSection({
       {earlyProjects.length > 0 && (
         <div className={styles.earlySection}>
           <button
+            type="button"
+            aria-expanded={earlyExpanded}
+            aria-controls={earlyWorksId}
             className={`${styles.earlySectionToggle} ${earlyExpanded ? styles.expanded : ''}`}
             onClick={() => setEarlyExpanded((prev) => !prev)}
           >
@@ -135,7 +140,11 @@ function WorksSection({
             <span>{t('earlyWorks')}</span>
             <span className={styles.earlySectionCount}>{earlyProjects.length}</span>
           </button>
-          <div className={`${styles.earlySectionContent} ${earlyExpanded ? styles.expanded : ''}`}>
+          <div
+            id={earlyWorksId}
+            inert={!earlyExpanded}
+            className={`${styles.earlySectionContent} ${earlyExpanded ? styles.expanded : ''}`}
+          >
             <div className={styles.projectGrid}>
               {earlyProjects.map((project) => (
                 <ProjectCard
@@ -153,6 +162,9 @@ function WorksSection({
 
       <div className={styles.earlySection}>
         <button
+          type="button"
+          aria-expanded={skillsExpanded}
+          aria-controls={skillsId}
           className={`${styles.earlySectionToggle} ${skillsExpanded ? styles.expanded : ''}`}
           onClick={() => setSkillsExpanded((prev) => !prev)}
         >
@@ -162,7 +174,11 @@ function WorksSection({
             {skillCategories.reduce((sum, cat) => sum + cat.skills.length, 0)}
           </span>
         </button>
-        <div className={`${styles.earlySectionContent} ${skillsExpanded ? styles.expanded : ''}`}>
+        <div
+          id={skillsId}
+          inert={!skillsExpanded}
+          className={`${styles.earlySectionContent} ${skillsExpanded ? styles.expanded : ''}`}
+        >
           <SkillTree categories={skillCategories} expanded={skillsExpanded} />
         </div>
       </div>

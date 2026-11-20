@@ -34,12 +34,8 @@ export default async function handler(request: Request) {
     return jsonResponse({ text: cache.text }, { headers: CACHE_HEADERS });
   }
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-
   try {
-    const upstream = await fetch(UPSTREAM, { signal: controller.signal });
-    clearTimeout(timeoutId);
+    const upstream = await fetch(UPSTREAM, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
     if (!upstream.ok) throw new Error(`upstream ${upstream.status}`);
     const data = await upstream.json();
     const text = typeof data?.hitokoto === 'string' ? data.hitokoto.trim() : '';
@@ -47,7 +43,6 @@ export default async function handler(request: Request) {
     cache = { text, expiresAt: Date.now() + CACHE_TTL_MS };
     return jsonResponse({ text }, { headers: CACHE_HEADERS });
   } catch (err) {
-    clearTimeout(timeoutId);
     console.warn('[hitokoto] upstream failed:', (err as Error).message);
     return jsonResponse({ error: 'upstream_unavailable' }, { status: 502 });
   }

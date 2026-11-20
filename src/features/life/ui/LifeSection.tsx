@@ -1,4 +1,4 @@
-import { type MouseEvent, type RefObject } from 'react';
+import { useId, type MouseEvent, type RefObject } from 'react';
 import { useTranslations } from 'next-intl';
 import styles from '../styles/LifeSection.module.scss';
 import ProjectCard from '../../../shared/ui/ProjectCard';
@@ -44,6 +44,7 @@ export default function LifeSection({
   handleLifeItemIntent,
 }: LifeSectionProps) {
   const { isInverted } = useHudPower();
+  const gamesId = useId();
   const [alsoPlayExpanded, setAlsoPlayExpanded] = useLocaleStableState(
     'content.life.also-play-expanded',
     false,
@@ -87,6 +88,7 @@ export default function LifeSection({
         {/* Game Tab */}
         <div
           ref={lifeGameTabRef}
+          inert={activeLifeTab !== 'game'}
           className={`${styles.lifeTabContent} ${activeLifeTab === 'game' ? styles.activeContent : ''}`}
         >
           <div className={styles.gameGrid}>
@@ -102,6 +104,9 @@ export default function LifeSection({
           </div>
           <div className={styles.earlySection}>
             <button
+              type="button"
+              aria-expanded={alsoPlayExpanded}
+              aria-controls={gamesId}
               className={`${styles.earlySectionToggle} ${alsoPlayExpanded ? styles.expanded : ''}`}
               onClick={() => setAlsoPlayExpanded((prev) => !prev)}
             >
@@ -110,6 +115,8 @@ export default function LifeSection({
               <span className={styles.earlySectionCount}>{alsoPlayGames.length}</span>
             </button>
             <div
+              id={gamesId}
+              inert={!alsoPlayExpanded}
               className={`${styles.earlySectionContent} ${alsoPlayExpanded ? styles.expanded : ''}`}
             >
               <div className={styles.smallGameGrid}>
@@ -125,6 +132,7 @@ export default function LifeSection({
         {/* Travel Tab */}
         <div
           ref={lifeTravelTabRef}
+          inert={activeLifeTab !== 'travel'}
           className={`${styles.lifeTabContent} ${activeLifeTab === 'travel' ? styles.activeContent : ''}`}
         >
           <div className={styles.travelGrid}>
@@ -142,6 +150,7 @@ export default function LifeSection({
         {/* Art Tab */}
         <div
           ref={lifeArtTabRef}
+          inert={activeLifeTab !== 'art'}
           className={`${styles.lifeTabContent} ${activeLifeTab === 'art' ? styles.activeContent : ''}`}
         >
           <div className={styles.compactTextContainer}>
@@ -151,6 +160,7 @@ export default function LifeSection({
         {/* Other Tab */}
         <div
           ref={lifeOtherTabRef}
+          inert={activeLifeTab !== 'other'}
           className={`${styles.lifeTabContent} ${activeLifeTab === 'other' ? styles.activeContent : ''} ${styles.compactTabContent}`}
         >
           <div className={styles.gameGrid}>

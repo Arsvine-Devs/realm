@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element -- decorative SVG badge is local, non-critical, and sized by existing HUD CSS */
-import { Fragment, useRef, type Ref } from 'react';
+import { Fragment, useLayoutEffect, useRef, type Ref } from 'react';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import styles from '../../../../app/styles/Shell.module.scss';
 import { useHudPerformance } from '../../model/HudProvider';
@@ -37,7 +38,7 @@ interface LeftPanelProps {
   displayedEnvParams: string;
   envArtifactStage?: 0 | 1 | 2 | 3 | 4;
   isInverted: boolean;
-  drawerOpen?: boolean;
+  drawer?: { id: string; open: boolean; close: () => void };
   isStandalone?: boolean;
   isTesseractDragging?: boolean;
   powerDisplayRef: Ref<HTMLDivElement>;
@@ -119,7 +120,7 @@ export default function LeftPanel({
   displayedEnvParams,
   envArtifactStage = 0,
   isInverted,
-  drawerOpen = false,
+  drawer,
   isStandalone = false,
   isTesseractDragging = false,
   powerDisplayRef,
@@ -127,6 +128,7 @@ export default function LeftPanel({
   envData = null as EnvData | null,
 }: LeftPanelProps) {
   const tNav = useTranslations('mainNav');
+  const tCommon = useTranslations('common');
   const tSite = useTranslations('pages.site');
   const travellingUrl = `https://www.travellings.cn/arsvine?lang=${TRAVELLING_LANG_MAP[locale]}`;
   const travellingLabel = tSite('travellingLabel');
@@ -155,11 +157,20 @@ export default function LeftPanel({
   const { allowLogoEffects } = useHudPerformance();
   const logoRef = useRef<HTMLDivElement | null>(null);
   useLogoEffects(logoRef, allowLogoEffects && leftPanelAnimated && !isStandalone);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const backdropPress = useRef(false);
+  const drawerOpen = drawer?.open === true;
 
-  return (
-    <div
-      className={`${styles.leftPanel} ${leftPanelAnimated ? styles.animated : ''} ${drawerOpen ? styles.drawerOpen : ''} ${isStandalone ? styles.standaloneHide : ''}`}
-    >
+  useLayoutEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (drawerOpen && !dialog.open) dialog.showModal();
+    if (!drawerOpen && dialog.open) dialog.close();
+  }, [drawerOpen]);
+
+  const panelClassName = `${styles.leftPanel} ${leftPanelAnimated ? styles.animated : ''} ${isStandalone && !drawer ? styles.standaloneHide : ''}`;
+  const panel = (
+    <>
       <div className={styles.topRightDecoration}></div>
       <div className={styles.leverGroup}>
         {mainVisible && (
@@ -182,15 +193,21 @@ export default function LeftPanel({
         )}
       </div>
       <button
+        type="button"
         className={`${styles.globalBackButton} ${showBackAndNav ? styles.visible : ''}`}
         onClick={handleGlobalBackClick}
+        disabled={!showBackAndNav}
         data-cursor-label="BACK"
         aria-label="BACK"
       ></button>
       <div
         className={`${styles.globalBackButtonDivider} ${showBackAndNav ? styles.visible : ''}`}
       ></div>
-      <div className={`${styles.leftNavLinks} ${showBackAndNav ? styles.visible : ''}`}>
+      <nav
+        className={`${styles.leftNavLinks} ${showBackAndNav ? styles.visible : ''}`}
+        aria-label={tCommon('siteNavigation')}
+        inert={!drawer && !showBackAndNav}
+      >
         {navLinks.map((link: DrawerNavLink, i: number) => (
           <Fragment key={link.href}>
             {i === 0 && (
@@ -213,12 +230,20 @@ export default function LeftPanel({
                 <span>{tNav('groupStandalone')}</span>
               </div>
             )}
-            <button className={styles.leftNavLink} onClick={() => handleLeftNavLinkClick(link)}>
+            <Link
+              className={styles.leftNavLink}
+              href={link.href}
+              prefetch={false}
+              onNavigate={(event) => {
+                event.preventDefault();
+                handleLeftNavLinkClick(link);
+              }}
+            >
               {link.label}
-            </button>
+            </Link>
           </Fragment>
         ))}
-      </div>
+      </nav>
       <div
         ref={powerDisplayRef as Ref<HTMLDivElement>}
         className={`${styles.powerDisplay} ${isTesseractDragging ? styles.attracting : ''}`}
@@ -344,6 +369,52 @@ export default function LeftPanel({
           </svg>
         </a>
       </div>
-    </div>
+    </>
+  );
+  if (!drawer)
+    return (
+      <aside className={panelClassName} inert={isStandalone}>
+        {panel}
+      </aside>
+    );
+
+  return (
+    <dialog
+      ref={dialogRef}
+      id={drawer.id}
+      className={panelClassName}
+      aria-label={tCommon('siteNavigation')}
+      onClose={drawer.close}
+      onPointerDown={(event) => {
+        const { left, top, right, bottom } = event.currentTarget.getBoundingClientRect();
+        backdropPress.current =
+          event.clientX < left ||
+          event.clientX > right ||
+          event.clientY < top ||
+          event.clientY > bottom;
+      }}
+      onPointerUp={(event) => {
+        const { left, top, right, bottom } = event.currentTarget.getBoundingClientRect();
+        if (
+          backdropPress.current &&
+          (event.clientX < left ||
+            event.clientX > right ||
+            event.clientY < top ||
+            event.clientY > bottom)
+        )
+          drawer.close();
+        backdropPress.current = false;
+      }}
+    >
+      <button
+        type="button"
+        className={styles.drawerCloseButton}
+        onClick={drawer.close}
+        aria-label={tCommon('closeMenu')}
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+      {panel}
+    </dialog>
   );
 }

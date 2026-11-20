@@ -17,7 +17,6 @@ import WorkDetailView from '../../portfolio/ui/WorkDetailView';
 import ExperienceDetailView from '../../experience/ui/ExperienceDetailView';
 import LifeDetailView from '../../life/ui/LifeDetailView';
 
-import { buildBlogPostHref } from '../../blog/model/blogClient';
 import { resolveRawAssetUrl } from '@/shared/lib/media';
 import { setHudTypingOverlaySuppressed } from '@/shared/lib/hud-typing-visibility';
 import { markCursorTargetsDirty } from '@/shared/lib/cursor-targets';
@@ -294,13 +293,6 @@ export default function ContentPage({
     navigateTo(`/${locale}/friends`);
   }, [navigateTo, locale]);
 
-  const handleBlogItemClick = useCallback(
-    (post: BlogPostMeta) => {
-      navigateTo(buildBlogPostHref(locale, post.slug, locale));
-    },
-    [navigateTo, locale],
-  );
-
   const handleBackFromDetail = useCallback(() => {
     if (isClosingRef.current) return;
     isClosingRef.current = true;
@@ -376,7 +368,7 @@ export default function ContentPage({
             blogSectionRef={blogSectionRef}
             locale={locale}
             posts={blogPosts}
-            handleBlogItemClick={handleBlogItemClick}
+            navigateTo={navigateTo}
           />
         </div>
 

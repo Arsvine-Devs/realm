@@ -1,6 +1,7 @@
 import {
   useState,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useCallback,
@@ -79,7 +80,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const { navigateTo, handleBack, isDetailOpen, registerTransitionSurface, pendingUrl } =
     useTransition();
   const { getScrollContainer } = useLayoutAnchors();
-  const { isMobile, isDesktop } = useResponsive();
+  const { isMobile, isTablet, isDesktop } = useResponsive();
   const {
     mainVisible,
     animationsComplete,
@@ -119,6 +120,18 @@ export default function MainLayout({ children }: MainLayoutProps) {
       tNav,
       tCommon,
     });
+  const drawerId = useId();
+  const hasDrawer = isMobile || isTablet;
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    const closeAtDesktop = () => {
+      if (desktop.matches) closeDrawer();
+    };
+    desktop.addEventListener('change', closeAtDesktop);
+    return () => desktop.removeEventListener('change', closeAtDesktop);
+  }, [closeDrawer]);
 
   const [forceHomeSection, setForceHomeSection] = useState(false);
   const [clientEffectsReady, setClientEffectsReady] = useState(false);
@@ -236,6 +249,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
         <button
           className={`${styles.hamburgerButton} ${drawerOpen ? styles.hamburgerOpen : ''}`}
           onClick={toggleDrawer}
+          type="button"
+          aria-expanded={hasDrawer && drawerOpen}
+          aria-controls={drawerId}
           aria-label={drawerToggleLabel}
           data-cursor-label={drawerToggleLabel}
         >
@@ -244,14 +260,6 @@ export default function MainLayout({ children }: MainLayoutProps) {
           <span />
         </button>
       )}
-
-      {/* 抽屉背景遮罩 */}
-      <button
-        type="button"
-        className={`${styles.drawerBackdrop} ${drawerOpen ? styles.backdropVisible : ''}`}
-        onClick={closeDrawer}
-        aria-label={tCommon('closeMenu')}
-      />
 
       {mainVisible && (
         <>
@@ -283,7 +291,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             envData={envData}
             envArtifactStage={envArtifactStage}
             isInverted={isInverted}
-            drawerOpen={drawerOpen}
+            drawer={hasDrawer ? { id: drawerId, open: drawerOpen, close: closeDrawer } : undefined}
             isStandalone={effectiveStandalone}
             isTesseractDragging={displayedTesseractDragging}
             powerDisplayRef={powerDisplayRef}
@@ -316,6 +324,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
       {mainVisible && isMobile && (
         <nav className={styles.bottomBar}>
           <button
+            type="button"
+            aria-label={tCommon('back')}
+            disabled={isHome}
             className={`${styles.bottomBarBtn} ${isHome ? styles.bottomBarDisabled : ''}`}
             onClick={() => {
               if (!isHome) handleGlobalBackClick();
@@ -325,6 +336,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <span className={styles.bottomBarIndicator} />
           </button>
           <button
+            type="button"
+            aria-label={tCommon('home')}
+            aria-current={isHome ? 'page' : undefined}
             className={`${styles.bottomBarBtn} ${isHome ? styles.bottomBarCurrent : ''}`}
             onClick={() => {
               if (!isHome) navigateTo(`/${locale}`);
@@ -334,9 +348,12 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <span className={styles.bottomBarIndicator} />
           </button>
           <button
+            type="button"
             className={`${styles.bottomBarBtn} ${drawerOpen ? styles.bottomBarActive : ''}`}
             onClick={toggleDrawer}
             aria-label={drawerToggleLabel}
+            aria-expanded={drawerOpen}
+            aria-controls={drawerId}
           >
             <span className={styles.bottomBarIcon}>{drawerOpen ? '✕' : '☰'}</span>
             <span className={styles.bottomBarIndicator} />

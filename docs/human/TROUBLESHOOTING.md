@@ -178,7 +178,7 @@ pnpm vitest run tests/features/blog/blog-protected-rsc-contract.test.ts
 检查 response header：
 
 ```bash
-curl -I https://cdn.arsvine.com/media/shared/fonts/google-fonts.css
+curl -I https://cdn.arsvine.com/media/shared/fonts/realm-fonts-critical.570a4ecb7a9d.css
 ```
 
 常见原因：

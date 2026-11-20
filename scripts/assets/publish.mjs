@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { lstat, mkdir, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 
@@ -57,6 +57,17 @@ async function atomicWrite(file, bytes) {
   }
 }
 
+async function publishImmutable(destination, bytes) {
+  const previous = await readFile(destination).catch((error) => {
+    if (error.code !== 'ENOENT') throw error;
+    return null;
+  });
+  if (previous && !previous.equals(bytes)) {
+    throw Error(`Existing release object differs: ${destination}`);
+  }
+  if (!previous) await atomicWrite(destination, bytes);
+}
+
 async function copyRelease(source, target) {
   for (const entry of await readdir(source, { withFileTypes: true })) {
     const origin = join(source, entry.name);
@@ -64,14 +75,7 @@ async function copyRelease(source, target) {
     if (entry.isDirectory()) {
       await copyRelease(origin, destination);
     } else if (entry.isFile()) {
-      const bytes = await readFile(origin);
-      const previous = await readFile(destination).catch((error) => {
-        if (error.code !== 'ENOENT') throw error;
-        return null;
-      });
-      if (previous && !previous.equals(bytes))
-        throw Error(`Existing release object differs: ${entry.name}`);
-      if (!previous) await atomicWrite(destination, bytes);
+      await publishImmutable(destination, await readFile(origin));
     } else {
       throw Error(`Release candidate includes a non-regular file: ${entry.name}`);
     }
@@ -85,15 +89,28 @@ await copyRelease(join(privateSource, catalogRelative), join(privateRoot, catalo
 const fonts = join('shared', 'fonts');
 const sourceFonts = join(publicSource, fonts);
 const targetFonts = join(publicRoot, fonts);
-for (const entry of await readdir(sourceFonts, { withFileTypes: true })) {
-  if (entry.isDirectory())
-    await copyRelease(join(sourceFonts, entry.name), join(targetFonts, entry.name));
-  else if (entry.name !== 'google-fonts.css') throw Error(`Unexpected font entry: ${entry.name}`);
+const fontEntries = await readdir(sourceFonts, { withFileTypes: true });
+const stylesheets = new Map();
+for (const entry of fontEntries) {
+  if (entry.isDirectory()) continue;
+  const name = /^realm-fonts-(critical|extended)\.([a-f0-9]{12})\.css$/.exec(entry.name);
+  if (!entry.isFile() || !name || stylesheets.has(name[1])) {
+    throw Error(`Unexpected font entry: ${entry.name}`);
+  }
+  const bytes = await readFile(join(sourceFonts, entry.name));
+  const digest = createHash('sha256').update(bytes).digest('hex').slice(0, 12);
+  if (digest !== name[2]) throw Error(`Font stylesheet digest mismatch: ${entry.name}`);
+  stylesheets.set(name[1], { filename: entry.name, bytes });
 }
-await atomicWrite(
-  join(targetFonts, 'google-fonts.css'),
-  await readFile(join(sourceFonts, 'google-fonts.css')),
-);
+if (stylesheets.size !== 2) throw Error('The critical and extended font stylesheets are required');
+for (const entry of fontEntries) {
+  if (entry.isDirectory()) {
+    await copyRelease(join(sourceFonts, entry.name), join(targetFonts, entry.name));
+  }
+}
+for (const { filename, bytes } of stylesheets.values()) {
+  await publishImmutable(join(targetFonts, filename), bytes);
+}
 
 await atomicWrite(
   join(privateRoot, 'realm', 'catalog', 'current.json'),

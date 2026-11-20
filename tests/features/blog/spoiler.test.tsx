@@ -1,6 +1,6 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import enMessages from '@/app/locales/en.json';
 import zhCNMessages from '@/app/locales/zh-CN.json';
@@ -8,6 +8,31 @@ import zhTWMessages from '@/app/locales/zh-TW.json';
 import MDXComponents from '@/features/blog/ui/mdx/MDXComponents';
 import Spoiler, { SpoilerProvider } from '@/features/blog/ui/mdx/Spoiler';
 import spoilerStyles from '@/features/blog/styles/Spoiler.module.scss';
+
+vi.mock('@/shared/hooks/useMediaQuery', () => ({ useReducedMotion: () => false }));
+
+// jsdom does not implement the dialog top layer. Browser tests cover native focus.
+beforeAll(() => {
+  Object.defineProperties(HTMLDialogElement.prototype, {
+    showModal: {
+      configurable: true,
+      value(this: HTMLDialogElement) {
+        this.open = true;
+      },
+    },
+    close: {
+      configurable: true,
+      value(this: HTMLDialogElement) {
+        this.open = false;
+      },
+    },
+  });
+});
+
+afterAll(() => {
+  Reflect.deleteProperty(HTMLDialogElement.prototype, 'showModal');
+  Reflect.deleteProperty(HTMLDialogElement.prototype, 'close');
+});
 
 afterEach(() => {
   cleanup();
@@ -200,14 +225,15 @@ describe('Spoiler MDX component', () => {
     renderSpoilers(3);
     getSpoilers().forEach((spoiler) => fireEvent.click(spoiler));
 
-    fireEvent.keyDown(document, { key: 'Escape' });
+    fireEvent(screen.getByRole('dialog'), new Event('cancel', { cancelable: true }));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
 
     cleanup();
     renderSpoilers(3);
     getSpoilers().forEach((spoiler) => fireEvent.click(spoiler));
     const dialog = screen.getByRole('dialog');
-    fireEvent.click(dialog.parentElement!);
+    fireEvent.pointerDown(dialog);
+    fireEvent.pointerUp(dialog);
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(getSpoilers()[0].getAttribute('data-spoiler-state')).toBe('revealed');
   });
@@ -218,17 +244,17 @@ describe('Spoiler MDX component', () => {
     spoilers.slice(0, 3).forEach((spoiler) => fireEvent.click(spoiler));
 
     fireEvent.click(screen.getByRole('button', { name: 'Reveal all' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     getSpoilers().forEach((spoiler) => {
       expect(spoiler.getAttribute('data-spoiler-state')).toBe('revealed');
     });
     expect(screen.getByText('secret-1')).toBeTruthy();
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
 
     getSpoilers().forEach((spoiler) => fireEvent.click(spoiler));
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('traps dialog focus and restores focus to the third spoiler', async () => {
+  it('opens a native modal and closes with the safe action', async () => {
     renderSpoilers(3);
     const spoilers = getSpoilers();
     const thirdSpoiler = spoilers[2];
@@ -238,20 +264,12 @@ describe('Spoiler MDX component', () => {
 
     const dialog = screen.getByRole('dialog');
     const keepVisible = screen.getByRole('button', { name: 'Keep visible' });
-    const revealAll = screen.getByRole('button', { name: 'Reveal all' });
-    await waitFor(() => expect(document.activeElement).toBe(keepVisible));
-
-    fireEvent.keyDown(document, { key: 'Tab' });
-    expect(document.activeElement).toBe(revealAll);
-    fireEvent.keyDown(document, { key: 'Tab' });
-    expect(document.activeElement).toBe(keepVisible);
-    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
-    expect(document.activeElement).toBe(revealAll);
+    expect(dialog.tagName).toBe('DIALOG');
+    expect(dialog.hasAttribute('open')).toBe(true);
 
     fireEvent.click(keepVisible);
-    expect(dialog.parentElement?.classList.contains(spoilerStyles.dialogClosing)).toBe(true);
+    expect(dialog.classList.contains(spoilerStyles.dialogClosing)).toBe(true);
     await waitFor(() => expect(document.body.contains(dialog)).toBe(false));
-    await waitFor(() => expect(document.activeElement).toBe(thirdSpoiler));
   });
 
   it('uses localized labels for all supported UI locales', () => {

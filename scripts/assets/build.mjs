@@ -1,8 +1,9 @@
-import { mkdir, stat, writeFile, rm } from 'node:fs/promises';
+import { mkdir, readFile, stat, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { toPosix, walkFiles } from './lib/filesystem.mjs';
 import { copySharedAsset, processAudioFile, processImageFile } from './lib/media-transform.mjs';
 import { loadMetaSection, replaceSourceFields } from './lib/catalog-transform.mjs';
+import { writeFontStylesheets } from '../lib/font-stylesheets.mjs';
 
 const DEFAULT_WORKSPACE = path.join(process.cwd(), 'media-workspace');
 const DEFAULT_DIST = path.join(process.cwd(), 'dist');
@@ -50,9 +51,17 @@ async function main() {
   const publicFiles = await walkFiles(publicRoot);
   const assetMap = new Map();
   const manifestEntries = [];
+  let fontStylesheets = [];
 
   for (const filePath of publicFiles) {
     const relativePath = toPosix(path.relative(publicRoot, filePath));
+    if (relativePath === 'shared/fonts/google-fonts.css') {
+      fontStylesheets = await writeFontStylesheets(
+        await readFile(filePath, 'utf8'),
+        path.join(distPublicRoot, 'shared', 'fonts'),
+      );
+      continue;
+    }
     if (relativePath.startsWith('realm/images/')) {
       const imageResult = await processImageFile(
         filePath,
@@ -126,6 +135,7 @@ async function main() {
         workspaceRoot: toPosix(path.relative(process.cwd(), workspaceRoot)),
         version,
         assets: manifestEntries,
+        fontStylesheets,
       },
       null,
       2,
