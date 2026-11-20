@@ -8,7 +8,6 @@ import { type Locale } from '@/app/i18n/config';
 import { localizedMetadata } from '@/app/metadata';
 
 export const revalidate = 300;
-export const dynamicParams = false;
 export function generateStaticParams() {
   return [];
 }
