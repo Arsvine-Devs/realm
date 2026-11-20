@@ -11,11 +11,13 @@ import { VisitorStatsProvider } from '@/features/visitor-stats/model/VisitorStat
 
 interface AppProvidersProps {
   children: ReactNode;
+  assets: Record<string, string>;
+  mediaBase: string;
 }
 
-export default function AppProviders({ children }: AppProvidersProps) {
+export default function AppProviders({ children, assets, mediaBase }: AppProvidersProps) {
   return (
-    <SiteAssetsProvider>
+    <SiteAssetsProvider assets={assets} mediaBase={mediaBase}>
       <VisitorStatsProvider>
         <HudProvider>
           <LocalePageStateProvider>

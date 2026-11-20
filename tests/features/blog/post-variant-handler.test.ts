@@ -94,4 +94,19 @@ describe('/api/post-variant', () => {
     expect(getPostBySlugAndContentLocaleMock).toHaveBeenCalledWith('protected-post', 'zh-CN');
     expect(serializeMock).toHaveBeenCalledWith('# secret');
   });
+
+  it('checks the access group returned with the body if publication changed during the request', async () => {
+    getBlogPostEntryMock.mockResolvedValue({ access: { mode: 'totp', group: 'old-group' } });
+    hasValidAccessGrantMock.mockImplementation((_, group) => group === 'old-group');
+    getPostBySlugAndContentLocaleMock.mockResolvedValue({
+      meta: { access: { mode: 'totp', group: 'new-group' } },
+      content: '# secret',
+    });
+    serializeMock.mockResolvedValue({});
+
+    const response = await handler(createRequest('arsvine_post_access=signed-token'));
+
+    expect(response.status).toBe(403);
+    expect(serializeMock).not.toHaveBeenCalled();
+  });
 });

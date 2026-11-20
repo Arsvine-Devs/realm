@@ -77,24 +77,6 @@
       "failureBehavior": "Invalid JSON is rejected; an unset map provides no configured groups."
     },
     {
-      "key": "REVALIDATE_WEBHOOK_SECRET",
-      "section": "Security",
-      "exampleFiles": [".env.example"],
-      "commented": true,
-      "requiredness": "conditional",
-      "secret": true,
-      "format": "long random HMAC secret shared with API and asset publisher",
-      "example": "replace-with-a-long-random-secret",
-      "localDefault": "",
-      "scopes": ["local", "preview", "production"],
-      "usedBy": [
-        "src/features/content/server/internalRevalidateHandler.ts",
-        "scripts/assets/publish.mjs"
-      ],
-      "description": "Authenticates internal Content and asset revalidation events.",
-      "failureBehavior": "Unsigned, stale, or incorrectly signed events are rejected."
-    },
-    {
       "key": "TRUST_PROXY",
       "section": "Security",
       "exampleFiles": [".env.example"],
@@ -286,27 +268,27 @@
       "requiredness": "conditional",
       "secret": false,
       "format": "absolute path",
-      "example": "/media-public/realm/site-catalog/current.json",
+      "example": "/media-private/realm/catalog/current.json",
       "localDefault": "",
       "scopes": ["local", "preview", "production"],
       "usedBy": ["src/features/assets/server/catalog/catalog-provider.ts"],
-      "description": "Read-only shared current-version file also available through the public media route.",
+      "description": "Read-only private Catalog pointer.",
       "failureBehavior": "Catalog endpoints return service unavailable when missing."
     },
     {
-      "key": "REALM_REVALIDATE_ORIGIN",
+      "key": "ARSVINE_PUBLIC_MEDIA_ORIGIN",
       "section": "Infra",
       "exampleFiles": [".env.example"],
       "commented": true,
       "requiredness": "optional",
       "secret": false,
-      "format": "absolute HTTP(S) origin",
-      "example": "http://realm:3000",
+      "format": "absolute HTTPS origin",
+      "example": "https://cdn.arsvine.com",
       "localDefault": "",
-      "scopes": ["local", "production"],
-      "usedBy": ["scripts/assets/publish.mjs"],
-      "description": "Internal Realm HTTP origin for refreshing pages after media publication.",
-      "failureBehavior": "Media publish does not notify Realm when neither refresh setting is supplied."
+      "scopes": ["production"],
+      "usedBy": ["src/shared/lib/media.ts"],
+      "description": "Public media origin registered by the Web gateway.",
+      "failureBehavior": "Development and previews use same-origin media."
     },
     {
       "key": "REDIS_KEY_PREFIX",

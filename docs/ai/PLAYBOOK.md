@@ -15,7 +15,7 @@
 - Run the narrowest check that can falsify the current change.
 - Keep `PASS`, `NOT_RUN`, and `BLOCKED` evidence labels truthful.
 - Do not add a dependency, registry, compatibility shim, or generic framework for an unresolved decision.
-- Treat generated output, local credentials, COS, databases, deployment, and revalidation as separate boundaries.
+- Treat generated output, local credentials, media mounts, databases, and deployment as separate boundaries.
 
 ## Before handoff
 

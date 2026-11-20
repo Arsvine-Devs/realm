@@ -17,12 +17,9 @@ import {
 import { loadMessages } from '@/app/i18n/data';
 import type { Locale } from '@/app/i18n/config';
 import { localizedMetadata } from '@/app/metadata';
+import { ContentServiceError } from '@/shared/lib/content/content-api';
 
-export const revalidate = 300;
-export const dynamicParams = true;
-export function generateStaticParams() {
-  return [];
-}
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,
@@ -109,7 +106,8 @@ export default async function BlogPost({
         isProtected={false}
       />
     );
-  } catch {
-    notFound();
+  } catch (error) {
+    if (error instanceof ContentServiceError && error.status === 404) notFound();
+    throw error;
   }
 }

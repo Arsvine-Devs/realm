@@ -301,15 +301,6 @@ export default function ContentPage({
     [navigateTo, locale],
   );
 
-  const handleBlogItemIntent = useCallback(
-    (post: BlogPostMeta) => {
-      if (post.access.mode === 'public') {
-        prefetchOnIntent(buildBlogPostHref(locale, post.slug, locale));
-      }
-    },
-    [locale, prefetchOnIntent],
-  );
-
   const handleBackFromDetail = useCallback(() => {
     if (isClosingRef.current) return;
     isClosingRef.current = true;
@@ -386,7 +377,6 @@ export default function ContentPage({
             locale={locale}
             posts={blogPosts}
             handleBlogItemClick={handleBlogItemClick}
-            handleBlogItemIntent={handleBlogItemIntent}
           />
         </div>
 

@@ -4,11 +4,22 @@ import type {
   ExternalAssetReference,
   ManagedAssetReference,
 } from '@/shared/types';
+import { readEnv } from '@/shared/config/env-provider';
 
 const REALM_NAMESPACE = 'realm/';
 const SHARED_NAMESPACE = 'shared/';
 
 export const PUBLIC_MEDIA_PATH = '/media';
+
+export function getPublicMediaBase() {
+  const origin = readEnv('ARSVINE_PUBLIC_MEDIA_ORIGIN');
+  if (!origin) return PUBLIC_MEDIA_PATH;
+  const url = new URL(origin);
+  if (url.protocol !== 'https:' || url.origin !== origin) {
+    throw new Error('ARSVINE_PUBLIC_MEDIA_ORIGIN must be an HTTPS origin');
+  }
+  return `${url.origin}${PUBLIC_MEDIA_PATH}`;
+}
 
 function normalizeObjectKey(objectKey: string) {
   return objectKey.replace(/^\/+/, '');
@@ -38,18 +49,12 @@ function assertAllowedManagedObjectKey(objectKey: string) {
     throw new Error(`Unsupported media object key namespace: ${objectKey}`);
   return key;
 }
-export function managedAsset(
-  objectKey: string,
-  meta: Omit<ManagedAssetReference, 'objectKey'> = {},
-): ManagedAssetReference {
-  return { objectKey: assertAllowedManagedObjectKey(objectKey), ...meta };
-}
 function catalogAsset(catalogKey: string, alt?: string): CatalogAssetReference {
   return alt ? { catalogKey, alt } : { catalogKey };
 }
-export function buildManagedAssetUrl(objectKey: string) {
+export function buildManagedAssetUrl(objectKey: string, mediaBase = PUBLIC_MEDIA_PATH) {
   const key = assertAllowedManagedObjectKey(objectKey);
-  return `${PUBLIC_MEDIA_PATH}/${key.split('/').map(encodeURIComponent).join('/')}`;
+  return `${mediaBase}/${key.split('/').map(encodeURIComponent).join('/')}`;
 }
 export function resolveRawAssetUrl(asset: AssetReference | null | undefined) {
   if (!asset) return '';

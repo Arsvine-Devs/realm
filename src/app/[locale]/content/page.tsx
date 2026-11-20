@@ -7,8 +7,6 @@ import type { Locale } from '@/app/i18n/config';
 import { localizedMetadata } from '@/app/metadata';
 import { connection } from 'next/server';
 
-export const revalidate = 300;
-
 export async function generateMetadata({
   params,
 }: {
@@ -28,7 +26,10 @@ export default async function Content({ params }: { params: Promise<{ locale: Lo
   const { locale } = await params;
   const [messages, blogPosts, catalogAssets] = await Promise.all([
     loadMessages(locale),
-    getAllPostsForLocale(locale),
+    getAllPostsForLocale(locale).catch(() => {
+      console.warn('[content] Blog posts unavailable');
+      return [];
+    }),
     getStaticCatalogAssets(),
   ]);
   const projects = loadProjects(locale);

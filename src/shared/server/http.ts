@@ -1,4 +1,3 @@
-import { timingSafeEqual } from 'node:crypto';
 import { readEnv } from '@/shared/config/env-provider';
 
 const JSON_CONTENT_TYPE = 'application/json; charset=utf-8';
@@ -36,12 +35,6 @@ export function parseCookieHeader(rawCookie: string | null): Record<string, stri
       }
     }),
   );
-}
-
-export function secureStringEqual(left: string, right: string) {
-  const leftBuffer = Buffer.from(left);
-  const rightBuffer = Buffer.from(right);
-  return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer);
 }
 
 export function isProxyTrusted() {

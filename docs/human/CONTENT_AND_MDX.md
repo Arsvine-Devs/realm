@@ -2,7 +2,7 @@
 
 [返回文档索引](../INDEX.md)
 
-本文说明结构化站点数据、已发布 Content release、MDX 组件、内容 locale、阅读时间和 locale fallback。受保护内容的认证细节见 [`SECURITY.md`](./SECURITY.md)。
+本文说明结构化站点数据、已发布内容、MDX 组件、文章语言和阅读时间。受保护内容的认证细节见 [`SECURITY.md`](./SECURITY.md)。
 
 ## 内容来源
 
@@ -11,7 +11,7 @@
 1. 仓库内 TypeScript 数据：作品、经历、Life、技能、友链和站点配置。
 2. `content.arsvine.com` 发布读面：博客索引、已发布 MDX variant 和推文归档。
 
-Realm 运行时只读取已发布 Content release。Content release 不可用时，Blog 读取按 Content client 错误边界失败，Tweet loader 只保留仍可读取的月度数据；不会恢复 GitHub 或仓库内文件读取。测试通过对应边界的 fixture 提供数据，开发环境可用 `TWEETS_STRESS_TEST=1` 生成合成归档。
+Realm 在每次请求时读取 Content。Content 从同环境的 PostgreSQL 发布视图读取文章与短帖。Content 暂时不可用时，内容汇总页仍展示作品和经历，独立文章页和短帖页面进入错误状态。开发环境可用 `TWEETS_STRESS_TEST=1` 生成合成归档。
 
 ## 结构化数据
 
@@ -36,7 +36,7 @@ en.ts
 
 `src/app/i18n/data.ts` 使用显式静态注册表。不要改成动态 `require()`。
 
-## Content release index
+## 文章索引
 
 索引是列表与受保护 metadata 的权威来源。单篇结构：
 
@@ -52,16 +52,12 @@ en.ts
   "variants": {
     "zh-CN": {
       "title": "示例文章",
-      "excerpt": "摘要",
-      "tags": ["随笔"],
-      "readingMinutes": 3
+      "excerpt": "摘要"
     },
     "en": {
       "title": "Example Post",
       "excerpt": "Summary",
-      "tags": ["Essay"],
-      "originLocale": "zh-CN",
-      "readingMinutes": 4
+      "originLocale": "zh-CN"
     }
   }
 }
@@ -70,13 +66,11 @@ en.ts
 规则：
 
 - `slug` 必须是安全的单一路径 segment。
-- `availableLocales` 决定可请求的 MDX 文件。
-- variant `tags` 优先；缺失时使用顶层 `tags`。
-- 列表/SSG metadata 使用索引中的 `readingMinutes`。
+- `availableLocales` 列出可以请求的语言版本。
 - 加载正文后会根据实际正文重新计算阅读时间。
 - protected post 的公开 metadata 会清空 excerpt、tags 和 reading time。
 
-发布 variant 的正文以 Content release 中的 `bodyMdx` 字段为准。展示 metadata 来自 release index 和 variant descriptor；Realm 不把本地 MDX frontmatter 作为运行时输入。
+Content 的语言版本包含 `bodyMdx` 正文。Realm 从文章索引和语言版本读取展示信息。
 
 ## 自定义 MDX 组件
 
@@ -147,30 +141,21 @@ protected body 不得进入静态 props、HTML 或 RSC payload。页面初始只
 
 ## 推文归档
 
-Realm 通过 Content service 的 `/v1/tweets/months` 和 `/v1/tweets/months/:month` 读取月度归档；loader 会：
+Realm 从 Content 读取公开短帖，按上海时区分月。`/api/tweet-months?offset=&limit=` 只读取请求的月份。空列表表示当前没有公开短帖，读服务故障返回 `503`。
 
-- 读取并排序月份；
-- 过滤不可见记录；
-- 对单月读取失败进行容错；
-- 通过 `/api/tweet-months?offset=&limit=` 分页返回月份组。
+## 发布与撤稿
 
-索引或单月读取失败时保留可用月份；没有可用数据时页面显示空状态。
-
-## 发布内容后的刷新
-
-Content/API 和资产发布脚本向 `POST /api/internal/revalidate` 发送带时间戳的 HMAC 事件。Content 事件包含 `posts:<slug>` 与 `tweets` 资源；资产事件包含 `assets` 资源。Realm 验证 `REVALIDATE_WEBHOOK_SECRET` 后刷新对应页面。
-
-该接口是服务间接口，不接受浏览器请求或 URL/query secret。具体签名边界见 [`SECURITY.md`](./SECURITY.md)。
+API 提交修改后，新的文章页面、列表和订阅请求读取已提交状态。草稿、撤下的文章和非公开短帖从发布视图排除。
 
 ## 修改检查清单
 
-- release index 的 locale 与可读取 variant 一致。
+- 文章索引的语言与可以读取的版本一致。
 - 每个 variant 有 title 和 excerpt。
 - `originLocale` 只使用 UI locale 合约允许的值。
 - protected metadata 不泄漏摘要、tag 或 reading time。
 - 自定义组件在 desktop/mobile 都可用键盘和触摸访问。
 - 内部链接保持安全，不绕过导航规则。
-- 运行 blog、content revalidation 和 build 相关测试。
+- 验证文章发布、修改、撤稿及受保护正文加载。
 
 ## 相关文档
 

@@ -11,7 +11,7 @@ vi.mock('@/shared/lib/content/content-api', () => ({
   fetchPublishedTweetMonth: fetchPublishedTweetMonthMock,
 }));
 
-import { getTweetMonthGroups } from '@/features/tweets/server/content';
+import { getTweetMonthGroupsPage } from '@/features/tweets/server/content';
 
 describe('published Content tweet source', () => {
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe('published Content tweet source', () => {
     fetchPublishedTweetMonthMock.mockReset();
   });
 
-  it('keeps available months when one monthly document is temporarily unavailable', async () => {
+  it('loads only the requested months and retains the total', async () => {
     fetchPublishedTweetIndexMock.mockResolvedValue({
       months: [
         { month: '2026-07', path: 'tweets/2026-07.json' },
@@ -42,18 +42,24 @@ describe('published Content tweet source', () => {
         : Promise.reject(new Error('month unavailable')),
     );
 
-    await expect(getTweetMonthGroups()).resolves.toEqual([
-      expect.objectContaining({
-        month: '2026-07',
-        tweets: [expect.objectContaining({ id: 'available' })],
-      }),
-    ]);
+    await expect(getTweetMonthGroupsPage(0, 1)).resolves.toEqual({
+      monthGroups: [
+        expect.objectContaining({
+          month: '2026-07',
+          tweets: [expect.objectContaining({ id: 'available' })],
+        }),
+      ],
+      totalMonths: 2,
+    });
+    expect(fetchPublishedTweetMonthMock).toHaveBeenCalledExactlyOnceWith('2026-07');
   });
 
-  it('falls back to an empty list when the remote index shape is invalid', async () => {
+  it('reports upstream errors without presenting an empty timeline', async () => {
     fetchPublishedTweetIndexMock.mockResolvedValue({ months: { month: '2026-07' } });
 
-    await expect(getTweetMonthGroups()).resolves.toEqual([]);
+    await expect(getTweetMonthGroupsPage(0, 1)).rejects.toThrow(
+      'Invalid published tweet index shape',
+    );
   });
 
   it('keeps a valid X origin alongside the normalized tweet', async () => {
@@ -79,14 +85,16 @@ describe('published Content tweet source', () => {
       ],
     });
 
-    await expect(getTweetMonthGroups()).resolves.toEqual([
-      expect.objectContaining({
-        tweets: [expect.objectContaining({ origin: expect.objectContaining({ provider: 'x' }) })],
-      }),
-    ]);
+    await expect(getTweetMonthGroupsPage(0, 1)).resolves.toMatchObject({
+      monthGroups: [
+        {
+          tweets: [expect.objectContaining({ origin: expect.objectContaining({ provider: 'x' }) })],
+        },
+      ],
+    });
   });
 
-  it('drops a monthly document with an invalid X origin shape', async () => {
+  it('reports an invalid month response', async () => {
     fetchPublishedTweetIndexMock.mockResolvedValue({
       months: [{ month: '2026-09', path: 'tweets/2026-09.json' }],
     });
@@ -102,6 +110,6 @@ describe('published Content tweet source', () => {
       ],
     });
 
-    await expect(getTweetMonthGroups()).resolves.toEqual([]);
+    await expect(getTweetMonthGroupsPage(0, 1)).rejects.toThrow('Invalid tweets for 2026-09');
   });
 });

@@ -190,20 +190,5 @@ describe('assets build script', () => {
     ]);
     expect(staticAssets.assets).not.toHaveProperty('posts/arsvine-realm-sceenshot-1.png');
     expect(staticAssets.assets).not.toHaveProperty('posts/arsvine-realm-sceenshot-2.png');
-
-    const publicAssetsRaw = await readFile(
-      path.join(
-        distRoot,
-        'media',
-        'public-root',
-        'realm',
-        'site-catalog',
-        'versions',
-        current.version,
-        'assets.json',
-      ),
-      'utf-8',
-    );
-    expect(JSON.parse(publicAssetsRaw)).toEqual({ version: current.version, assets: {} });
   });
 });

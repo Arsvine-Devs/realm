@@ -6,6 +6,7 @@ import {
   type BlogContentLocale,
 } from './blog';
 import { hasValidAccessGrant } from '@/shared/lib/content/access-grant';
+import { ContentServiceError } from '@/shared/lib/content/content-api';
 import { jsonResponse, parseCookieHeader } from '@/shared/server/http';
 
 export default async function handler(request: Request) {
@@ -48,6 +49,13 @@ export default async function handler(request: Request) {
     );
   }
 
+  const accessRequest = { cookies: parseCookieHeader(request.headers.get('cookie')) };
+  const grantRequired = () =>
+    jsonResponse(
+      { ok: false, error: { code: 'FORBIDDEN', message: 'Access grant required.' } },
+      { ...responseInit, status: 403 },
+    );
+
   if (entry.access.mode === 'totp') {
     const group = entry.access.group?.trim();
     if (!group) {
@@ -57,14 +65,7 @@ export default async function handler(request: Request) {
       );
     }
 
-    if (
-      !hasValidAccessGrant({ cookies: parseCookieHeader(request.headers.get('cookie')) }, group)
-    ) {
-      return jsonResponse(
-        { ok: false, error: { code: 'FORBIDDEN', message: 'Access grant required.' } },
-        { ...responseInit, status: 403 },
-      );
-    }
+    if (!hasValidAccessGrant(accessRequest, group)) return grantRequired();
   }
 
   try {
@@ -72,6 +73,13 @@ export default async function handler(request: Request) {
       slugParam,
       localeParam as BlogContentLocale,
     );
+    const access = variant.meta.access;
+    if (
+      access.mode === 'totp' &&
+      (!access.group || !hasValidAccessGrant(accessRequest, access.group))
+    ) {
+      return grantRequired();
+    }
     const mdxSource = await serialize(variant.content);
 
     return jsonResponse(
@@ -83,10 +91,8 @@ export default async function handler(request: Request) {
       responseInit,
     );
   } catch (error) {
-    // 区分"文章不存在"与"MDX 序列化失败" / "上游错误"。
-    // 文章找不到（Content 404）走 404 + NOT_FOUND；其他（MDX 编译、序列化、5xx）走 500。
-    const message = error instanceof Error ? error.message : '';
-    if (message.includes('not found') || message.includes('404')) {
+    if (error instanceof ContentServiceError && error.status === 403) return grantRequired();
+    if (error instanceof ContentServiceError && error.status === 404) {
       return jsonResponse(
         { ok: false, error: { code: 'NOT_FOUND', message: 'Post variant not found.' } },
         { ...responseInit, status: 404 },

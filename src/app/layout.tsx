@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { connection } from 'next/server';
 import type { ReactNode } from 'react';
 
 import '@/app/styles/globals.scss';
@@ -10,6 +11,8 @@ import LocaleClientProviders from '@/app/providers/LocaleClientProviders';
 import { defaultLocale, htmlLangMap } from '@/app/i18n/config';
 import { siteConfig, getSiteUrl } from '@/shared/config/site';
 import { buildDocumentBootstrapScript } from '@/shared/lib/document-bootstrap';
+import { buildManagedAssetUrl, getPublicMediaBase } from '@/shared/lib/media';
+import { getStaticCatalogAssets } from '@/features/assets/server/catalog/catalog-provider';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -39,18 +42,34 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  await connection();
+  const mediaBase = getPublicMediaBase();
+  const catalog = await getStaticCatalogAssets().catch(() => ({}));
+  const assets = Object.fromEntries(
+    Object.entries(catalog).map(([key, asset]) => [
+      key,
+      buildManagedAssetUrl(asset.objectKey, mediaBase),
+    ]),
+  );
   return (
     <html lang={htmlLangMap[defaultLocale]} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         {process.env.NODE_ENV === 'production' ? (
           <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
         ) : null}
-        <link href={siteConfig.fonts.mediaStylesheet} rel="stylesheet" />
+        <link
+          href={buildManagedAssetUrl(siteConfig.fonts.stylesheetKey, mediaBase)}
+          rel="stylesheet"
+          crossOrigin="anonymous"
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
         <DocumentBootstrapScript script={buildDocumentBootstrapScript()} />
       </head>
       <body>
-        <LocaleClientProviders>{children}</LocaleClientProviders>
+        <LocaleClientProviders assets={assets} mediaBase={mediaBase}>
+          {children}
+        </LocaleClientProviders>
       </body>
     </html>
   );

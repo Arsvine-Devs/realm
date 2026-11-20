@@ -6,15 +6,6 @@ import { loadMetaSection, replaceSourceFields } from './lib/catalog-transform.mj
 
 const DEFAULT_WORKSPACE = path.join(process.cwd(), 'media-workspace');
 const DEFAULT_DIST = path.join(process.cwd(), 'dist');
-const SITE_ASSET_KEYS = new Set([
-  'site/about-qr',
-  'site/travelling',
-  'decor/contour-map',
-  'decor/portfolio-title',
-  'decor/experience-title',
-  'decor/life-title',
-  'decor/texture-noise',
-]);
 
 function parseArgs(argv) {
   const options = {
@@ -126,27 +117,6 @@ async function main() {
     );
   }
 
-  const staticAssets = transformedSections['static-assets']?.assets || {};
-  const publicSiteAssets = Object.fromEntries(
-    Object.entries(staticAssets)
-      .filter(([key]) => SITE_ASSET_KEYS.has(key))
-      .map(([key, record]) => [
-        key,
-        {
-          objectKey: record.objectKey,
-          ...(record.alt ? { alt: record.alt } : {}),
-          ...(record.width ? { width: record.width } : {}),
-          ...(record.height ? { height: record.height } : {}),
-        },
-      ]),
-  );
-  const publicSiteCatalogRoot = path.join(distPublicRoot, 'realm', 'site-catalog');
-  const publicSiteVersionRoot = path.join(publicSiteCatalogRoot, 'versions', version);
-  await mkdir(publicSiteVersionRoot, { recursive: true });
-  await writeFile(
-    path.join(publicSiteVersionRoot, 'assets.json'),
-    JSON.stringify({ version, assets: publicSiteAssets }, null, 2),
-  );
   await mkdir(distManifestRoot, { recursive: true });
   await writeFile(
     path.join(distManifestRoot, 'manifest.generated.json'),

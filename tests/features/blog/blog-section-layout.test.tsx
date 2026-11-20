@@ -41,15 +41,13 @@ describe('BlogSection layout', () => {
     expect(postList?.contains(screen.getByText('Signal'))).toBe(true);
   });
 
-  it('signals navigation intent only on primary pointer or keyboard activation', () => {
+  it('opens a live post on activation', () => {
     const handleBlogItemClick = vi.fn();
-    const handleBlogItemIntent = vi.fn();
     render(
       <BlogSection
         blogSectionRef={{ current: null }}
         locale="en"
         handleBlogItemClick={handleBlogItemClick}
-        handleBlogItemIntent={handleBlogItemIntent}
         posts={[
           {
             slug: 'signal',
@@ -68,13 +66,12 @@ describe('BlogSection layout', () => {
     fireEvent.mouseEnter(card);
     fireEvent.focus(card);
     fireEvent.pointerDown(card, { button: 2 });
-    expect(handleBlogItemIntent).not.toHaveBeenCalled();
+    expect(handleBlogItemClick).not.toHaveBeenCalled();
 
     fireEvent.pointerDown(card, { button: 0 });
     fireEvent.keyDown(card, { key: 'Enter' });
     fireEvent.keyDown(card, { key: ' ' });
 
-    expect(handleBlogItemIntent).toHaveBeenCalledTimes(3);
     expect(handleBlogItemClick).toHaveBeenCalledTimes(2);
   });
 });

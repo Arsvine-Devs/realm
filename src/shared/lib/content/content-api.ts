@@ -3,8 +3,6 @@ import { readEnv } from '@/shared/config/env-provider';
 import { authOrigin, contentOrigin } from '@/shared/config/site-endpoints';
 
 const FETCH_TIMEOUT_MS = 8000;
-const PUBLIC_CONTENT_REVALIDATE_SECONDS = 300;
-export const PUBLIC_CONTENT_CACHE_TAG = 'published-content';
 const PROTECTED_SCOPE = 'content:protected:read';
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 
@@ -15,7 +13,7 @@ type ServiceToken = {
 
 let serviceToken: ServiceToken | null = null;
 
-class ContentServiceError extends Error {
+export class ContentServiceError extends Error {
   constructor(
     message: string,
     readonly status?: number,
@@ -56,15 +54,6 @@ function getContentAudience() {
 function getBaseUrl() {
   const internalOrigin = readEnv('CONTENT_INTERNAL_ORIGIN');
   return internalOrigin ? readOrigin(internalOrigin, true) : getContentAudience();
-}
-
-export async function checkContentReady() {
-  const response = await fetch(`${getBaseUrl()}/health/ready`, {
-    cache: 'no-store',
-    signal: AbortSignal.timeout(2000),
-  });
-  await response.body?.cancel();
-  if (!response.ok) throw new Error('Content service is not ready');
 }
 
 function getProtectedContentAuthConfig() {
@@ -135,11 +124,7 @@ async function fetchContentJson<T>(
   const response = await fetch(`${getBaseUrl()}${path}`, {
     headers,
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-    ...(options.protected
-      ? { cache: 'no-store' as const }
-      : {
-          next: { revalidate: PUBLIC_CONTENT_REVALIDATE_SECONDS, tags: [PUBLIC_CONTENT_CACHE_TAG] },
-        }),
+    cache: 'no-store',
   });
   const body = (await response.json().catch(() => null)) as {
     error?: { code?: string; message?: string };
@@ -159,11 +144,7 @@ async function fetchContentJson<T>(
 }
 
 export async function fetchPublishedBlogIndex(): Promise<ContentBlogIndex> {
-  const data = await fetchContentJson<{
-    publishedAt: string;
-    posts: ContentBlogIndex['posts'];
-  }>('/v1/posts');
-  return { version: 1, updatedAt: data.publishedAt, posts: data.posts };
+  return fetchContentJson<ContentBlogIndex>('/v1/posts');
 }
 
 export type PublishedPostVariant = {
@@ -199,7 +180,12 @@ export async function fetchPublishedTweetIndex() {
 }
 
 export async function fetchPublishedTweetMonth(month: string) {
-  return fetchContentJson<{ month: string; tweets: unknown[] }>(
-    `/v1/tweets/months/${encodeURIComponent(month)}`,
-  );
+  try {
+    return await fetchContentJson<{ month: string; tweets: unknown[] }>(
+      `/v1/tweets/months/${encodeURIComponent(month)}`,
+    );
+  } catch (error) {
+    if (error instanceof ContentServiceError && error.status === 404) return { month, tweets: [] };
+    throw error;
+  }
 }

@@ -83,7 +83,7 @@ styles/      feature styles
 
 ### `src/shared/`
 
-只存跨 feature 的稳定能力：locale/performance contract、通用 hook、UI primitive、HTTP/revalidation helper、内容安全工具和配置。
+存放通用的语言和性能配置、Hook、UI 组件、HTTP 和内容安全工具。
 
 单个 feature 消费的算法应留在该 feature 的 `model/`，避免把 `shared` 变成杂物层。
 
@@ -138,17 +138,16 @@ Realm 运行时不包含 GitHub 内容读取器；已发布 Content service 是 
 
 ## API 边界
 
-| Route                                  | 责任                                        |
-| -------------------------------------- | ------------------------------------------- |
-| `/api/hitokoto`                        | timeout/cached 第三方文本代理               |
-| `/api/visitor-stats`                   | 生产主域名的去重访客统计                    |
-| `/api/grant-check`                     | 检查签名访问 Cookie                         |
-| `/api/protected-verify`                | 校验 TOTP、限流、设置 Cookie                |
-| `/api/post-variant`                    | 按 locale 返回 MDX；protected 需要 grant    |
-| `/api/tweet-months`                    | 分页返回 tweet month group                  |
-| `/api/assets/{audio,home,links,works}` | 读取当前 Catalog section                    |
-| `/api/assets/collections/[slug]`       | 分页读取 collection                         |
-| `/api/internal/revalidate`             | 接收 Content/asset 发布 HMAC 事件并刷新页面 |
+| Route                                  | 责任                                     |
+| -------------------------------------- | ---------------------------------------- |
+| `/api/hitokoto`                        | timeout/cached 第三方文本代理            |
+| `/api/visitor-stats`                   | 生产主域名的去重访客统计                 |
+| `/api/grant-check`                     | 检查签名访问 Cookie                      |
+| `/api/protected-verify`                | 校验 TOTP、限流、设置 Cookie             |
+| `/api/post-variant`                    | 按 locale 返回 MDX；protected 需要 grant |
+| `/api/tweet-months`                    | 分页返回 tweet month group               |
+| `/api/assets/{audio,home,links,works}` | 读取当前 Catalog section                 |
+| `/api/assets/collections/[slug]`       | 分页读取 collection                      |
 
 Route 文件只适配 Web `Request` / `Response`；业务 handler 位于 feature/server。当前 route method 的权威列表见 [`docs/ai/API-REF.md`](../ai/API-REF.md)，未导出的方法由 Next.js 返回 `405`。
 
@@ -171,7 +170,7 @@ WebGL module 必须允许 lazy load failure、context loss、pause 和能力关�
 
 ## Failure boundary
 
-- Content release/API 不可用：博客和推文按 Content client 的错误边界处理；检查静态 service origin 和发布 release。
+- Content 不可用时，独立文章和短帖页面显示读取失败，内容汇总页继续展示作品和经历。检查 Content 健康路由及 Core 发布视图连接。
 - public site manifest 失败：移除可选装饰，不阻断导航。
 - private Catalog 失败：API 返回明确 `502`，server loader 使用定义好的 fallback。
 - telemetry provider 失败：error boundary 隔离，不阻断站点。

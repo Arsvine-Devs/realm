@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-describe('GEO and ISR rendering contract', () => {
-  it('keeps request cookies out of the locale root layout so blog routes remain prerenderable', () => {
+describe('GEO and content rendering', () => {
+  it('keeps geo cookies in the document bootstrap and renders articles at request time', () => {
     const rootLayout = readFileSync(resolve(process.cwd(), 'src/app/layout.tsx'), 'utf8');
     const localeLayout = readFileSync(
       resolve(process.cwd(), 'src/app/[locale]/layout.tsx'),
@@ -29,7 +29,7 @@ describe('GEO and ISR rendering contract', () => {
     expect(documentBootstrapScript).toContain('useServerInsertedHTML');
     expect(documentBootstrapScript).toContain('id="document-bootstrap"');
     expect(documentBootstrapScript).toContain('return null;');
-    expect(blogPage).toContain('export const revalidate = 300;');
+    expect(blogPage).toContain("export const dynamic = 'force-dynamic';");
   });
 
   it('applies proxy-issued GEO_COUNTRY only in the synchronous document bootstrap', () => {

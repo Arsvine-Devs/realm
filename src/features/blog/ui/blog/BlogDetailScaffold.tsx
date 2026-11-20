@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useHudPower } from '../../../../features/hud/model/HudProvider';
 import { useTransition } from '../../../navigation/model/TransitionProvider';
-import useNavigationIntentPrefetch from '../../../navigation/model/useNavigationIntentPrefetch';
 import { buildBlogIndexHref, buildBlogPostHref } from '../../model/blogClient';
 import type { BlogContentLocale } from '../../server/blog';
 import { type Locale } from '@/shared/contracts/locale';
@@ -37,7 +36,6 @@ export default function BlogDetailScaffold({
 }: BlogDetailScaffoldProps) {
   const { isInverted } = useHudPower();
   const { navigateTo } = useTransition();
-  const prefetchOnIntent = useNavigationIntentPrefetch();
   const tCommon = useTranslations('common');
   const tNav = useTranslations('nav');
   const pageStateStore = useLocalePageStateStore();
@@ -204,16 +202,6 @@ export default function BlogDetailScaffold({
                 href={prevPostHref}
                 prefetch={false}
                 className={`${styles.footerNavButton} ${styles.footerNavPrev}`}
-                onPointerDown={(event) => {
-                  if (event.button === 0 && prevPost.access.mode === 'public') {
-                    prefetchOnIntent(prevPostHref);
-                  }
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' && prevPost.access.mode === 'public') {
-                    prefetchOnIntent(prevPostHref);
-                  }
-                }}
                 onClick={(event) => {
                   event.preventDefault();
                   navigateTo(prevPostHref);
@@ -228,12 +216,6 @@ export default function BlogDetailScaffold({
                 href={contentIndexHref}
                 prefetch={false}
                 className={`${styles.footerNavButton} ${styles.footerNavPrev}`}
-                onPointerDown={(event) => {
-                  if (event.button === 0) prefetchOnIntent(contentIndexHref);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') prefetchOnIntent(contentIndexHref);
-                }}
                 onClick={handleBack}
                 data-cursor-label="BACK"
               >
@@ -247,16 +229,6 @@ export default function BlogDetailScaffold({
                 href={nextPostHref}
                 prefetch={false}
                 className={`${styles.footerNavButton} ${styles.footerNavNext}`}
-                onPointerDown={(event) => {
-                  if (event.button === 0 && nextPost.access.mode === 'public') {
-                    prefetchOnIntent(nextPostHref);
-                  }
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' && nextPost.access.mode === 'public') {
-                    prefetchOnIntent(nextPostHref);
-                  }
-                }}
                 onClick={(event) => {
                   event.preventDefault();
                   navigateTo(nextPostHref);
@@ -271,12 +243,6 @@ export default function BlogDetailScaffold({
                 href={contentIndexHref}
                 prefetch={false}
                 className={`${styles.footerNavButton} ${styles.footerNavNext}`}
-                onPointerDown={(event) => {
-                  if (event.button === 0) prefetchOnIntent(contentIndexHref);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') prefetchOnIntent(contentIndexHref);
-                }}
                 onClick={handleBack}
                 data-cursor-label="BACK"
               >

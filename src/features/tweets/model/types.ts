@@ -35,13 +35,6 @@ export type TweetItem = {
   origin?: TweetOrigin;
 };
 
-export type TweetIndexItem = {
-  month: string;
-  path: string;
-  count?: number;
-  updatedAt?: string;
-};
-
 export type TweetMonthGroup = {
   month: string;
   count?: number;

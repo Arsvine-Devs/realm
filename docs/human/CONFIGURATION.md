@@ -12,7 +12,6 @@
 | 预览 OAuth 服务与 audience | `AUTH_ORIGIN`、`CONTENT_ORIGIN`                              |
 | 保护正文服务凭据           | `CONTENT_SERVICE_CLIENT_ID`、`CONTENT_SERVICE_CLIENT_SECRET` |
 | TOTP 授权                  | `ACCESS_GRANT_SECRET`、`TOTP_GROUPS_JSON`                    |
-| 发布刷新                   | `REVALIDATE_WEBHOOK_SECRET`、`REALM_REVALIDATE_ORIGIN`       |
 | 访客统计                   | `DATABASE_URL`、`VISITOR_STATS_SECRET`                       |
 | Valkey 限流                | `REDIS_URL`、`REDIS_KEY_PREFIX`                              |
 | 媒体                       | `REALM_CATALOG_ROOT`、`REALM_CATALOG_POINTER`                |

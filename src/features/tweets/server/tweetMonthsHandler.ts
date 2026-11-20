@@ -2,6 +2,7 @@ import { getTweetMonthGroupsPage } from './content';
 import { jsonResponse } from '@/shared/server/http';
 
 function parsePositiveInt(value: string | null, fallback: number) {
+  if (value === null) return fallback;
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < 0) return fallback;
   return Math.floor(parsed);
@@ -11,14 +12,14 @@ export default async function handler(request: Request) {
   try {
     const searchParams = new URL(request.url).searchParams;
     const offset = parsePositiveInt(searchParams.get('offset'), 0);
-    const limit = parsePositiveInt(searchParams.get('limit'), 1);
+    const limit = Math.min(12, Math.max(1, parsePositiveInt(searchParams.get('limit'), 1)));
     const result = await getTweetMonthGroupsPage(offset, limit);
     return jsonResponse(
       {
         ...result,
         generatedAt: new Date().toISOString(),
       },
-      { headers: { 'Cache-Control': 'private, no-store, must-revalidate' } },
+      { headers: { 'Cache-Control': 'no-store' } },
     );
   } catch (error) {
     console.error('[api/tweets/months] source unavailable:', error);
@@ -26,7 +27,7 @@ export default async function handler(request: Request) {
       {
         error: 'tweets_source_unavailable',
       },
-      { status: 500 },
+      { status: 503, headers: { 'Cache-Control': 'no-store' } },
     );
   }
 }

@@ -1,11 +1,17 @@
 import type { PublicCatalogStaticAsset } from './catalog-provider';
-import { isCatalogAssetReference, managedAsset } from '@/shared/lib/media';
+import {
+  buildManagedAssetUrl,
+  getPublicMediaBase,
+  isCatalogAssetReference,
+} from '@/shared/lib/media';
 
 export function hydrateCatalogAssets<T>(
   value: T,
   assets: Record<string, PublicCatalogStaticAsset>,
+  mediaBase = getPublicMediaBase(),
 ): T {
-  if (Array.isArray(value)) return value.map((item) => hydrateCatalogAssets(item, assets)) as T;
+  if (Array.isArray(value))
+    return value.map((item) => hydrateCatalogAssets(item, assets, mediaBase)) as T;
   if (!value || typeof value !== 'object') return value;
   if (isCatalogAssetReference(value as never)) {
     const catalogReference = value as unknown as { catalogKey: string; alt?: string };
@@ -21,12 +27,12 @@ export function hydrateCatalogAssets<T>(
         height: catalogAsset.height,
       }).filter(([, entry]) => entry !== undefined),
     );
-    return managedAsset(catalogAsset.objectKey, metadata) as T;
+    return { ...metadata, url: buildManagedAssetUrl(catalogAsset.objectKey, mediaBase) } as T;
   }
   return Object.fromEntries(
     Object.entries(value as Record<string, unknown>).map(([key, item]) => [
       key,
-      hydrateCatalogAssets(item, assets),
+      hydrateCatalogAssets(item, assets, mediaBase),
     ]),
   ) as T;
 }

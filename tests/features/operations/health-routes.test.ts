@@ -7,7 +7,6 @@ import { checkCatalogReady } from '@/features/assets/server/catalog/catalog-prov
 vi.mock('@/features/assets/server/catalog/catalog-provider', () => ({
   checkCatalogReady: vi.fn(),
 }));
-vi.mock('@/shared/lib/content/content-api', () => ({ checkContentReady: vi.fn() }));
 
 describe('Realm health routes', () => {
   it('reports liveness without requiring external configuration', async () => {
@@ -17,7 +16,7 @@ describe('Realm health routes', () => {
     expect(await response.json()).toEqual({ status: 'live', service: 'realm' });
   });
 
-  it('reports readiness after the catalog and Content are available', async () => {
+  it('reports readiness after the local catalog is available', async () => {
     const response = await getReady();
 
     expect(response.status).toBe(200);

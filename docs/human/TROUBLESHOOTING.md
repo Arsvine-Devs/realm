@@ -116,7 +116,7 @@ UI locale 和 content-only locale 是两个概念；`ja`、`ru`、`fr` 不会切
 
 检查 `config/site-config.mjs` 中 Content origin 对应的 `/health/ready`、`/v1/posts` 和 `/v1/tweets/months`。受保护文章还需要检查 `CONTENT_SERVICE_CLIENT_ID` 和 `CONTENT_SERVICE_CLIENT_SECRET`；不要记录 client secret 或 access token。
 
-Content release 不可用时，Realm 不恢复 GitHub 读取；应检查 Content pointer、manifest、对象存储和服务认证状态。
+Content 不可用时，检查同环境 Core 数据库、Content 只读角色和发布视图。只有受保护正文还需要检查 Auth 服务令牌。
 
 开发推文压力模式：
 
@@ -167,12 +167,9 @@ pnpm vitest run tests/features/blog/blog-protected-rsc-contract.test.ts
 
 检查顺序：
 
-1. public/private version object 是否存在；
-2. 公开和私有读取方是否在使用同一个当前版本指针；
-3. `/api/internal/revalidate` response 的 `failed`；
-4. ISR route 是否包含目标 detail；
-5. 公开 manifest 是否为当前版本；
-6. 数据中的 `catalogKey` 是否正确。
+1. 当前版本是否包含新的媒体文件和私有 Catalog。
+2. Realm 的 Catalog 指针是否已切到新版本。
+3. 数据中的 `catalogKey` 是否与 Catalog 一致。
 
 不要删除旧 object，直到新版本全部验证。
 
@@ -181,7 +178,7 @@ pnpm vitest run tests/features/blog/blog-protected-rsc-contract.test.ts
 检查 response header：
 
 ```bash
-curl -I https://arsvine.com/media/shared/fonts/google-fonts.css
+curl -I https://cdn.arsvine.com/media/shared/fonts/google-fonts.css
 ```
 
 常见原因：
@@ -219,14 +216,6 @@ document.documentElement.dataset.performanceReason;
 ## 生产构建异常
 
 检查 `pnpm build` 输出。需要完整重建时，清理此前失败生成的 `.next` 目录后再构建。
-
-## Revalidation 返回 `401`、`422` 或 partial
-
-- `401`：`REVALIDATE_WEBHOOK_SECRET` 未配置、时间戳过期或 HMAC 不匹配。
-- `422`：事件类型、release ID 或 resources 不符合当前契约。
-- `partial` / `failed`：逐项检查刷新结果；不要只根据 HTTP `2xx` 判定成功。
-
-唯一接口是 `POST /api/internal/revalidate`。发布方必须发送 `X-Arsvine-Timestamp`、`X-Arsvine-Signature` 和原始 JSON body；它不接受 query secret。
 
 ## `pnpm env:sync` 后配置缺失
 
