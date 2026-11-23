@@ -2,9 +2,7 @@
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { compileMDX } from 'next-mdx-remote/rsc';
 import BlogPostPage from '@/features/blog/ui/blog/BlogPostPage';
-import MDXComponents from '@/features/blog/ui/mdx/MDXComponents';
 import {
   getAllPostsForLocale,
   getAvailablePostContentLocales,
@@ -71,7 +69,7 @@ export default async function BlogPost({
           locale={locale}
           messages={messages}
           meta={getProtectedPostPublicMeta(metaResult.meta)}
-          mdxSource={null}
+          bodyDocument={null}
           allPosts={allPosts}
           translationStatus={metaResult.translationStatus}
           actualLocale={metaResult.actualLocale}
@@ -84,18 +82,12 @@ export default async function BlogPost({
       );
     }
     const post = await getPostBySlugAndLocale(slug, locale);
-    const { content: initialBody } = await compileMDX({
-      source: post.content,
-      components: MDXComponents,
-      options: { blockJS: true },
-    });
     return (
       <BlogPostPage
         locale={locale}
         messages={messages}
         meta={post.meta}
-        mdxSource={null}
-        initialBody={initialBody}
+        bodyDocument={{ markdown: post.content, assets: post.assets }}
         allPosts={allPosts}
         translationStatus={post.translationStatus}
         actualLocale={post.actualLocale}

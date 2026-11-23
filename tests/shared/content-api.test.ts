@@ -59,14 +59,15 @@ describe('published Content client', () => {
           variant: {
             slug: 'private-post',
             locale: 'zh-CN',
-            bodyMdx: '# private',
+            bodyMarkdown: '# private',
+            assets: {},
           },
         }),
       );
 
     await expect(
-      fetchPublishedPostVariant('private-post', 'zh-CN', { protected: true }),
-    ).resolves.toMatchObject({ bodyMdx: '# private' });
+      fetchPublishedPostVariant('private-post', 'zh-CN', { accessGroup: 'test-group' }),
+    ).resolves.toMatchObject({ bodyMarkdown: '# private' });
 
     const [tokenUrl, tokenInit] = fetchMock.mock.calls[0] ?? [];
     expect(tokenUrl).toBe('http://127.0.0.1:44002/api/auth/oauth2/token');
@@ -84,6 +85,7 @@ describe('published Content client', () => {
     const [contentUrl, contentInit] = fetchMock.mock.calls[1] ?? [];
     expect(contentUrl).toBe('http://127.0.0.1:44001/v1/internal/posts/private-post/variants/zh-CN');
     expect(new Headers(contentInit?.headers).get('Authorization')).toBe('Bearer service-token');
+    expect(new Headers(contentInit?.headers).get('X-Content-Access-Group')).toBe('test-group');
     expect(contentInit?.cache).toBe('no-store');
     expect(contentInit?.next?.tags).toBeUndefined();
   });

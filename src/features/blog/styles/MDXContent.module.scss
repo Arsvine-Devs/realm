@@ -50,6 +50,27 @@
   letter-spacing: 0.04em;
 }
 
+.image {
+  display: block;
+  max-inline-size: 100%;
+  block-size: auto;
+  margin-block: 0.6em;
+}
+
+.spoilerBlock {
+  margin-block: 0.8rem 1.25rem;
+  border-inline-start: 2px solid rgba(var(--ark-border-rgb), 0.35);
+  padding-inline-start: 0.8rem;
+
+  & > summary {
+    display: list-item;
+    width: fit-content;
+    min-height: 44px;
+    align-content: center;
+    cursor: pointer;
+  }
+}
+
 .scrambleBlock {
   position: relative;
 }

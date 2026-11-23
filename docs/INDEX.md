@@ -11,7 +11,7 @@
 - [`human/MAINTAINER.md`](./human/MAINTAINER.md)：日常开发、测试、质量命令和修改入口。
 - [`human/ARCHITECTURE.md`](./human/ARCHITECTURE.md)：系统边界、运行拓扑和数据流。
 - [`human/ROUTING_AND_I18N.md`](./human/ROUTING_AND_I18N.md)：App Router、locale、过渡和 hash 导航。
-- [`human/CONTENT_AND_MDX.md`](./human/CONTENT_AND_MDX.md)：博客、推文、MDX、内容 locale 和 fallback。
+- [`文章与短帖`](./human/CONTENT_AND_MDX.md)：Markdown、语言版本和受保护附件。
 - [`human/SECURITY.md`](./human/SECURITY.md)：protected post、Cookie、限流和输入安全。
 - [`human/ASSETS.md`](./human/ASSETS.md)：COS、Catalog、字体、图片和音频。
 - [`human/PERFORMANCE.md`](./human/PERFORMANCE.md)：性能 tier、WebGL、动画和降级。

@@ -54,13 +54,9 @@ function resolveOriginLocale(value: string | undefined): Locale | undefined {
   return value && isLocale(value) ? value : undefined;
 }
 
-async function readVariantDocument(
-  slug: string,
-  locale: BlogContentLocale,
-  protectedContent = false,
-) {
+async function readVariantDocument(slug: string, locale: BlogContentLocale, accessGroup?: string) {
   const variant = await fetchPublishedPostVariant(slug, locale, {
-    protected: protectedContent,
+    accessGroup,
   });
   return {
     data: {
@@ -72,7 +68,8 @@ async function readVariantDocument(
       access: variant.access,
       originLocale: variant.originLocale,
     },
-    content: variant.bodyMdx,
+    content: variant.bodyMarkdown,
+    assets: variant.assets,
   };
 }
 
@@ -218,11 +215,7 @@ function sanitizeProtectedPostMeta(meta: BlogPostMeta): BlogPostMeta {
 function estimateReadingMinutes(content: string, locale: BlogContentLocale): number {
   if (!content) return 1;
 
-  const stripped = content
-    .replace(/```[\s\S]*?```/g, ' ')
-    .replace(/`[^`\n]*`/g, ' ')
-    .replace(/<\/?[a-zA-Z][^>]*>/g, ' ')
-    .replace(/^\s*(?:import|export)\s.+$/gm, ' ');
+  const stripped = content.replace(/```[\s\S]*?```/g, ' ').replace(/`[^`\n]*`/g, ' ');
 
   const cjkChars = stripped.match(CJK_CHAR_RE)?.length ?? 0;
   const latinWords = stripped.match(LATIN_WORD_RE)?.length ?? 0;
@@ -254,7 +247,11 @@ export async function getAvailablePostContentLocales(slug: string): Promise<Blog
     .sort((left, right) => blogContentLocales.indexOf(left) - blogContentLocales.indexOf(right));
 }
 
-export async function getPostBySlugAndContentLocale(slug: string, locale: BlogContentLocale) {
+export async function getPostBySlugAndContentLocale(
+  slug: string,
+  locale: BlogContentLocale,
+  accessGroup?: string,
+) {
   const entry = await getBlogIndexEntry(slug);
   if (!entry) {
     throw new ContentServiceError(`No post found for slug: ${slug}`, 404);
@@ -267,7 +264,10 @@ export async function getPostBySlugAndContentLocale(slug: string, locale: BlogCo
     );
   }
 
-  const parsed = await readVariantDocument(slug, locale, entry.access.mode === 'totp');
+  if (entry.access.mode === 'totp' && (!accessGroup || accessGroup !== entry.access.group)) {
+    throw new ContentServiceError('Access grant required.', 403);
+  }
+  const parsed = await readVariantDocument(slug, locale, accessGroup);
   const meta =
     entry.access.mode === 'totp'
       ? buildLoadedVariantMeta(entry, locale, parsed.data, parsed.content)
@@ -276,6 +276,7 @@ export async function getPostBySlugAndContentLocale(slug: string, locale: BlogCo
   return {
     meta,
     content: parsed.content,
+    assets: parsed.assets,
     actualLocale: locale,
   };
 }
@@ -320,6 +321,7 @@ export async function getPostBySlugAndLocale(slug: string, locale: Locale) {
   return {
     meta,
     content: parsed.content,
+    assets: parsed.assets,
     requestedLocale: metaResult.requestedLocale,
     actualLocale: metaResult.actualLocale,
     actualContentLocale: metaResult.actualContentLocale,

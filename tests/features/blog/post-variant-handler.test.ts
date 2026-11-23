@@ -1,16 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const {
-  getBlogPostEntryMock,
-  getPostBySlugAndContentLocaleMock,
-  hasValidAccessGrantMock,
-  serializeMock,
-} = vi.hoisted(() => ({
-  getBlogPostEntryMock: vi.fn(),
-  getPostBySlugAndContentLocaleMock: vi.fn(),
-  hasValidAccessGrantMock: vi.fn(),
-  serializeMock: vi.fn(),
-}));
+const { getBlogPostEntryMock, getPostBySlugAndContentLocaleMock, hasValidAccessGrantMock } =
+  vi.hoisted(() => ({
+    getBlogPostEntryMock: vi.fn(),
+    getPostBySlugAndContentLocaleMock: vi.fn(),
+    hasValidAccessGrantMock: vi.fn(),
+  }));
 
 vi.mock('@/features/blog/server/blog', () => ({
   getBlogPostEntry: getBlogPostEntryMock,
@@ -21,10 +16,6 @@ vi.mock('@/features/blog/server/blog', () => ({
 
 vi.mock('@/shared/lib/content/access-grant', () => ({
   hasValidAccessGrant: hasValidAccessGrantMock,
-}));
-
-vi.mock('next-mdx-remote/serialize', () => ({
-  serialize: serializeMock,
 }));
 
 import handler from '@/features/blog/server/postVariantHandler';
@@ -40,7 +31,6 @@ describe('/api/post-variant', () => {
     getBlogPostEntryMock.mockReset();
     getPostBySlugAndContentLocaleMock.mockReset();
     hasValidAccessGrantMock.mockReset();
-    serializeMock.mockReset();
   });
 
   it('rejects unauthorized protected requests before fetching article content', async () => {
@@ -59,7 +49,6 @@ describe('/api/post-variant', () => {
       error: { code: 'FORBIDDEN', message: 'Access grant required.' },
     });
     expect(getPostBySlugAndContentLocaleMock).not.toHaveBeenCalled();
-    expect(serializeMock).not.toHaveBeenCalled();
     expect(response.headers.get('Cache-Control')).toBe('private, no-store');
     expect(response.headers.get('Vary')).toBe('Cookie');
   });
@@ -81,18 +70,21 @@ describe('/api/post-variant', () => {
         access: { mode: 'totp', group: 'family' },
       },
       content: '# secret',
-    });
-    serializeMock.mockResolvedValue({
-      compiledSource: 'compiled',
-      frontmatter: {},
-      scope: {},
+      assets: {},
     });
 
     const response = await handler(createRequest('arsvine_post_access=signed-token'));
 
     expect(response.status).toBe(200);
-    expect(getPostBySlugAndContentLocaleMock).toHaveBeenCalledWith('protected-post', 'zh-CN');
-    expect(serializeMock).toHaveBeenCalledWith('# secret');
+    expect(getPostBySlugAndContentLocaleMock).toHaveBeenCalledWith(
+      'protected-post',
+      'zh-CN',
+      'family',
+    );
+    expect(await response.json()).toMatchObject({
+      ok: true,
+      bodyDocument: { markdown: '# secret', assets: {} },
+    });
   });
 
   it('checks the access group returned with the body if publication changed during the request', async () => {
@@ -102,11 +94,10 @@ describe('/api/post-variant', () => {
       meta: { access: { mode: 'totp', group: 'new-group' } },
       content: '# secret',
     });
-    serializeMock.mockResolvedValue({});
 
     const response = await handler(createRequest('arsvine_post_access=signed-token'));
 
     expect(response.status).toBe(403);
-    expect(serializeMock).not.toHaveBeenCalled();
+    expect(await response.text()).not.toContain('# secret');
   });
 });

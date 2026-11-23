@@ -12,6 +12,10 @@ Realm 使用 Node 26、仓库锁定的 pnpm 和 Next.js App Router。在开发�
 
 私有 Catalog 由 `REALM_CATALOG_ROOT` 指向。它包含 `realm/catalog/versions/` 与 `realm/catalog/current.json`。平台生成当前指针路径和公开媒体源。将整个 Catalog 目录挂载给 Realm，原子替换指针后下一次请求即可读取新版本。
 
+## 访客统计初始化
+
+为目标环境配置 PostgreSQL 后，在 Realm 仓库运行 `pnpm db:migrate`。首次执行新版初始化时，会清空该环境的旧访客统计，并随机将总访客数设在 410 至 430 之间。之后新访客使总数和当日统计各增加一次，重复访问由访客标识去重。数据库记录初始化状态，后续执行会保留已累积的访客数。
+
 ## 发布与探针
 
 - `GET /api/health/live` 表示应用进程可访问。

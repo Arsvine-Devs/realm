@@ -38,6 +38,8 @@
     "closeTitle": "关闭音乐播放器"
   },
   "spoiler": {
+    "annotations": "注释",
+    "backToAnnotation": "返回注释引用处",
     "revealLabel": "显示被遮挡内容",
     "revealedLabel": "已显示被遮挡内容",
     "clickToReveal": "点击揭示文案",

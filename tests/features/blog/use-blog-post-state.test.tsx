@@ -32,14 +32,14 @@ const meta: BlogPostMeta = {
   access: { mode: 'public' },
 };
 const contentVariants = {};
-const mdxSource = { compiledSource: 'test', frontmatter: {}, scope: {} };
+const bodyDocument = { markdown: 'Test', assets: {} };
 
 function buildProps(hydrationReady: boolean) {
   return {
     currentUrl: '/en/blog/init',
     locale: 'en' as const,
     meta,
-    mdxSource,
+    bodyDocument,
     translationStatus: 'source' as const,
     actualLocale: 'en' as const,
     actualContentLocale: 'en' as const,

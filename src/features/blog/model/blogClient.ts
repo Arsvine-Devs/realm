@@ -1,4 +1,4 @@
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
+import type { MarkdownDocument } from '../ui/blog/MarkdownPost';
 
 import type { BlogPostMeta } from '../../../shared/types';
 import { defaultLocale, isLocale, type Locale } from '@/shared/contracts/locale';
@@ -26,7 +26,7 @@ const PROTOCOL_PREFIX_RE = /^[A-Za-z][A-Za-z\d+.-]*:/;
 
 export interface BlogVariantPayload {
   meta: BlogPostMeta;
-  mdxSource: MDXRemoteSerializeResult | null;
+  bodyDocument: MarkdownDocument | null;
 }
 
 export function getRequestedContentLocaleFromPath(currentUrl: string): BlogContentLocale | null {

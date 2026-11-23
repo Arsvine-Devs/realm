@@ -1,8 +1,9 @@
-import type { ContentBlogIndex, ContentTweetIndexItem } from './types';
+import type { ContentBlogIndex, ContentBlogIndexItem, ContentTweetIndexItem } from './types';
 import { readEnv } from '@/shared/config/env-provider';
 import { authOrigin, contentOrigin } from '@/shared/config/site-endpoints';
 
 const FETCH_TIMEOUT_MS = 8000;
+const ASSET_TIMEOUT_MS = 60_000;
 const PROTECTED_SCOPE = 'content:protected:read';
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 
@@ -92,6 +93,7 @@ async function getProtectedContentToken() {
     }),
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     cache: 'no-store',
+    redirect: 'error',
   });
   const body = (await response.json().catch(() => null)) as {
     access_token?: string;
@@ -114,22 +116,24 @@ async function getProtectedContentToken() {
 
 async function fetchContentJson<T>(
   path: string,
-  options: { protected?: boolean } = {},
+  options: { accessGroup?: string } = {},
   retry = true,
 ): Promise<T> {
   const headers = new Headers({ Accept: 'application/json' });
-  if (options.protected) {
+  if (options.accessGroup) {
     headers.set('Authorization', `Bearer ${await getProtectedContentToken()}`);
+    headers.set('X-Content-Access-Group', options.accessGroup);
   }
   const response = await fetch(`${getBaseUrl()}${path}`, {
     headers,
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     cache: 'no-store',
+    redirect: 'error',
   });
   const body = (await response.json().catch(() => null)) as {
     error?: { code?: string; message?: string };
   } | null;
-  if (options.protected && response.status === 401 && retry) {
+  if (options.accessGroup && response.status === 401 && retry) {
     serviceToken = null;
     return fetchContentJson<T>(path, options, false);
   }
@@ -140,12 +144,27 @@ async function fetchContentJson<T>(
       body?.error?.code,
     );
   }
+  if (body === null) throw new ContentServiceError('Content returned invalid JSON.', 502);
   return body as T;
 }
 
 export async function fetchPublishedBlogIndex(): Promise<ContentBlogIndex> {
   return fetchContentJson<ContentBlogIndex>('/v1/posts');
 }
+
+export async function fetchPublishedPostEntry(slug: string) {
+  try {
+    const { post } = await fetchContentJson<{ post: ContentBlogIndexItem }>(
+      `/v1/posts/${encodeURIComponent(slug)}`,
+    );
+    return post;
+  } catch (error) {
+    if (error instanceof ContentServiceError && error.status === 404) return null;
+    throw error;
+  }
+}
+
+export type PublishedAsset = { url: string } | { private: true };
 
 export type PublishedPostVariant = {
   slug: string;
@@ -157,22 +176,51 @@ export type PublishedPostVariant = {
   updatedAt?: string;
   originLocale?: string;
   access?: { mode: 'public' | 'totp'; group?: string };
-  bodyMdx: string;
+  bodyMarkdown: string;
+  assets: Record<string, PublishedAsset>;
 };
 
 export async function fetchPublishedPostVariant(
   slug: string,
   locale: string,
-  options: { protected?: boolean } = {},
+  options: { accessGroup?: string } = {},
 ) {
   const data = await fetchContentJson<{ variant: PublishedPostVariant }>(
-    `${options.protected ? '/v1/internal' : '/v1'}/posts/${encodeURIComponent(slug)}/variants/${encodeURIComponent(locale)}`,
+    `${options.accessGroup ? '/v1/internal' : '/v1'}/posts/${encodeURIComponent(slug)}/variants/${encodeURIComponent(locale)}`,
     options,
   );
-  if (!data.variant || typeof data.variant.bodyMdx !== 'string') {
+  if (
+    !data.variant ||
+    typeof data.variant.bodyMarkdown !== 'string' ||
+    !data.variant.assets ||
+    typeof data.variant.assets !== 'object' ||
+    Array.isArray(data.variant.assets)
+  ) {
     throw new ContentServiceError('Published content variant is invalid.');
   }
   return data.variant;
+}
+
+export async function fetchProtectedAsset(
+  slug: string,
+  id: string,
+  group: string,
+  { range, signal }: { range: string | null; signal: AbortSignal },
+) {
+  const url = `${getBaseUrl()}/v1/internal/posts/${encodeURIComponent(slug)}/assets/${encodeURIComponent(id)}`;
+  const deadline = AbortSignal.any([signal, AbortSignal.timeout(ASSET_TIMEOUT_MS)]);
+  const headers = new Headers({ 'X-Content-Access-Group': group });
+  if (range) headers.set('Range', range);
+  async function read() {
+    deadline.throwIfAborted();
+    headers.set('Authorization', `Bearer ${await getProtectedContentToken()}`);
+    return fetch(url, { headers, signal: deadline, cache: 'no-store', redirect: 'error' });
+  }
+  const response = await read();
+  if (response.status !== 401) return response;
+  await response.body?.cancel();
+  serviceToken = null;
+  return read();
 }
 
 export async function fetchPublishedTweetIndex() {

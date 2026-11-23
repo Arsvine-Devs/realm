@@ -1,4 +1,3 @@
-import { serialize } from 'next-mdx-remote/serialize';
 import {
   getBlogPostEntry,
   getPostBySlugAndContentLocale,
@@ -72,6 +71,7 @@ export default async function handler(request: Request) {
     const variant = await getPostBySlugAndContentLocale(
       slugParam,
       localeParam as BlogContentLocale,
+      entry.access.mode === 'totp' ? entry.access.group : undefined,
     );
     const access = variant.meta.access;
     if (
@@ -80,13 +80,11 @@ export default async function handler(request: Request) {
     ) {
       return grantRequired();
     }
-    const mdxSource = await serialize(variant.content);
-
     return jsonResponse(
       {
         ok: true,
         meta: variant.meta,
-        mdxSource,
+        bodyDocument: { markdown: variant.content, assets: variant.assets },
       },
       responseInit,
     );
@@ -98,7 +96,7 @@ export default async function handler(request: Request) {
         { ...responseInit, status: 404 },
       );
     }
-    console.error('[post-variant] variant fetch / serialize failed:', error);
+    console.error('[post-variant] variant fetch failed:', error);
     return jsonResponse(
       {
         ok: false,

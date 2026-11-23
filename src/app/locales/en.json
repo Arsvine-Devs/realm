@@ -38,6 +38,8 @@
     "closeTitle": "Close music player"
   },
   "spoiler": {
+    "annotations": "Annotations",
+    "backToAnnotation": "Back to the annotation reference",
     "revealLabel": "Reveal hidden content",
     "revealedLabel": "Hidden content is visible",
     "clickToReveal": "Click to reveal",

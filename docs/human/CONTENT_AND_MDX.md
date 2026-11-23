@@ -1,17 +1,17 @@
-# 内容与 MDX
+# 文章与短帖
 
 [返回文档索引](../INDEX.md)
 
-本文说明结构化站点数据、已发布内容、MDX 组件、文章语言和阅读时间。受保护内容的认证细节见 [`SECURITY.md`](./SECURITY.md)。
+本文说明结构化站点数据、已发布内容、Markdown、文章语言和阅读时间。受保护内容的认证细节见 [`SECURITY.md`](./SECURITY.md)。
 
 ## 内容来源
 
 项目有两类内容来源：
 
 1. 仓库内 TypeScript 数据：作品、经历、Life、技能、友链和站点配置。
-2. `content.arsvine.com` 发布读面：博客索引、已发布 MDX variant 和推文归档。
+2. `content.arsvine.com` 提供博客索引、已发布的 Markdown 语言版本和短帖归档。
 
-Realm 在每次请求时读取 Content。Content 从同环境的 PostgreSQL 发布视图读取文章与短帖。Content 暂时不可用时，内容汇总页仍展示作品和经历，独立文章页和短帖页面进入错误状态。开发环境可用 `TWEETS_STRESS_TEST=1` 生成合成归档。
+Realm 在每次请求时向 Content 读取当前发布稿。Content 暂时不可用时，内容汇总页仍展示作品和经历，独立文章页和短帖页面显示加载错误。开发环境可用 `TWEETS_STRESS_TEST=1` 生成合成归档。
 
 ## 结构化数据
 
@@ -70,42 +70,18 @@ en.ts
 - 加载正文后会根据实际正文重新计算阅读时间。
 - protected post 的公开 metadata 会清空 excerpt、tags 和 reading time。
 
-Content 的语言版本包含 `bodyMdx` 正文。Realm 从文章索引和语言版本读取展示信息。
+## Markdown 与附件
 
-## 自定义 MDX 组件
+Content 的语言版本返回 `bodyMarkdown` 和当前发布稿的素材映射。文章支持 CommonMark 与 GFM。使用 `asset:<UUID>` 引用托管素材，访问地址由 Content 的发布记录解析。公开素材加载自 CDN。受保护文章的私有素材通过 Realm 的 `/api/post-asset` 读取，每次请求都校验当前文章的访问组。
 
-常用组件：
-
-| 组件                                   | 用途                                      |
-| -------------------------------------- | ----------------------------------------- |
-| `<Term note="...">word</Term>`         | 短词、专有名词或缩写的 ruby 注解          |
-| `<Explain note="...">phrase</Explain>` | 较长的 tooltip / mobile bottom sheet 说明 |
-| `<Spoiler>phrase</Spoiler>`            | 句内涂黑/剧透遮挡，悬停预览、点击固定显示 |
-| `<Lead>`                               | 开篇导语                                  |
-| `<Aside>`                              | 补充说明块                                |
-| `<Mark>`                               | section 标记                              |
-| `<Ref>`                                | 引用/参考 section                         |
-
-示例：
-
-```mdx
-这是一个 <Term note="作品集">Portfolio</Term>。
-
-<Explain note="移动端会显示为底部说明面板">需要补充解释的短语</Explain>
-
-<Spoiler>需要默认遮挡的剧透内容</Spoiler>
-```
-
-`<Spoiler>` 仅用于句内内容。内容默认被涂黑，桌面端悬停或键盘聚焦时渐变显示，点击、Enter 或 Space 后在当前文章中保持显示。当前文章中第 3 个不同的遮挡内容被激活后，会询问是否“全部揭示”当前文章的遮挡内容；提示每次文章内容视图只出现一次。
-
-MDX link 允许安全的 `http:`、`https:`、`mailto:`、站内相对路径和 `#fragment`，拒绝 `javascript:`、`data:`、协议相对 URL 与反斜杠路径。
+正文链接支持 `http:`、`https:`、`mailto:`、站内相对路径和 `#fragment`。公开文章的正文参与服务端首屏渲染。
 
 ## 阅读时间
 
 `src/features/blog/server/blog.ts` 使用项目内估算器：
 
 - 分别统计 CJK 字符和 Latin/Cyrillic 单词；
-- 去除 fenced code、inline code、HTML/JSX tag 和 MDX import/export；
+- 估算时忽略 fenced code 和 inline code；
 - 最少返回 1 分钟；
 - 当前 CJK 和 Latin 基准均为每分钟对应计数配置。
 

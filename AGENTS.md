@@ -1,6 +1,6 @@
 # ARSVINE REALM — AI entrypoint
 
-ARSVINE REALM is a Next.js 16 App Router portfolio and blog using React, TypeScript, Three.js, MDX, next-intl, a filesystem media catalog, and protected posts.
+ARSVINE REALM is a Next.js 16 App Router portfolio and blog using React, TypeScript, Three.js, Markdown, next-intl, a filesystem media catalog, and protected posts.
 
 ## Branch and delivery
 

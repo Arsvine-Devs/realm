@@ -20,7 +20,6 @@
     "assets:build": "node scripts/assets/build.mjs",
     "assets:publish": "node scripts/assets/publish.mjs",
     "db:migrate": "node scripts/visitor-stats-migrate.mjs",
-    "db:seed:visitor-stats": "node scripts/visitor-stats-seed.mjs",
     "env:sync": "node scripts/sync-env-files.mjs",
     "maintenance:check": "node scripts/fetch-google-fonts.mjs --check-config && pnpm docs:check",
     "check": "pnpm format:check && pnpm maintenance:check && pnpm env:check && pnpm lint && pnpm typecheck && pnpm quality && pnpm test && pnpm build"
@@ -44,12 +43,15 @@
     "ioredis": "5.11.1",
     "next": "16.4.6",
     "next-intl": "4.14.9",
-    "next-mdx-remote": "^6.0.0",
     "pg": "8.23.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",
+    "react-markdown": "10.1.0",
+    "remark-gfm": "4.0.1",
+    "remark-parse": "11.0.0",
     "sass": "1.105.2",
     "three": "0.186.1",
+    "unified": "11.0.5",
     "xstate": "5.33.2"
   },
   "devDependencies": {

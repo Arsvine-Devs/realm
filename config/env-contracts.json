@@ -12,7 +12,7 @@
       "example": "3000",
       "localDefault": "3000",
       "scopes": ["local", "self-hosted"],
-      "usedBy": ["Dockerfile"],
+      "usedBy": ["package.json"],
       "description": "Local or self-hosted Realm listen port.",
       "failureBehavior": "Defaults to 3000."
     },
@@ -134,8 +134,7 @@
       "scopes": ["local", "preview", "production"],
       "usedBy": [
         "src/features/visitor-stats/server/visitorStats.ts",
-        "scripts/visitor-stats-migrate.mjs",
-        "scripts/visitor-stats-seed.mjs"
+        "scripts/visitor-stats-migrate.mjs"
       ],
       "description": "Realm visitor-statistics database connection.",
       "failureBehavior": "Visitor-statistics persistence and database commands fail closed."

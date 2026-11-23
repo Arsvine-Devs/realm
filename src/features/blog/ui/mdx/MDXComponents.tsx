@@ -39,25 +39,52 @@ const MDXComponents: MDXComponentsType = {
     </BlogScrambleBlock>
   ),
   blockquote: ({ children }) => <blockquote className={styles.blockquote}>{children}</blockquote>,
-  a: ({ href, children }) => {
+  a: ({ href, children, node: _node, ...attributes }) => {
     const safeHref = getSafeMdxHref(href);
     if (!safeHref) {
       // 危险协议或协议相对 URL 降级为纯文本，防止内容链接绕过协议限制。
       return <span className={styles.a}>{children}</span>;
     }
+    const external = /^https?:/i.test(safeHref);
     return (
-      <a href={safeHref} target="_blank" rel="noopener noreferrer" className={styles.a}>
+      <a
+        {...attributes}
+        href={safeHref}
+        target={external ? '_blank' : undefined}
+        rel={external ? 'noopener noreferrer' : undefined}
+        className={styles.a}
+      >
         {children}
       </a>
     );
   },
+  img: ({ src, alt, title }) =>
+    typeof src === 'string' && src ? (
+      // The browser fetches protected media directly with its current grant cookie.
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt={alt ?? ''}
+        title={title}
+        loading="lazy"
+        decoding="async"
+        className={styles.image}
+      />
+    ) : (
+      alt
+    ),
   ul: ({ children }) => <ul className={styles.ul}>{children}</ul>,
   ol: ({ children }) => <ol className={styles.ol}>{children}</ol>,
-  li: ({ children }) => (
-    <BlogScrambleBlock as="li" className={styles.li}>
-      {children}
-    </BlogScrambleBlock>
-  ),
+  li: ({ id, children }) =>
+    id ? (
+      <li id={id} className={styles.li}>
+        {children}
+      </li>
+    ) : (
+      <BlogScrambleBlock as="li" className={styles.li}>
+        {children}
+      </BlogScrambleBlock>
+    ),
   strong: ({ children }: { children?: React.ReactNode }) => {
     const text = typeof children === 'string' ? children : '';
     const isShort = text.length > 0 && text.length <= 5;

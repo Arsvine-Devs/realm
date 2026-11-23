@@ -9,7 +9,7 @@
 - Next.js 16 App Router、React 19、TypeScript。
 - `next-intl` 4 与三个 UI locale。
 - SCSS Modules + shared partials。
-- MDX 通过 `next-mdx-remote` 序列化和渲染。
+- 文章使用 `react-markdown` 和 GFM 渲染 Content 的 Markdown。
 - Three.js、`@react-three/fiber`、`@react-three/cannon`、`cannon-es`。
 - GSAP 与 Web Animations API。
 - XState 5 / `@xstate/react` 处理受保护文章状态。
@@ -126,7 +126,7 @@ styles/      feature styles
 
 ### Published Content service
 
-生产服务端通过 `config/site-config.mjs` 中的 Content origin 读取已发布 release 的 Blog/Tweet metadata、MDX variant 和 tweet month。公开 Content API 不返回受保护正文；Realm 在验证访客 TOTP grant 后使用静态 Auth origin、client-credentials 和 `content:protected:read` scope 读取正文。
+Realm 从同环境 Content 读取已发布的文章、Markdown 语言版本及短帖归档。访客通过 TOTP 校验后，Realm 使用限定作用域的机器令牌和当前访问组向 Content 读取私有正文与附件。
 
 Realm 运行时不包含 GitHub 内容读取器；已发布 Content service 是 Blog/Tweet 的唯一运行时来源。
 
@@ -138,16 +138,17 @@ Realm 运行时不包含 GitHub 内容读取器；已发布 Content service 是 
 
 ## API 边界
 
-| Route                                  | 责任                                     |
-| -------------------------------------- | ---------------------------------------- |
-| `/api/hitokoto`                        | timeout/cached 第三方文本代理            |
-| `/api/visitor-stats`                   | 生产主域名的去重访客统计                 |
-| `/api/grant-check`                     | 检查签名访问 Cookie                      |
-| `/api/protected-verify`                | 校验 TOTP、限流、设置 Cookie             |
-| `/api/post-variant`                    | 按 locale 返回 MDX；protected 需要 grant |
-| `/api/tweet-months`                    | 分页返回 tweet month group               |
-| `/api/assets/{audio,home,links,works}` | 读取当前 Catalog section                 |
-| `/api/assets/collections/[slug]`       | 分页读取 collection                      |
+| Route                                  | 责任                                        |
+| -------------------------------------- | ------------------------------------------- |
+| `/api/hitokoto`                        | timeout/cached 第三方文本代理               |
+| `/api/visitor-stats`                   | 生产主域名的去重访客统计                    |
+| `/api/grant-check`                     | 检查签名访问 Cookie                         |
+| `/api/protected-verify`                | 校验 TOTP、限流、设置 Cookie                |
+| `/api/post-variant`                    | 按 locale 返回 Markdown，私有文章校验访问组 |
+| `/api/post-asset/[slug]/[id]`          | 校验访问组并传输当前文章引用的私有附件      |
+| `/api/tweet-months`                    | 分页返回 tweet month group                  |
+| `/api/assets/{audio,home,links,works}` | 读取当前 Catalog section                    |
+| `/api/assets/collections/[slug]`       | 分页读取 collection                         |
 
 Route 文件只适配 Web `Request` / `Response`；业务 handler 位于 feature/server。当前 route method 的权威列表见 [`docs/ai/API-REF.md`](../ai/API-REF.md)，未导出的方法由 Next.js 返回 `405`。
 

@@ -180,10 +180,11 @@ describe('getAllPostsForLocale', () => {
       date: '2026-05-12',
       updatedAt: '2026-05-12T00:00:00.000Z',
       access: { mode: 'totp', group: 'family' },
-      bodyMdx: 'authorized content',
+      bodyMarkdown: 'authorized content',
+      assets: {},
     });
 
-    const result = await getPostBySlugAndContentLocale('protected-post', 'zh-TW');
+    const result = await getPostBySlugAndContentLocale('protected-post', 'zh-TW', 'family');
 
     expect(result.meta).toMatchObject({
       title: 'Protected Post',
@@ -192,7 +193,7 @@ describe('getAllPostsForLocale', () => {
       access: { mode: 'totp', group: 'family' },
     });
     expect(fetchPublishedPostVariantMock).toHaveBeenCalledWith('protected-post', 'zh-TW', {
-      protected: true,
+      accessGroup: 'family',
     });
   });
 });
@@ -224,13 +225,14 @@ describe('post variant metadata', () => {
       ],
     });
     fetchPublishedPostVariantMock.mockResolvedValue({
-      title: 'Ignored frontmatter title',
+      title: 'Shared Metadata',
       excerpt: 'Entry excerpt',
       date: '2026-05-12',
       updatedAt: '2026-05-13T00:00:00.000Z',
       tags: ['essay'],
       originLocale: 'zh-CN',
-      bodyMdx: 'word '.repeat(116),
+      bodyMarkdown: 'word '.repeat(116),
+      assets: {},
     });
 
     const indexed = await getPostMetaBySlugAndLocale('metadata-paths', 'en');

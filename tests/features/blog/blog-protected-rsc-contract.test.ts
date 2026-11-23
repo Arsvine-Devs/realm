@@ -12,7 +12,7 @@ describe('protected blog App Router contract', () => {
       source.indexOf("if (access.mode !== 'public')"),
       source.indexOf('const post ='),
     );
-    expect(protectedBranch).toContain('mdxSource={null}');
+    expect(protectedBranch).toContain('bodyDocument={null}');
     expect(protectedBranch).toContain('contentVariants={{}}');
     expect(protectedBranch).not.toContain('serialize(');
     expect(protectedBranch).not.toContain('getPostBySlugAndLocale(');

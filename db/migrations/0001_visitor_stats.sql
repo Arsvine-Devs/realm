@@ -1,3 +1,5 @@
+SELECT pg_advisory_xact_lock(hashtext('arsvine_visitor_stats'));
+
 CREATE TABLE IF NOT EXISTS arsvine_visitor_identities (
   visitor_key CHAR(64) PRIMARY KEY,
   first_seen_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -27,6 +29,25 @@ CREATE TABLE IF NOT EXISTS arsvine_visitor_baselines (
   applied_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO arsvine_visitor_totals (id, total_visitors)
-VALUES (TRUE, 0)
-ON CONFLICT (id) DO NOTHING;
+DO $$
+DECLARE
+  initial_total BIGINT;
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM arsvine_visitor_baselines WHERE baseline_name = 'initial-visitor-count'
+  ) THEN
+    RETURN;
+  END IF;
+
+  initial_total := 410 + floor(random() * 21)::integer;
+  TRUNCATE arsvine_visitor_identities, arsvine_visitor_daily_visits, arsvine_visitor_daily_counts;
+
+  INSERT INTO arsvine_visitor_totals (id, total_visitors)
+  VALUES (TRUE, initial_total)
+  ON CONFLICT (id) DO UPDATE
+    SET total_visitors = EXCLUDED.total_visitors,
+        updated_at = CURRENT_TIMESTAMP;
+
+  INSERT INTO arsvine_visitor_baselines (baseline_name, added_visitors)
+  VALUES ('initial-visitor-count', initial_total);
+END $$;

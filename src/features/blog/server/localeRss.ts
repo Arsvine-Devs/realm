@@ -1,3 +1,6 @@
+import remarkGfm from 'remark-gfm';
+import remarkParse from 'remark-parse';
+import { unified } from 'unified';
 import { getPostBySlugAndLocale, getPublicPostsForLocale } from './blog';
 import { getSiteUrl } from '@/shared/config/site';
 import { rssLanguageMap, type Locale } from '@/shared/contracts/locale';
@@ -6,8 +9,26 @@ import type { BlogPostMeta } from '../../../shared/types';
 
 const SITE_URL = getSiteUrl();
 
-// 摘要兜底字符数。description 优先取 frontmatter excerpt，缺失时截这段。
+// 发布稿缺少摘要时，截取正文中的一小段文字。
 const FALLBACK_EXCERPT_LEN = 160;
+const markdown = unified().use(remarkParse).use(remarkGfm);
+const omittedNodes = new Set([
+  'code',
+  'inlineCode',
+  'html',
+  'footnoteDefinition',
+  'footnoteReference',
+]);
+const blockContainers = new Set(['root', 'blockquote', 'list', 'listItem', 'table', 'tableRow']);
+
+type MarkdownNode = { type: string; value?: string; children?: readonly MarkdownNode[] };
+
+function visibleText(node: MarkdownNode): string {
+  if (omittedNodes.has(node.type)) return '';
+  if (node.type === 'text') return node.value ?? '';
+  if (node.type === 'break') return ' ';
+  return node.children?.map(visibleText).join(blockContainers.has(node.type) ? ' ' : '') ?? '';
+}
 
 function escapeXml(str: string): string {
   return str
@@ -19,21 +40,11 @@ function escapeXml(str: string): string {
 }
 
 /**
- * 从 MDX 正文裁出安全摘要：剥除代码块/HTML/JSX/MDX import-export 后取首段，
- * 超过 FALLBACK_EXCERPT_LEN 字符截断并加 …。仅在 frontmatter excerpt 缺失时使用。
+ * 正文摘要保留 Markdown 链接文字，省略图片和代码。
  */
 function buildFallbackExcerpt(content: string): string {
   if (!content) return '';
-  const stripped = content
-    .replace(/```[\s\S]*?```/g, ' ')
-    .replace(/`[^`\n]*`/g, ' ')
-    .replace(/<\/?[a-zA-Z][^>]*>/g, ' ')
-    .replace(/^\s*(?:import|export)\s.+$/gm, ' ')
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ') // markdown 图
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1') // markdown 链接保留文字
-    .replace(/[#>*_~`-]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const stripped = visibleText(markdown.parse(content)).replace(/\s+/g, ' ').trim();
   if (!stripped) return '';
   if (stripped.length <= FALLBACK_EXCERPT_LEN) return stripped;
   return `${stripped.slice(0, FALLBACK_EXCERPT_LEN)}…`;
@@ -118,7 +129,7 @@ export async function buildLocaleRssResponse(locale: Locale) {
 
   const items: RssItemInput[] = await Promise.all(
     posts.map(async (meta) => {
-      // excerpt 缺失才读正文做兜底，避免对每篇文章都重读一次 MDX。
+      // 发布稿缺少摘要时才读取正文。
       let description = meta.excerpt;
       if (!description) {
         try {

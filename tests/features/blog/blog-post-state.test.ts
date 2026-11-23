@@ -19,7 +19,7 @@ const variantPayload = {
     readingMinutes: 1,
     access: { mode: 'public' as const },
   },
-  mdxSource: { compiledSource: 'test', frontmatter: {}, scope: {} },
+  bodyDocument: { markdown: 'Test', assets: {} },
 };
 
 function input(overrides: Partial<BlogPostArticleInput> = {}): BlogPostArticleInput {

@@ -11,9 +11,9 @@ Treat protected content as a security boundary, not a UI-only flow. Read the cur
 
 ## Invariants
 
-- Unauthorized protected metadata is sanitized and protected MDX/body is absent from static props and RSC payloads.
+- Unauthorized protected metadata is sanitized and Markdown is absent from static props and RSC payloads.
 - `/api/protected-verify` validates the requested group and safe internal `next` path, applies the configured limiter, and sets the signed grant only after valid TOTP verification.
-- `/api/post-variant` checks the grant before fetching or serializing protected content and returns private, non-cacheable failures.
+- `/api/post-variant` and `/api/post-asset` check the current access group before requesting protected Markdown or attachments. Both use private, non-cacheable responses.
 - `blogPostMachine` keeps grant check and variant loading in invoked actors so stale requests are aborted when the article or locale changes. Preserve complete `ARTICLE_CHANGED` replacement and forbidden fallback behavior.
 - Internal navigation continues through `useTransition().navigateTo()` or `switchLocale()`; do not introduce direct `router.push()` for these flows.
 
